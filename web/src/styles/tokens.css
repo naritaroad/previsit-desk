@@ -1,0 +1,228 @@
+/*
+ * PreVisit Desk 診前助理 — design tokens
+ * Source of truth: docs/design/visual-direction.md
+ * Contrast verified by docs/design/contrast-check.mjs (WCAG AA, both themes).
+ *
+ * Rule: red (--color-danger*) is reserved for emergencies / red-flag only.
+ * Never use it for form errors, failed tool calls, or decoration.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ---------- Surfaces (warm neutral) ---------- */
+  --color-bg: #f6f4ef;
+  --color-surface: #fffdf9;
+  --color-surface-raised: #ffffff;
+  --color-surface-sunken: #eeebe4;
+  --color-overlay: rgba(28, 33, 32, 0.48);
+
+  /* ---------- Lines ---------- */
+  --color-border: #ddd8ce;          /* decorative dividers only (no 3:1 requirement) */
+  --color-border-strong: #857e72;   /* input / control boundaries, >= 3:1 */
+
+  /* ---------- Text ---------- */
+  --color-text: #1d2628;
+  --color-text-muted: #545e5e;
+  --color-text-subtle: #66706f;     /* timestamps, captions; still >= 4.5:1 */
+
+  /* ---------- Primary (teal) ---------- */
+  --color-primary: #0e6b66;
+  --color-primary-hover: #0a5551;
+  --color-primary-contrast: #ffffff;
+  --color-primary-soft: #dcefeb;    /* selected tab, patient bubble */
+  --color-primary-strong: #0a4f4b;  /* text on --color-primary-soft */
+
+  /* ---------- Accent (blue-grey): info, consult outcome, model source ---------- */
+  --color-accent: #3b5a74;
+  --color-accent-bg: #e5ecf2;
+
+  /* ---------- Status ---------- */
+  --color-success: #2b6a33;
+  --color-success-bg: #e2efdf;
+  --color-warning: #855400;
+  --color-warning-bg: #f9eed6;
+  --color-revisit: #66468a;         /* plum: "needs a revisit" outcome */
+  --color-revisit-bg: #efe8f6;
+
+  /* ---------- Danger: emergencies / red flag ONLY ---------- */
+  --color-danger: #b0241a;          /* text / icon on light surfaces */
+  --color-danger-bg: #fdebe8;
+  --color-danger-strong: #8c1b13;   /* body text on --color-danger-bg */
+  --color-danger-solid: #b0241a;    /* emergency call button fill */
+  --color-danger-contrast: #ffffff;
+
+  /* ---------- Focus ---------- */
+  --color-focus: #2554c7;
+  --focus-ring: 0 0 0 2px var(--color-surface-raised), 0 0 0 4px var(--color-focus);
+
+  /* ---------- Refill outcome aliases (icon + label + shape carry meaning; color is the 4th cue) ---------- */
+  --outcome-eligible-fg: var(--color-success);
+  --outcome-eligible-bg: var(--color-success-bg);
+  --outcome-too-early-fg: var(--color-warning);
+  --outcome-too-early-bg: var(--color-warning-bg);
+  --outcome-revisit-fg: var(--color-revisit);
+  --outcome-revisit-bg: var(--color-revisit-bg);
+  --outcome-consult-fg: var(--color-accent);
+  --outcome-consult-bg: var(--color-accent-bg);
+
+  /* ---------- Typography ---------- */
+  --font-sans: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial,
+    "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Heiti TC", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, "Noto Sans Mono CJK TC", monospace;
+
+  --text-xs: 0.75rem;    /* 12px  captions, trace meta */
+  --text-sm: 0.875rem;   /* 14px  secondary, table cells */
+  --text-md: 1rem;       /* 16px  body, chat */
+  --text-lg: 1.125rem;   /* 18px  card titles */
+  --text-xl: 1.25rem;    /* 20px  section titles */
+  --text-2xl: 1.5rem;    /* 24px  page titles */
+  --text-3xl: 1.875rem;  /* 30px  emergency number */
+
+  --leading-tight: 1.35; /* headings */
+  --leading-snug: 1.5;   /* UI labels, buttons */
+  --leading-body: 1.7;   /* CJK body text */
+  --tracking-body: 0.01em;
+  --tracking-label: 0.02em;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+
+  /* ---------- Spacing (4px base) ---------- */
+  --space-1: 0.25rem;  /* 4 */
+  --space-2: 0.5rem;   /* 8 */
+  --space-3: 0.75rem;  /* 12 */
+  --space-4: 1rem;     /* 16 */
+  --space-5: 1.5rem;   /* 24 */
+  --space-6: 2rem;     /* 32 */
+  --space-7: 3rem;     /* 48 */
+  --space-8: 4rem;     /* 64 */
+
+  /* ---------- Radius ---------- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  /* ---------- Elevation (warm, low alpha) ---------- */
+  --shadow-1: 0 1px 2px rgba(45, 38, 28, 0.06), 0 1px 1px rgba(45, 38, 28, 0.04);
+  --shadow-2: 0 4px 12px rgba(45, 38, 28, 0.08), 0 1px 3px rgba(45, 38, 28, 0.06);
+  --shadow-3: 0 12px 32px rgba(45, 38, 28, 0.14), 0 2px 6px rgba(45, 38, 28, 0.08);
+
+  /* ---------- Motion ---------- */
+  --dur-instant: 80ms;   /* press feedback */
+  --dur-fast: 140ms;     /* hover, tab underline, toggles */
+  --dur-base: 200ms;     /* message enter, panel content swap */
+  --dur-slow: 280ms;     /* mobile sheet, result card reveal */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* ---------- Layout ---------- */
+  --touch-min: 44px;
+  --header-h: 56px;
+  --banner-min-h: 44px;
+  --panel-w: 420px;          /* right-hand panel on desktop */
+  --content-max: 1280px;
+  --chat-measure: 42rem;     /* max bubble line length */
+  --z-sticky: 10;
+  --z-tabbar: 20;
+  --z-emergency: 40;
+  --z-toast: 50;
+}
+
+/* ---------- Dark theme (explicit) ---------- */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg: #121615;
+  --color-surface: #1a201f;
+  --color-surface-raised: #222a28;
+  --color-surface-sunken: #0d1110;
+  --color-overlay: rgba(0, 0, 0, 0.6);
+
+  --color-border: #313b39;
+  --color-border-strong: #75827f;
+
+  --color-text: #e7ecea;
+  --color-text-muted: #a8b3b0;
+  --color-text-subtle: #96a29f;
+
+  --color-primary: #5cc0b5;
+  --color-primary-hover: #7dd0c6;
+  --color-primary-contrast: #08201e;
+  --color-primary-soft: #173532;
+  --color-primary-strong: #9ee0d7;
+
+  --color-accent: #9fbad3;
+  --color-accent-bg: #1d2a35;
+
+  --color-success: #86cf8c;
+  --color-success-bg: #172e1a;
+  --color-warning: #e6b75a;
+  --color-warning-bg: #33280f;
+  --color-revisit: #c9aceb;
+  --color-revisit-bg: #2a2036;
+
+  --color-danger: #ff8f84;
+  --color-danger-bg: #3a1512;
+  --color-danger-strong: #ffc2bb;
+  --color-danger-solid: #d33a2f;
+  --color-danger-contrast: #ffffff;
+
+  --color-focus: #86b4ff;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-3: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- Dark theme (system preference, unless user forced light) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --color-bg: #121615;
+    --color-surface: #1a201f;
+    --color-surface-raised: #222a28;
+    --color-surface-sunken: #0d1110;
+    --color-overlay: rgba(0, 0, 0, 0.6);
+
+    --color-border: #313b39;
+    --color-border-strong: #75827f;
+
+    --color-text: #e7ecea;
+    --color-text-muted: #a8b3b0;
+    --color-text-subtle: #96a29f;
+
+    --color-primary: #5cc0b5;
+    --color-primary-hover: #7dd0c6;
+    --color-primary-contrast: #08201e;
+    --color-primary-soft: #173532;
+    --color-primary-strong: #9ee0d7;
+
+    --color-accent: #9fbad3;
+    --color-accent-bg: #1d2a35;
+
+    --color-success: #86cf8c;
+    --color-success-bg: #172e1a;
+    --color-warning: #e6b75a;
+    --color-warning-bg: #33280f;
+    --color-revisit: #c9aceb;
+    --color-revisit-bg: #2a2036;
+
+    --color-danger: #ff8f84;
+    --color-danger-bg: #3a1512;
+    --color-danger-strong: #ffc2bb;
+    --color-danger-solid: #d33a2f;
+    --color-danger-contrast: #ffffff;
+
+    --color-focus: #86b4ff;
+
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.35);
+    --shadow-3: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4);
+  }
+}

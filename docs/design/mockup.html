@@ -1,0 +1,1195 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PreVisit Desk 設計稿</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%230e6b66' d='M8 3h16a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H13.5l-5.6 4.4A1 1 0 0 1 6.3 28.6V24.6A6 6 0 0 1 2 19V9a6 6 0 0 1 6-6z'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8.5 13.6l3 3 5.5-6'/%3E%3Cpath d='M20 11.5h4.5M20 16.5h3'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+/*
+ * PreVisit Desk 診前助理 — design tokens
+ * Source of truth: docs/design/visual-direction.md
+ * Contrast verified by docs/design/contrast-check.mjs (WCAG AA, both themes).
+ *
+ * Rule: red (--color-danger*) is reserved for emergencies / red-flag only.
+ * Never use it for form errors, failed tool calls, or decoration.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ---------- Surfaces (warm neutral) ---------- */
+  --color-bg: #f6f4ef;
+  --color-surface: #fffdf9;
+  --color-surface-raised: #ffffff;
+  --color-surface-sunken: #eeebe4;
+  --color-overlay: rgba(28, 33, 32, 0.48);
+
+  /* ---------- Lines ---------- */
+  --color-border: #ddd8ce;          /* decorative dividers only (no 3:1 requirement) */
+  --color-border-strong: #857e72;   /* input / control boundaries, >= 3:1 */
+
+  /* ---------- Text ---------- */
+  --color-text: #1d2628;
+  --color-text-muted: #545e5e;
+  --color-text-subtle: #66706f;     /* timestamps, captions; still >= 4.5:1 */
+
+  /* ---------- Primary (teal) ---------- */
+  --color-primary: #0e6b66;
+  --color-primary-hover: #0a5551;
+  --color-primary-contrast: #ffffff;
+  --color-primary-soft: #dcefeb;    /* selected tab, patient bubble */
+  --color-primary-strong: #0a4f4b;  /* text on --color-primary-soft */
+
+  /* ---------- Accent (blue-grey): info, consult outcome, model source ---------- */
+  --color-accent: #3b5a74;
+  --color-accent-bg: #e5ecf2;
+
+  /* ---------- Status ---------- */
+  --color-success: #2b6a33;
+  --color-success-bg: #e2efdf;
+  --color-warning: #855400;
+  --color-warning-bg: #f9eed6;
+  --color-revisit: #66468a;         /* plum: "needs a revisit" outcome */
+  --color-revisit-bg: #efe8f6;
+
+  /* ---------- Danger: emergencies / red flag ONLY ---------- */
+  --color-danger: #b0241a;          /* text / icon on light surfaces */
+  --color-danger-bg: #fdebe8;
+  --color-danger-strong: #8c1b13;   /* body text on --color-danger-bg */
+  --color-danger-solid: #b0241a;    /* emergency call button fill */
+  --color-danger-contrast: #ffffff;
+
+  /* ---------- Focus ---------- */
+  --color-focus: #2554c7;
+  --focus-ring: 0 0 0 2px var(--color-surface-raised), 0 0 0 4px var(--color-focus);
+
+  /* ---------- Refill outcome aliases (icon + label + shape carry meaning; color is the 4th cue) ---------- */
+  --outcome-eligible-fg: var(--color-success);
+  --outcome-eligible-bg: var(--color-success-bg);
+  --outcome-too-early-fg: var(--color-warning);
+  --outcome-too-early-bg: var(--color-warning-bg);
+  --outcome-revisit-fg: var(--color-revisit);
+  --outcome-revisit-bg: var(--color-revisit-bg);
+  --outcome-consult-fg: var(--color-accent);
+  --outcome-consult-bg: var(--color-accent-bg);
+
+  /* ---------- Typography ---------- */
+  --font-sans: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial,
+    "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Heiti TC", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, "Noto Sans Mono CJK TC", monospace;
+
+  --text-xs: 0.75rem;    /* 12px  captions, trace meta */
+  --text-sm: 0.875rem;   /* 14px  secondary, table cells */
+  --text-md: 1rem;       /* 16px  body, chat */
+  --text-lg: 1.125rem;   /* 18px  card titles */
+  --text-xl: 1.25rem;    /* 20px  section titles */
+  --text-2xl: 1.5rem;    /* 24px  page titles */
+  --text-3xl: 1.875rem;  /* 30px  emergency number */
+
+  --leading-tight: 1.35; /* headings */
+  --leading-snug: 1.5;   /* UI labels, buttons */
+  --leading-body: 1.7;   /* CJK body text */
+  --tracking-body: 0.01em;
+  --tracking-label: 0.02em;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+
+  /* ---------- Spacing (4px base) ---------- */
+  --space-1: 0.25rem;  /* 4 */
+  --space-2: 0.5rem;   /* 8 */
+  --space-3: 0.75rem;  /* 12 */
+  --space-4: 1rem;     /* 16 */
+  --space-5: 1.5rem;   /* 24 */
+  --space-6: 2rem;     /* 32 */
+  --space-7: 3rem;     /* 48 */
+  --space-8: 4rem;     /* 64 */
+
+  /* ---------- Radius ---------- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  /* ---------- Elevation (warm, low alpha) ---------- */
+  --shadow-1: 0 1px 2px rgba(45, 38, 28, 0.06), 0 1px 1px rgba(45, 38, 28, 0.04);
+  --shadow-2: 0 4px 12px rgba(45, 38, 28, 0.08), 0 1px 3px rgba(45, 38, 28, 0.06);
+  --shadow-3: 0 12px 32px rgba(45, 38, 28, 0.14), 0 2px 6px rgba(45, 38, 28, 0.08);
+
+  /* ---------- Motion ---------- */
+  --dur-instant: 80ms;   /* press feedback */
+  --dur-fast: 140ms;     /* hover, tab underline, toggles */
+  --dur-base: 200ms;     /* message enter, panel content swap */
+  --dur-slow: 280ms;     /* mobile sheet, result card reveal */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* ---------- Layout ---------- */
+  --touch-min: 44px;
+  --header-h: 56px;
+  --banner-min-h: 44px;
+  --panel-w: 420px;          /* right-hand panel on desktop */
+  --content-max: 1280px;
+  --chat-measure: 42rem;     /* max bubble line length */
+  --z-sticky: 10;
+  --z-tabbar: 20;
+  --z-emergency: 40;
+  --z-toast: 50;
+}
+
+/* ---------- Dark theme (explicit) ---------- */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg: #121615;
+  --color-surface: #1a201f;
+  --color-surface-raised: #222a28;
+  --color-surface-sunken: #0d1110;
+  --color-overlay: rgba(0, 0, 0, 0.6);
+
+  --color-border: #313b39;
+  --color-border-strong: #75827f;
+
+  --color-text: #e7ecea;
+  --color-text-muted: #a8b3b0;
+  --color-text-subtle: #96a29f;
+
+  --color-primary: #5cc0b5;
+  --color-primary-hover: #7dd0c6;
+  --color-primary-contrast: #08201e;
+  --color-primary-soft: #173532;
+  --color-primary-strong: #9ee0d7;
+
+  --color-accent: #9fbad3;
+  --color-accent-bg: #1d2a35;
+
+  --color-success: #86cf8c;
+  --color-success-bg: #172e1a;
+  --color-warning: #e6b75a;
+  --color-warning-bg: #33280f;
+  --color-revisit: #c9aceb;
+  --color-revisit-bg: #2a2036;
+
+  --color-danger: #ff8f84;
+  --color-danger-bg: #3a1512;
+  --color-danger-strong: #ffc2bb;
+  --color-danger-solid: #d33a2f;
+  --color-danger-contrast: #ffffff;
+
+  --color-focus: #86b4ff;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-3: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- Dark theme (system preference, unless user forced light) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --color-bg: #121615;
+    --color-surface: #1a201f;
+    --color-surface-raised: #222a28;
+    --color-surface-sunken: #0d1110;
+    --color-overlay: rgba(0, 0, 0, 0.6);
+
+    --color-border: #313b39;
+    --color-border-strong: #75827f;
+
+    --color-text: #e7ecea;
+    --color-text-muted: #a8b3b0;
+    --color-text-subtle: #96a29f;
+
+    --color-primary: #5cc0b5;
+    --color-primary-hover: #7dd0c6;
+    --color-primary-contrast: #08201e;
+    --color-primary-soft: #173532;
+    --color-primary-strong: #9ee0d7;
+
+    --color-accent: #9fbad3;
+    --color-accent-bg: #1d2a35;
+
+    --color-success: #86cf8c;
+    --color-success-bg: #172e1a;
+    --color-warning: #e6b75a;
+    --color-warning-bg: #33280f;
+    --color-revisit: #c9aceb;
+    --color-revisit-bg: #2a2036;
+
+    --color-danger: #ff8f84;
+    --color-danger-bg: #3a1512;
+    --color-danger-strong: #ffc2bb;
+    --color-danger-solid: #d33a2f;
+    --color-danger-contrast: #ffffff;
+
+    --color-focus: #86b4ff;
+
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.35);
+    --shadow-3: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4);
+  }
+}
+
+</style>
+<style>
+/*
+ * PreVisit Desk 診前助理 — base styles
+ * Import order: tokens.css, then base.css, then component styles.
+ */
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  tab-size: 4;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* CJK: break between any characters, keep Latin words whole, break long URLs/IDs only when needed */
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+img,
+svg,
+video,
+canvas,
+picture {
+  display: block;
+  max-width: 100%;
+}
+
+svg {
+  flex-shrink: 0;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+textarea {
+  resize: vertical;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+  padding: 0;
+}
+
+/* ---------- Typography ---------- */
+h1,
+h2,
+h3,
+h4 {
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--text-2xl); }
+h2 { font-size: var(--text-xl); }
+h3 { font-size: var(--text-lg); }
+h4 { font-size: var(--text-md); }
+
+p {
+  text-wrap: pretty;
+}
+
+small,
+.text-sm {
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+}
+
+.text-xs {
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+}
+
+.text-muted { color: var(--color-text-muted); }
+.text-subtle { color: var(--color-text-subtle); }
+
+code,
+kbd,
+samp,
+pre,
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  letter-spacing: 0;
+}
+
+/* Numbers that update or line up in columns */
+.num,
+time,
+td.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Focus ---------- */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Inputs keep their own box and use a ring instead of an offset outline */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-color: var(--color-focus);
+}
+
+/* Windows High Contrast / forced colours */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText;
+  }
+}
+
+/* ---------- Accessibility helpers ---------- */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-3);
+  top: -100px;
+  z-index: var(--z-toast);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+}
+
+.skip-link:focus-visible {
+  top: var(--space-3);
+}
+
+/* ---------- Minimal utilities ---------- */
+.stack { display: flex; flex-direction: column; gap: var(--space-4); }
+.stack-sm { display: flex; flex-direction: column; gap: var(--space-2); }
+.cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.row { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.grow { flex: 1 1 auto; min-width: 0; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.surface {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+.icon-sm { width: 16px; height: 16px; }
+.icon-lg { width: 24px; height: 24px; }
+
+/* Shared button primitives (components may extend) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-min);
+  min-width: var(--touch-min);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-instant) var(--ease-out);
+}
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn-primary { background: var(--color-primary); color: var(--color-primary-contrast); }
+.btn-primary:hover { background: var(--color-primary-hover); color: var(--color-primary-contrast); }
+.btn-secondary { background: var(--color-surface-raised); color: var(--color-text); border-color: var(--color-border-strong); }
+.btn-secondary:hover { background: var(--color-surface-sunken); }
+.btn-ghost { color: var(--color-primary); }
+.btn-ghost:hover { background: var(--color-primary-soft); color: var(--color-primary-strong); }
+.btn-danger { background: var(--color-danger-solid); color: var(--color-danger-contrast); }
+.btn:disabled { opacity: 0.55; }
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+</style>
+<style>
+/* =====================================================================
+   Mockup page chrome (not part of the product)
+   ===================================================================== */
+.doc { max-width: var(--content-max); margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-8); }
+.doc-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-5); }
+.doc-head img { height: 48px; width: auto; }
+.doc-nav { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.doc-nav a { font-size: var(--text-sm); padding: var(--space-1) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-pill); text-decoration: none; color: var(--color-text-muted); min-height: 32px; display: inline-flex; align-items: center; }
+.doc-section { margin-top: var(--space-7); scroll-margin-top: var(--space-4); }
+.doc-section > h2 { margin-bottom: var(--space-1); }
+.doc-section > p.lead { color: var(--color-text-muted); margin-bottom: var(--space-4); font-size: var(--text-sm); }
+.frame { border: 1px solid var(--color-border); border-radius: var(--radius-xl); overflow: hidden; background: var(--color-bg); box-shadow: var(--shadow-2); }
+.frame--desktop { height: 820px; }
+.frames-row > div { max-width: 100%; min-width: 0; }
+.frames-row { display: flex; flex-wrap: wrap; gap: var(--space-5); align-items: flex-start; }
+.frame--phone { width: 390px; max-width: 100%; height: 800px; border-radius: 28px; border-width: 8px; border-color: var(--color-surface-sunken); }
+.frame-cap { font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-2); }
+
+/* =====================================================================
+   App shell
+   ===================================================================== */
+.app { container-type: inline-size; container-name: app; height: 100%; }
+.app__grid { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; height: 100%; }
+
+.app-header { display: flex; align-items: center; gap: var(--space-3); height: var(--header-h); padding: 0 var(--space-4); background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+.brand { display: flex; align-items: center; gap: var(--space-2); text-decoration: none; color: var(--color-text); min-width: 0; }
+.brand svg { width: 28px; height: 28px; }
+.brand__name { font-weight: var(--weight-bold); white-space: nowrap; }
+.brand__sub { color: var(--color-text-muted); font-size: var(--text-sm); white-space: nowrap; }
+.app-header__actions { margin-left: auto; display: flex; align-items: center; gap: var(--space-1); }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; min-width: var(--touch-min); min-height: var(--touch-min); border-radius: var(--radius-md); color: var(--color-text-muted); }
+.icon-btn:hover { background: var(--color-surface-sunken); color: var(--color-text); }
+.lang-switch { font-size: var(--text-sm); color: var(--color-text-muted); min-height: var(--touch-min); padding: 0 var(--space-2); border-radius: var(--radius-md); }
+.lang-switch:hover { background: var(--color-surface-sunken); }
+
+/* AI disclosure banner: always visible, never dismissible, never red */
+.ai-banner { display: flex; align-items: flex-start; gap: var(--space-2); min-height: var(--banner-min-h); padding: var(--space-2) var(--space-4); background: var(--color-accent-bg); color: var(--color-text); font-size: var(--text-sm); line-height: var(--leading-snug); border-bottom: 1px solid var(--color-border); }
+.ai-banner .icon { color: var(--color-accent); margin-top: 1px; }
+.ai-banner strong { color: var(--color-accent); font-weight: var(--weight-bold); }
+.ai-banner__more { margin-left: auto; white-space: nowrap; font-size: var(--text-sm); }
+
+.app-body { min-height: 0; display: flex; flex-direction: column; }
+.panel { display: contents; }
+.panel-tabs { display: none; }
+.pane { display: none; min-height: 0; flex: 1 1 auto; flex-direction: column; }
+.app[data-active="chat"] .pane--chat,
+.app[data-active="trace"] .pane--trace,
+.app[data-active="summary"] .pane--summary,
+.app[data-active="refill"] .pane--refill { display: flex; }
+
+/* Mobile tab bar */
+.tabbar { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--color-surface); border-top: 1px solid var(--color-border); padding-bottom: env(safe-area-inset-bottom); }
+.tabbar__btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px; font-size: var(--text-xs); color: var(--color-text-muted); position: relative; }
+.tabbar__btn[aria-selected="true"] { color: var(--color-primary); font-weight: var(--weight-bold); }
+.tabbar__btn[aria-selected="true"]::before { content: ""; position: absolute; top: 0; left: 25%; right: 25%; height: 3px; border-radius: 0 0 3px 3px; background: currentColor; }
+.tabbar__dot { position: absolute; top: 8px; right: calc(50% - 18px); width: 8px; height: 8px; border-radius: 50%; background: var(--color-danger-solid); box-shadow: 0 0 0 2px var(--color-surface); }
+
+@container app (min-width: 900px) {
+  .app-body { display: grid; grid-template-columns: minmax(0, 1fr) 380px; }
+  .panel { display: flex; flex-direction: column; min-height: 0; border-left: 1px solid var(--color-border); background: var(--color-surface); }
+  .panel-tabs { display: flex; gap: var(--space-1); padding: var(--space-2) var(--space-3) 0; border-bottom: 1px solid var(--color-border); }
+  .pane--chat { display: flex !important; }
+  .panel .pane { display: none !important; }
+  .app[data-panel="trace"] .panel .pane--trace,
+  .app[data-panel="summary"] .panel .pane--summary,
+  .app[data-panel="refill"] .panel .pane--refill { display: flex !important; }
+  .tabbar { display: none; }
+  .brand__sub { display: inline; }
+}
+@container app (min-width: 1180px) { .app-body { grid-template-columns: minmax(0, 1fr) var(--panel-w); } }
+@container app (max-width: 420px) { .brand__sub { display: none; } .ai-banner__more { display: none; } }
+
+.tab { position: relative; min-height: var(--touch-min); padding: 0 var(--space-3); font-size: var(--text-sm); color: var(--color-text-muted); border-radius: var(--radius-md) var(--radius-md) 0 0; white-space: nowrap; display: inline-flex; align-items: center; gap: var(--space-2); }
+.tab:hover { color: var(--color-text); background: var(--color-surface-sunken); }
+.tab[aria-selected="true"] { color: var(--color-primary-strong); font-weight: var(--weight-bold); }
+.tab[aria-selected="true"]::after { content: ""; position: absolute; left: var(--space-2); right: var(--space-2); bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--color-primary); }
+.count-badge { font-size: var(--text-xs); min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--color-surface-sunken); color: var(--color-text-muted); display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+
+.pane__scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: var(--space-4); }
+.pane__head { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border); background: var(--color-surface); }
+.pane__title { font-size: var(--text-md); font-weight: var(--weight-bold); }
+
+/* =====================================================================
+   Chat
+   ===================================================================== */
+.progress { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--color-text-muted); margin-left: auto; white-space: nowrap; }
+.progress__bar { width: 88px; height: 6px; border-radius: var(--radius-pill); background: var(--color-surface-sunken); overflow: hidden; }
+.progress__bar > span { display: block; height: 100%; background: var(--color-primary); border-radius: inherit; transition: width var(--dur-slow) var(--ease-out); }
+.stage-chip { font-size: var(--text-xs); padding: 2px var(--space-2); border-radius: var(--radius-pill); background: var(--color-primary-soft); color: var(--color-primary-strong); white-space: nowrap; }
+
+.chat-log { display: flex; flex-direction: column; gap: var(--space-4); max-width: var(--chat-measure); margin: 0 auto; width: 100%; }
+.msg { display: flex; gap: var(--space-2); align-items: flex-start; max-width: 100%; animation: msg-in var(--dur-base) var(--ease-out); }
+.msg__avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-primary-soft); color: var(--color-primary-strong); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.msg__body { min-width: 0; max-width: min(36rem, 85%); }
+.msg__bubble { padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); background: var(--color-surface-raised); border: 1px solid var(--color-border); box-shadow: var(--shadow-1); white-space: pre-wrap; }
+.msg__meta { display: flex; gap: var(--space-2); align-items: center; margin-top: var(--space-1); font-size: var(--text-xs); color: var(--color-text-subtle); }
+.msg--patient { flex-direction: row-reverse; }
+.msg--patient .msg__body { margin-left: auto; }
+.msg--patient .msg__bubble { background: var(--color-primary-soft); border-color: transparent; box-shadow: none; border-bottom-right-radius: var(--radius-sm); }
+.msg--patient .msg__meta { justify-content: flex-end; color: var(--color-text-muted); }
+.msg--assistant .msg__bubble { border-bottom-left-radius: var(--radius-sm); }
+.msg--opening .msg__bubble { background: var(--color-surface); border-style: dashed; border-color: var(--color-border-strong); }
+.kind-tag { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs); color: var(--color-text-muted); }
+.caret { display: inline-block; width: 0.5em; height: 1.1em; vertical-align: text-bottom; background: var(--color-primary); margin-left: 2px; border-radius: 1px; animation: blink 1s steps(2, start) infinite; }
+.typing { display: inline-flex; gap: 4px; padding: var(--space-3) var(--space-4); }
+.typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--color-text-subtle); animation: dot 1.2s var(--ease-in-out) infinite; }
+.typing span:nth-child(2) { animation-delay: 0.15s; } .typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes msg-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes blink { to { visibility: hidden; } }
+@keyframes dot { 0%, 80%, 100% { opacity: 0.3; } 40% { opacity: 1; } }
+
+.composer { border-top: 1px solid var(--color-border); background: var(--color-surface); padding: var(--space-3) var(--space-4); }
+.composer__inner { max-width: var(--chat-measure); margin: 0 auto; }
+.composer__row { display: flex; gap: var(--space-2); align-items: flex-end; }
+.field { width: 100%; min-height: var(--touch-min); padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); background: var(--color-surface-raised); color: var(--color-text); line-height: var(--leading-snug); }
+.field::placeholder { color: var(--color-text-subtle); }
+.composer textarea { resize: none; max-height: 160px; }
+.composer__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-top: var(--space-2); font-size: var(--text-xs); color: var(--color-text-muted); }
+.composer__closed { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); justify-content: space-between; font-size: var(--text-sm); color: var(--color-text-muted); }
+
+/* =====================================================================
+   Emergency card — the only red surface in the product
+   ===================================================================== */
+.emergency { border: 2px solid var(--color-danger-solid); background: var(--color-danger-bg); border-radius: var(--radius-lg); padding: var(--space-4); color: var(--color-danger-strong); box-shadow: var(--shadow-2); }
+.emergency__head { display: flex; gap: var(--space-3); align-items: flex-start; }
+.emergency__icon { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--color-danger-solid); color: var(--color-danger-contrast); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.emergency__title { color: var(--color-danger); font-size: var(--text-lg); line-height: var(--leading-tight); }
+.emergency__hit { font-size: var(--text-sm); margin-top: 2px; }
+.emergency__text { margin-top: var(--space-3); font-size: var(--text-md); }
+.emergency__actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--space-2); margin-top: var(--space-4); }
+.call-btn { display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: var(--space-2) var(--space-4); border-radius: var(--radius-md); text-decoration: none; font-weight: var(--weight-bold); line-height: var(--leading-tight); }
+.call-btn__num { font-size: var(--text-2xl); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.call-btn__label { font-size: var(--text-sm); font-weight: var(--weight-medium); display: block; }
+.call-btn--119 { background: var(--color-danger-solid); color: var(--color-danger-contrast); }
+.call-btn--119:hover { color: var(--color-danger-contrast); filter: brightness(0.94); }
+.call-btn--1925 { background: var(--color-surface-raised); color: var(--color-danger-strong); border: 2px solid var(--color-danger-solid); }
+.call-btn--1925:hover { color: var(--color-danger-strong); background: var(--color-surface); }
+.emergency__foot { margin-top: var(--space-3); font-size: var(--text-sm); }
+.emergency-wrap { position: sticky; top: 0; z-index: var(--z-emergency); padding-bottom: var(--space-3); }
+.emergency { animation: emergency-in var(--dur-fast) var(--ease-out); }
+@keyframes emergency-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* =====================================================================
+   Tool trace
+   ===================================================================== */
+.run-head { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); align-items: center; font-size: var(--text-xs); color: var(--color-text-muted); padding: var(--space-2) var(--space-3); background: var(--color-surface-sunken); border-radius: var(--radius-md); margin-bottom: var(--space-2); }
+.run-head b { color: var(--color-text); font-weight: var(--weight-medium); }
+.trace { display: flex; flex-direction: column; gap: var(--space-1); }
+.trace-row { border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-raised); }
+.trace-row > summary { list-style: none; display: grid; grid-template-columns: 24px auto minmax(0, 1fr) auto; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); min-height: var(--touch-min); cursor: pointer; }
+.trace-row > summary::-webkit-details-marker { display: none; }
+.trace-row__step { font-size: var(--text-xs); color: var(--color-text-subtle); font-variant-numeric: tabular-nums; text-align: right; }
+.trace-row__name { font-family: var(--font-mono); font-size: var(--text-sm); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trace-row__end { display: flex; align-items: center; gap: var(--space-2); }
+.trace-row__ms { font-size: var(--text-xs); color: var(--color-text-subtle); font-variant-numeric: tabular-nums; min-width: 3.5em; text-align: right; }
+.trace-row__detail { border-top: 1px solid var(--color-border); padding: var(--space-2) var(--space-3) var(--space-3); font-size: var(--text-xs); }
+.trace-row__detail pre { background: var(--color-surface-sunken); border-radius: var(--radius-sm); padding: var(--space-2); overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: var(--space-1); color: var(--color-text); }
+.trace-row--redflag { border-color: var(--color-danger-solid); border-width: 2px; }
+
+/* Source badges: shape differs (square / pill / dashed) */
+.src { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs); padding: 1px 6px; white-space: nowrap; color: var(--color-text-muted); border: 1px solid var(--color-border-strong); }
+.src--code { border-radius: 2px; }
+.src--model { border-radius: var(--radius-pill); color: var(--color-accent); border-color: var(--color-accent); }
+.src--form { border-radius: 2px; border-style: dashed; }
+/* Status: icon + word, color only reinforces */
+.status { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs); font-weight: var(--weight-medium); white-space: nowrap; }
+.status--ok { color: var(--color-success); }
+.status--rejected { color: var(--color-text-muted); }
+.status--error { color: var(--color-warning); }
+.status--redflag { color: var(--color-danger); }
+
+/* =====================================================================
+   Summary
+   ===================================================================== */
+.sum-block + .sum-block { margin-top: var(--space-4); }
+.sum-label { font-size: var(--text-xs); color: var(--color-text-muted); font-weight: var(--weight-medium); letter-spacing: var(--tracking-label); margin-bottom: var(--space-1); }
+.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--space-1) var(--space-3); font-size: var(--text-sm); }
+.kv dt { color: var(--color-text-muted); white-space: nowrap; }
+.kv dd { margin: 0; }
+.missing { color: var(--color-text-subtle); font-style: normal; }
+.missing::before { content: "— "; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs); padding: 2px var(--space-2); border-radius: var(--radius-pill); border: 1px solid var(--color-border-strong); color: var(--color-text-muted); }
+.screen-ok { display: flex; gap: var(--space-2); align-items: flex-start; font-size: var(--text-sm); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); background: var(--color-success-bg); color: var(--color-text); }
+.screen-ok .icon { color: var(--color-success); }
+.note-box { font-size: var(--text-xs); color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: var(--space-3); margin-top: var(--space-4); }
+
+/* =====================================================================
+   Refill form + four outcome cards
+   ===================================================================== */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); }
+.form-field { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.form-field label, .form-legend { font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.form-hint { font-size: var(--text-xs); color: var(--color-text-muted); }
+.form-err { font-size: var(--text-xs); color: var(--color-warning); display: flex; gap: 4px; align-items: center; }
+.field[aria-invalid="true"] { border-color: var(--color-warning); border-width: 2px; }
+fieldset { border: 0; padding: 0; min-width: 0; }
+.seg { align-self: flex-start; max-width: 100%; display: inline-flex; border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); overflow: hidden; }
+.seg label { min-height: var(--touch-min); padding: 0 var(--space-3); display: inline-flex; align-items: center; font-size: var(--text-sm); cursor: pointer; border-left: 1px solid var(--color-border); }
+.seg label:first-of-type { border-left: 0; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg input:checked + span { font-weight: var(--weight-bold); }
+.seg label:has(input:checked) { background: var(--color-primary-soft); color: var(--color-primary-strong); }
+.seg label:has(input:focus-visible) { box-shadow: inset 0 0 0 2px var(--color-focus); }
+.check { display: flex; align-items: center; gap: var(--space-2); min-height: var(--touch-min); font-size: var(--text-sm); }
+.check input { width: 20px; height: 20px; accent-color: var(--color-primary); }
+
+.outcomes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-4); }
+.rcard { position: relative; border-radius: var(--radius-lg); padding: var(--space-4); background: var(--color-surface-raised); color: var(--color-text); animation: card-in var(--dur-slow) var(--ease-out); }
+.rcard__head { display: flex; align-items: flex-start; gap: var(--space-3); }
+.rcard__icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.rcard__label { font-size: var(--text-xs); font-weight: var(--weight-bold); letter-spacing: var(--tracking-label); }
+.rcard__title { font-size: var(--text-lg); line-height: var(--leading-tight); }
+.rcard__msg { margin-top: var(--space-3); font-size: var(--text-sm); }
+.rcard__dates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); margin-top: var(--space-3); }
+.rcard__date { padding: var(--space-2); border-radius: var(--radius-md); background: var(--color-surface); border: 1px solid var(--color-border); }
+.rcard__date dt { font-size: var(--text-xs); color: var(--color-text-muted); }
+.rcard__date dd { margin: 0; font-weight: var(--weight-bold); font-variant-numeric: tabular-nums; }
+.rcard__reasons { margin-top: var(--space-3); padding-left: 1.2em; font-size: var(--text-sm); }
+.rcard__rules { margin-top: var(--space-3); font-size: var(--text-xs); color: var(--color-text-muted); }
+.rcard__rules summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; }
+.rcard__ticket { margin-top: var(--space-3); display: flex; gap: var(--space-2); align-items: center; font-size: var(--text-sm); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); background: var(--color-accent-bg); }
+/* eligible: solid outline, filled round icon */
+.rcard--eligible { border: 2px solid var(--outcome-eligible-fg); }
+.rcard--eligible .rcard__icon { border-radius: 50%; background: var(--outcome-eligible-fg); color: var(--color-surface-raised); }
+.rcard--eligible .rcard__label { color: var(--outcome-eligible-fg); }
+/* too_early: dashed outline, hollow round icon */
+.rcard--too-early { border: 2px dashed var(--outcome-too-early-fg); }
+.rcard--too-early .rcard__icon { border-radius: 50%; border: 2px solid var(--outcome-too-early-fg); color: var(--outcome-too-early-fg); background: var(--outcome-too-early-bg); }
+.rcard--too-early .rcard__label { color: var(--outcome-too-early-fg); }
+/* revisit: thick double left rule, square icon */
+.rcard--revisit { border: 1px solid var(--color-border); border-left: 8px double var(--outcome-revisit-fg); }
+.rcard--revisit .rcard__icon { border-radius: var(--radius-sm); background: var(--outcome-revisit-bg); color: var(--outcome-revisit-fg); border: 2px solid var(--outcome-revisit-fg); }
+.rcard--revisit .rcard__label { color: var(--outcome-revisit-fg); }
+/* consult: heavy top band, rounded-square icon, always with a ticket */
+.rcard--consult { border: 1px solid var(--color-border); border-top: 6px solid var(--outcome-consult-fg); }
+.rcard--consult .rcard__icon { border-radius: var(--radius-md); background: var(--outcome-consult-bg); color: var(--outcome-consult-fg); }
+.rcard--consult .rcard__label { color: var(--outcome-consult-fg); }
+@keyframes card-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* =====================================================================
+   Clinician
+   ===================================================================== */
+.cl { background: var(--color-bg); height: 100%; overflow: auto; }
+.cl-main { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-4); }
+.toolbar { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.filter { min-height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-pill); border: 1px solid var(--color-border-strong); font-size: var(--text-sm); color: var(--color-text-muted); display: inline-flex; align-items: center; gap: 6px; }
+.filter[aria-pressed="true"] { background: var(--color-primary-soft); color: var(--color-primary-strong); border-color: var(--color-primary); font-weight: var(--weight-bold); }
+.search { margin-left: auto; width: min(260px, 100%); }
+.vlist { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; }
+.vrow { display: grid; grid-template-columns: 112px minmax(0, 1fr) 120px 72px 96px; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--color-border); text-decoration: none; color: inherit; min-height: 56px; }
+.vrow:first-child { border-top: 0; }
+.vrow:hover { background: var(--color-surface-sunken); }
+.vrow--head { font-size: var(--text-xs); color: var(--color-text-muted); font-weight: var(--weight-medium); background: var(--color-surface-sunken); min-height: 40px; }
+.vrow--urgent { box-shadow: inset 4px 0 0 var(--color-danger-solid); }
+.vrow__cc { min-width: 0; }
+.vrow__cc b { display: block; font-weight: var(--weight-medium); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vrow__cc small { color: var(--color-text-muted); font-size: var(--text-xs); }
+.urg { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs); font-weight: var(--weight-bold); padding: 2px var(--space-2); border-radius: var(--radius-sm); white-space: nowrap; }
+.urg--urgent { background: var(--color-danger-bg); color: var(--color-danger); border: 1px solid var(--color-danger-solid); }
+.urg--soon { background: var(--color-warning-bg); color: var(--color-warning); border: 1px dashed var(--color-warning); }
+.urg--routine { color: var(--color-text-muted); border: 1px solid var(--color-border-strong); }
+.vstatus { font-size: var(--text-sm); display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; color: var(--color-text-muted); }
+.vstatus--submitted { color: var(--color-primary); }
+.vstatus--reviewed { color: var(--color-success); }
+.vrow__time { font-size: var(--text-xs); color: var(--color-text-muted); text-align: right; font-variant-numeric: tabular-nums; }
+.vrow__tickets { font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
+@container app (max-width: 700px) {
+  .vrow { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "cc urg" "st time"; }
+  .vrow--head { display: none; }
+  .vrow > :nth-child(1) { grid-area: urg; justify-self: end; }
+  .vrow > :nth-child(2) { grid-area: cc; }
+  .vrow > :nth-child(3) { grid-area: st; }
+  .vrow > :nth-child(4) { display: none; }
+  .vrow > :nth-child(5) { grid-area: time; }
+  .search { margin-left: 0; width: 100%; }
+  .vrow__cc b { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+}
+
+.detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
+@container app (min-width: 960px) { .detail { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); } }
+.card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-4); }
+.card > h3 { font-size: var(--text-md); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2); }
+.detail-head { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.detail-head h2 { font-size: var(--text-xl); }
+.review-box { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: flex-end; }
+.review-box .field { flex: 1 1 220px; }
+.ticket { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-2) var(--space-3); align-items: start; padding: var(--space-3) 0; border-top: 1px solid var(--color-border); font-size: var(--text-sm); }
+.ticket:first-of-type { border-top: 0; padding-top: 0; }
+.convo { display: flex; flex-direction: column; gap: var(--space-2); max-height: 360px; overflow-y: auto; font-size: var(--text-sm); }
+.convo .line { display: grid; grid-template-columns: 3.5em minmax(0, 1fr); gap: var(--space-2); }
+.convo .who { color: var(--color-text-muted); font-size: var(--text-xs); padding-top: 2px; }
+
+/* =====================================================================
+   Safety page
+   ===================================================================== */
+.safety-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-3); }
+.boundary { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: var(--space-3); align-items: start; }
+.boundary__num { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--color-primary-soft); color: var(--color-primary-strong); font-weight: var(--weight-bold); display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+.boundary h3 { font-size: var(--text-md); }
+.boundary p { font-size: var(--text-sm); color: var(--color-text-muted); margin-top: 2px; }
+.boundary__how { display: inline-flex; gap: 4px; align-items: center; margin-top: var(--space-2); }
+.eval { display: flex; flex-direction: column; gap: var(--space-3); }
+.eval-row { display: grid; grid-template-columns: 9em minmax(0, 1fr) 8.5em; gap: var(--space-3); align-items: center; font-size: var(--text-sm); }
+.meter { height: 10px; border-radius: var(--radius-pill); background: var(--color-surface-sunken); overflow: hidden; border: 1px solid var(--color-border); }
+.meter > span { display: block; height: 100%; background: var(--color-primary); }
+.eval-row__num { white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
+@container app (max-width: 480px) { .eval-row { grid-template-columns: minmax(0, 1fr) auto; } .eval-row .meter { grid-column: 1 / -1; grid-row: 2; } }
+
+/* State catalogue */
+.states { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-3); }
+.empty { text-align: center; padding: var(--space-5) var(--space-4); color: var(--color-text-muted); font-size: var(--text-sm); }
+.empty .icon { margin: 0 auto var(--space-2); width: 32px; height: 32px; color: var(--color-text-subtle); }
+.skel { border-radius: var(--radius-sm); background: linear-gradient(90deg, var(--color-surface-sunken) 0%, var(--color-border) 50%, var(--color-surface-sunken) 100%); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; height: 12px; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.notice { display: flex; gap: var(--space-2); align-items: flex-start; padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--color-warning); background: var(--color-warning-bg); font-size: var(--text-sm); }
+.notice .icon { color: var(--color-warning); }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#desktop">跳到設計稿</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-logo" viewBox="0 0 32 32"><path fill="var(--color-primary)" stroke="none" d="M8 3h16a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H13.5l-5.6 4.4A1 1 0 0 1 6.3 28.6V24.6A6 6 0 0 1 2 19V9a6 6 0 0 1 6-6z"/><g fill="none" stroke="var(--color-primary-contrast)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 13.6l3 3 5.5-6"/><path d="M20 11.5h4.5M20 16.5h3"/></g></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15h6M13 13l2 2-2 2"/></symbol>
+    <symbol id="i-person-chat" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M15 4h5a1 1 0 0 1 1 1v3.5a1 1 0 0 1-1 1h-2.5L15.5 11V9.5H15a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 4.2L2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4.5M12 17h.01"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h3.5l1.8 4.5-2.3 1.4a11 11 0 0 0 6.1 6.1l1.4-2.3L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16 16 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="M8.5 8L4.5 12l4 4M15.5 8l4 4-4 4"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5l1.8 5.2 5.2 1.8-5.2 1.8L12 17.5l-1.8-5.2L5 10.5l5.2-1.8z"/><path d="M18.5 16.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></symbol>
+    <symbol id="i-form" viewBox="0 0 24 24"><rect x="4.5" y="3.5" width="15" height="17" rx="2"/><path d="M8 8.5h8M8 12h8M8 15.5h5"/></symbol>
+    <symbol id="i-slash" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2.5-6.5z"/><path d="M11.5 13.5L20 4"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-8l-4.5 3.5v-3.5H5A1.5 1.5 0 0 1 3.5 15V6A1.5 1.5 0 0 1 5 4.5z"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="5" cy="6.5" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="5" cy="17.5" r="1"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3.5h8l4.5 4.5v12a.5.5 0 0 1-.5.5H6a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M14 3.5V8h4.5M9 12.5h6M9 16h6"/></symbol>
+    <symbol id="i-pill" viewBox="0 0 24 24"><rect x="2.8" y="8.5" width="18.4" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.3 8.2l5.4 7.6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8.2-7.5 9.5-4.3-1.3-7.5-5-7.5-9.5V6z"/><path d="M8.8 12l2.3 2.3 4.2-4.6"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M14.5 6l-6 6 6 6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24"><path d="M3.5 7.5A1.5 1.5 0 0 1 5 6h14a1.5 1.5 0 0 1 1.5 1.5V10a2 2 0 0 0 0 4v2.5A1.5 1.5 0 0 1 19 18H5a1.5 1.5 0 0 1-1.5-1.5V14a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2"/></symbol>
+  </defs>
+</svg>
+
+<div class="doc">
+  <header class="doc-head">
+    <div class="brand" style="gap:var(--space-3)"><svg aria-hidden="true" style="width:44px;height:44px"><use href="#i-logo"/></svg><div><div class="brand__name" style="font-size:var(--text-xl);line-height:1.2">PreVisit Desk</div><div class="text-muted" style="letter-spacing:0.12em;font-size:var(--text-sm)">診前助理・設計稿</div></div></div>
+    <button class="btn btn-secondary" id="themeToggle" type="button" aria-pressed="false">
+      <svg class="icon"><use href="#i-moon"/></svg><span>切換深色</span>
+    </button>
+  </header>
+  <nav class="doc-nav" aria-label="設計稿章節">
+    <a href="#desktop">病人端（桌面）</a><a href="#mobile">病人端（手機）</a><a href="#refill">慢箋四種結果</a>
+    <a href="#clinician">醫師端</a><a href="#safety">安全界線</a><a href="#states">元件狀態</a>
+  </nav>
+
+  <section class="doc-section" id="desktop">
+    <h2>病人端・桌面</h2>
+    <p class="lead">左側對話、右側三個分頁。分頁可點選；寬度不足 900px 時自動改成單欄加底部分頁列。</p>
+    <div class="frame frame--desktop" data-mount="patient" data-active="chat" data-panel="trace"></div>
+  </section>
+
+  <section class="doc-section" id="mobile">
+    <h2>病人端・手機（390px）</h2>
+    <p class="lead">單欄、底部四個分頁。右邊是紅旗命中後的狀態：緊急卡片固定在對話最上方，輸入框改成「開始新的預問診」。</p>
+    <div class="frames-row">
+      <div><div class="frame frame--phone" data-mount="patient" data-active="chat" data-panel="trace"></div><p class="frame-cap">一般問診中</p></div>
+      <div><div class="frame frame--phone" data-mount="patient" data-emergency="1" data-active="chat" data-panel="trace"></div><p class="frame-cap">紅旗命中（胸痛）</p></div>
+      <div><div class="frame frame--phone" data-mount="patient" data-active="refill" data-panel="refill"></div><p class="frame-cap">慢箋分頁</p></div>
+    </div>
+  </section>
+
+  <section class="doc-section" id="refill">
+    <h2>慢箋檢核・四種結果</h2>
+    <p class="lead">每種結果用「圖示＋文字標籤＋外框形狀」區分，顏色只是第四個提示。可領：實線框＋實心圓圖示；尚未到：虛線框＋空心圓；需回診：左側雙線＋方形圖示；請洽藥師或醫師：上方粗色帶＋圓角方形圖示，並附轉交單號。</p>
+    <div class="app"><div class="outcomes" id="outcomeCards"></div></div>
+  </section>
+
+  <section class="doc-section" id="clinician">
+    <h2>醫師端</h2>
+    <p class="lead">清單依緊急程度排序（紅旗優先），詳情頁左邊摘要、右邊對話與工具追蹤，最下方標記已審閱。</p>
+    <div class="frame" style="height:auto"><div class="app" id="clinicianList"></div></div>
+    <div style="height:var(--space-5)"></div>
+    <div class="frame" style="height:auto"><div class="app" id="clinicianDetail"></div></div>
+  </section>
+
+  <section class="doc-section" id="safety">
+    <h2>安全界線頁</h2>
+    <p class="lead">六條界線，每條寫清楚「怎麼做到」與「怎麼驗證」；下方是最近一次評測通過率。</p>
+    <div class="frame" style="height:auto"><div class="app" id="safetyPage"></div></div>
+  </section>
+
+  <section class="doc-section" id="states">
+    <h2>元件狀態</h2>
+    <p class="lead">空白、載入、錯誤、超長文字、中英混排。</p>
+    <div class="app"><div class="states" id="stateCards"></div></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const ic = (id, cls = 'icon') => `<svg class="${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+
+  /* ---------- Sample data ---------- */
+  const chatNormal = [
+    { role: 'assistant', kind: 'opening', text: '您好，我是 AI 預問診助理，不是醫師。我會先了解您的狀況，整理成摘要交給醫師，不做診斷、不開藥。\n請勿輸入真實姓名、身分證字號或病歷。若有胸痛、呼吸困難等緊急狀況，請直接撥打 119。', time: '14:02' },
+    { role: 'patient', text: '我這三天一直咳嗽，晚上躺下來比較嚴重。', time: '14:03' },
+    { role: 'assistant', text: '了解，咳嗽三天、晚上躺下時較嚴重。請問有痰嗎？如果有，大概是什麼顏色？', time: '14:03' },
+    { role: 'patient', text: '有一點黃痰，昨天量體溫 37.8°C，有吃 Panadol。', time: '14:04' },
+    { role: 'assistant', stream: true, text: '謝謝您。我記下了「黃痰、昨天 37.8°C、有服用 Panadol」。最後想確認：您平常有固定吃的藥，或對哪些藥物過敏嗎', time: '' },
+  ];
+  const chatEmergency = [
+    { role: 'assistant', kind: 'opening', text: '您好，我是 AI 預問診助理，不是醫師。我會整理您的狀況交給醫師，不做診斷、不開藥。請勿輸入真實病歷或個資。', time: '09:41' },
+    { role: 'patient', text: '胸口很悶，像被石頭壓住，左手也有點麻，已經半小時了。', time: '09:42' },
+    { role: 'assistant', kind: 'red_flag', text: '您描述的症狀可能需要立即處理。請現在就撥打 119，或請身邊的人陪您到最近的急診。這次預問診先暫停。', time: '09:42' },
+  ];
+  const trace = [
+    { step: 1, name: 'red_flag_precheck', src: 'code', status: 'ok', ms: 3, args: '{ "message_id": "m_7f2c" }', result: '{ "hit": null }' },
+    { step: 2, name: 'scope_precheck', src: 'code', status: 'ok', ms: 1, args: '{ "message_id": "m_7f2c" }', result: '{ "scope": "ok" }' },
+    { step: 3, name: 'record_intake', src: 'model', status: 'ok', ms: 12, args: '{ "hpi.associated": "黃痰、發燒 37.8°C" }', result: '{ "stage": "background", "missing": ["medications","allergies"] }' },
+    { step: 4, name: 'search_health_education', src: 'model', status: 'ok', ms: 84, args: '{ "query": "咳嗽 發燒 何時就醫" }', result: '{ "sections": ["§2.1 發燒多久要就醫", "§2.4 咳嗽與痰"] }' },
+    { step: 5, name: 'output_guard', src: 'code', status: 'rejected', ms: 2, args: '{ "kind": "dosage" }', result: '{ "action": "rewritten", "note": "移除劑量建議" }' },
+    { step: 6, name: 'check_chronic_refill', src: 'form', status: 'ok', ms: 6, args: '{ "fills_done": 1, "controlled": "no" }', result: '{ "outcome": "too_early", "earliest_date": "2026-12-02" }' },
+    { step: 7, name: 'transfer_to_clinician', src: 'model', status: 'error', ms: 5012, args: '{ "reason": "patient_request" }', result: '{ "error": "timeout", "retried": true }' },
+  ];
+  const traceEmergency = [
+    { step: 1, name: 'red_flag_precheck', src: 'code', status: 'redflag', ms: 2, args: '{ "message_id": "m_19ab" }', result: '{ "category": "chest_pain", "label": "胸痛／胸悶" }' },
+    { step: 2, name: 'transfer_to_clinician', src: 'code', status: 'ok', ms: 4, args: '{ "reason": "red_flag", "urgency": "urgent" }', result: '{ "ticket_no": "T-20261125-0007" }' },
+  ];
+  const srcLabel = { code: ['code', '程式'], model: ['spark', '模型'], form: ['form', '表單'] };
+  const statusLabel = { ok: ['check', '完成'], rejected: ['slash', '已攔下'], error: ['alert', '錯誤'], redflag: ['alert', '紅旗命中'] };
+
+  const outcomes = [
+    { key: 'eligible', icon: 'check-circle', label: '可領', title: '可以憑慢箋領藥', msg: '目前在第 2 次可領期間內，請攜帶慢箋與健保卡到藥局。', dates: [['可領期間', '11/22–12/02'], ['慢箋到期', '2027-02-20']], reasons: ['上次給藥 30 天，將於 12/02 屆滿', '今天在屆滿前 10 天內'] },
+    { key: 'too-early', icon: 'clock', label: '尚未到可領期間', title: '還不能領，12 月 2 日起可領', msg: '第 2 次領藥要在上次給藥期間屆滿前 10 天內。', dates: [['最早可領日', '2026-12-02'], ['還要等', '7 天']], reasons: ['上次領藥 2026-11-02，給藥 40 天', '屆滿日 12/12，往前 10 天為 12/02'] },
+    { key: 'revisit', icon: 'calendar', label: '需回診', title: '慢箋已到期，請回診', msg: '這張慢箋的有效期限已過，請預約門診讓醫師重新評估。', dates: [['慢箋到期', '2026-11-10'], ['已領次數', '3／3']], reasons: ['開立日 2026-08-12，總日數 90 天', '三次都已領完'] },
+    { key: 'consult', icon: 'person-chat', label: '請洽藥師或醫師', title: '這次需要藥師或醫師確認', msg: '您勾選了「症狀有變化」。我們已建立轉交單，請到藥局時告訴藥師，或回診讓醫師評估。', dates: [['交給', '藥師或醫師'], ['緊急程度', '一般']], reasons: ['症狀有變化，需由醫師評估', '本工具不判斷是否調整用藥'], ticket: true },
+  ];
+
+  /* ---------- Builders ---------- */
+  function msgHtml(m) {
+    if (m.role === 'patient') {
+      return `<div class="msg msg--patient"><div class="msg__body"><div class="msg__bubble">${m.text}</div><div class="msg__meta"><time>${m.time}</time></div></div></div>`;
+    }
+    const opening = m.kind === 'opening';
+    const tag = opening ? `<span class="kind-tag">${ic('info', 'icon icon-sm')}固定開場說明</span>` : m.kind === 'red_flag' ? `<span class="kind-tag">${ic('shield', 'icon icon-sm')}規則回覆・未經 AI</span>` : '';
+    const body = m.stream ? `${m.text}<span class="caret" aria-hidden="true"></span>` : m.text;
+    const meta = m.stream ? `<span>正在回覆…</span>` : `<time>${m.time}</time>${tag}`;
+    return `<div class="msg msg--assistant ${opening ? 'msg--opening' : ''}"><div class="msg__avatar">${ic('chat', 'icon icon-sm')}</div><div class="msg__body"><div class="msg__bubble"${m.stream ? ' aria-busy="true"' : ''}>${body}</div><div class="msg__meta">${meta}</div></div></div>`;
+  }
+
+  function traceHtml(rows, emergency) {
+    const head = emergency
+      ? `<div class="run-head"><span>回合 <b>#2</b></span><span>模型 <b>未呼叫（規則直接回覆）</b></span><span>狀態 <b>skipped</b></span></div>`
+      : `<div class="run-head"><span>回合 <b>#4</b></span><span>模型 <b class="mono">gemini-3.5-flash</b></span><span>備援 <b>未使用</b></span><span>用量 <b class="num">1,284 / 312</b> tokens</span></div>`;
+    return head + `<ol class="trace" role="list">` + rows.map((r, i) => {
+      const [si, sl] = srcLabel[r.src]; const [ti, tl] = statusLabel[r.status];
+      return `<li><details class="trace-row ${r.status === 'redflag' ? 'trace-row--redflag' : ''}" ${i === 4 ? 'open' : ''}>
+        <summary><span class="trace-row__step">${r.step}</span><span class="src src--${r.src}">${ic(si, 'icon icon-sm')}${sl}</span><span class="trace-row__name" title="${r.name}">${r.name}</span>
+        <span class="trace-row__end"><span class="status status--${r.status}">${ic(ti, 'icon icon-sm')}${tl}</span></span></summary>
+        <div class="trace-row__detail"><div class="text-muted">耗時 <span class="num">${r.ms.toLocaleString()}</span> ms・${r.src === 'model' ? '模型呼叫' : r.src === 'form' ? '表單送出' : '程式執行'}</div><div style="margin-top:6px">參數</div><pre>${r.args}</pre><div style="margin-top:6px">結果</div><pre>${r.result}</pre></div></details></li>`;
+    }).join('') + `</ol>`;
+  }
+
+  function summaryHtml() {
+    return `<div class="sum-block"><div class="sum-label">主訴</div><p><b>咳嗽 3 天，夜間平躺時加劇</b></p></div>
+      <div class="sum-block"><div class="sum-label">現病史（OPQRST）</div><dl class="kv">
+        <dt>何時開始</dt><dd>3 天前</dd><dt>加重／緩解</dt><dd>平躺時加重</dd><dt>性質</dt><dd>有痰，黃色</dd>
+        <dt>部位</dt><dd>不適用</dd><dt>嚴重度</dt><dd class="num">5／10</dd><dt>病程</dt><dd>逐日略加重</dd>
+        <dt>伴隨症狀</dt><dd>發燒 37.8°C（昨天）</dd></dl></div>
+      <div class="sum-block"><div class="sum-label">過去病史・用藥・過敏</div><dl class="kv">
+        <dt>過去病史</dt><dd>高血壓</dd><dt>用藥</dt><dd>Amlodipine 5 mg（自述）、Panadol</dd><dt>過敏</dt><dd><span class="missing">尚未取得</span></dd></dl></div>
+      <div class="sum-block"><div class="sum-label">紅旗篩檢</div><div class="screen-ok">${ic('check-circle')}<span>已篩檢，未命中紅旗規則。</span></div></div>
+      <div class="sum-block"><div class="sum-label">想問醫師的問題</div><ul style="padding-left:1.2em;font-size:var(--text-sm)"><li>需要照胸部 X 光嗎？</li></ul></div>
+      <div class="sum-block"><div class="sum-label">未取得欄位</div><div class="cluster"><span class="chip">過敏</span></div></div>
+      <p class="note-box">由 AI 依對話整理（gemini-3.5-flash，14:06）。僅供醫師參考，不是診斷。</p>
+      <div style="margin-top:var(--space-4)"><button class="btn btn-primary" type="button" style="width:100%">確認並送出給醫師</button></div>`;
+  }
+
+  function refillFormHtml(withResult) {
+    return `<form class="stack" onsubmit="return false" aria-describedby="refill-intro">
+      <p id="refill-intro" class="text-sm text-muted">輸入慢箋上的資料，我們依健保規則幫您算可不可以領。結果由程式計算，不經 AI。</p>
+      <div class="form-grid">
+        <div class="form-field"><label for="f-pd">慢箋開立日</label><input class="field" id="f-pd" type="date" value="2026-11-02"></div>
+        <div class="form-field"><label for="f-td">總給藥日數</label><input class="field num" id="f-td" inputmode="numeric" value="90"><span class="form-hint">最多 90 天</span></div>
+        <div class="form-field"><label for="f-dp">每次調劑日數</label><input class="field num" id="f-dp" inputmode="numeric" value="40" aria-invalid="true" aria-describedby="f-dp-err"><span class="form-err" id="f-dp-err">${ic('alert', 'icon icon-sm')}每次最多 30 天</span></div>
+        <div class="form-field"><label for="f-lf">上次領藥日</label><input class="field" id="f-lf" type="date" value="2026-11-02"></div>
+      </div>
+      <fieldset class="form-field"><legend class="form-legend">已領幾次</legend><div class="seg"><label><input type="radio" name="fd" checked><span>1 次</span></label><label><input type="radio" name="fd"><span>2 次</span></label></div></fieldset>
+      <fieldset class="form-field"><legend class="form-legend">是否含第一、二級管制藥品</legend><div class="seg"><label><input type="radio" name="ct" checked><span>否</span></label><label><input type="radio" name="ct"><span>是</span></label><label><input type="radio" name="ct"><span>不確定</span></label></div></fieldset>
+      <div class="form-field"><label for="f-ss">特殊身分</label><select class="field" id="f-ss"><option>無</option><option>預定出國</option><option>返回離島</option><option>遠洋漁船船員</option><option>國際航線船員</option><option>罕見疾病</option></select></div>
+      <div><label class="check"><input type="checkbox"> 最近症狀有變化</label><label class="check"><input type="checkbox"> 吃藥後有不舒服（副作用）</label></div>
+      <button class="btn btn-primary" type="submit">檢核</button>
+    </form>${withResult ? `<div style="margin-top:var(--space-4)">${cardHtml(outcomes[1])}</div>` : ''}`;
+  }
+
+  function cardHtml(o) {
+    return `<article class="rcard rcard--${o.key}" aria-labelledby="rc-${o.key}-${Math.random().toString(36).slice(2, 6)}">
+      <div class="rcard__head"><div class="rcard__icon">${ic(o.icon, 'icon icon-lg')}</div><div class="grow"><div class="rcard__label">${o.label}</div><h3 class="rcard__title">${o.title}</h3></div></div>
+      <p class="rcard__msg">${o.msg}</p>
+      <dl class="rcard__dates">${o.dates.map(([k, v]) => `<div class="rcard__date"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+      <ul class="rcard__reasons">${o.reasons.map((r) => `<li>${r}</li>`).join('')}</ul>
+      ${o.ticket ? `<div class="rcard__ticket">${ic('ticket', 'icon icon-sm')}<span>已通知醫療團隊，轉交單 <b class="mono" style="white-space:nowrap">T-20261125-0012</b></span></div>` : ''}
+      <details class="rcard__rules"><summary>規則依據（2 條）</summary><p>第二、三次領藥須在上次給藥期間屆滿前 10 天內。<a href="#">健保署</a></p></details>
+    </article>`;
+  }
+
+  function emergencyHtml() {
+    return `<div class="emergency-wrap"><section class="emergency" role="alert" aria-labelledby="em-title">
+      <div class="emergency__head"><div class="emergency__icon">${ic('alert', 'icon icon-lg')}</div>
+        <div><h2 class="emergency__title" id="em-title">請立即就醫</h2><p class="emergency__hit">偵測到：胸痛／胸悶</p></div></div>
+      <p class="emergency__text">您描述的症狀可能很危急。請馬上撥打 119，或請身邊的人陪您到最近的急診。不要自己開車。</p>
+      <div class="emergency__actions">
+        <a class="call-btn call-btn--119" href="tel:119">${ic('phone', 'icon icon-lg')}<span><span class="call-btn__num">119</span><span class="call-btn__label">緊急救護</span></span></a>
+        <a class="call-btn call-btn--1925" href="tel:1925">${ic('phone', 'icon icon-lg')}<span><span class="call-btn__num">1925</span><span class="call-btn__label">安心專線・24 小時</span></span></a>
+      </div>
+      <p class="emergency__foot">已通知醫療團隊（轉交單 <span class="mono" style="white-space:nowrap">T-20261125-0007</span>）。</p></section></div>`;
+  }
+
+  function patientApp(el) {
+    const emergency = el.dataset.emergency === '1';
+    const active = el.dataset.active, panel = el.dataset.panel;
+    const chat = emergency ? chatEmergency : chatNormal;
+    const panelTab = (k, label, n) => `<button class="tab" role="tab" type="button" data-panel-tab="${k}" aria-selected="${panel === k}" tabindex="${panel === k ? 0 : -1}">${label}${n != null ? `<span class="count-badge">${n}</span>` : ''}</button>`;
+    const barBtn = (k, icon, label, dot) => `<button class="tabbar__btn" role="tab" type="button" data-bar="${k}" aria-selected="${active === k}">${ic(icon)}<span>${label}</span>${dot ? '<span class="tabbar__dot" aria-hidden="true"></span>' : ''}</button>`;
+    el.innerHTML = `<div class="app" data-active="${active}" data-panel="${panel}"><div class="app__grid">
+      <header class="app-header">
+        <a class="brand" href="#"><svg aria-hidden="true"><use href="#i-logo"/></svg><span class="brand__name">PreVisit Desk</span><span class="brand__sub">診前助理</span></a>
+        <div class="app-header__actions"><button class="lang-switch" type="button" lang="en">English</button><button class="icon-btn js-theme" type="button" aria-label="切換深色模式">${ic('moon')}</button></div>
+      </header>
+      <div class="ai-banner" role="note">${ic('info')}<p><strong>AI 預問診助理，不是醫師。</strong>不做診斷、不開藥。請勿輸入真實病歷或個資。</p><a class="ai-banner__more" href="#safety">安全說明</a></div>
+      <div class="app-body">
+        <section class="pane pane--chat" aria-label="對話">
+          <div class="pane__head"><span class="pane__title">預問診</span>${emergency ? '<span class="urg urg--urgent">' + ic('alert', 'icon icon-sm') + '已暫停</span>' : '<span class="stage-chip">過去史・用藥</span><span class="progress"><span class="num">8／11</span><span class="progress__bar"><span style="width:73%"></span></span></span>'}</div>
+          <div class="pane__scroll">${emergency ? emergencyHtml() : ''}<div class="chat-log" role="log" aria-live="polite" aria-relevant="additions">${chat.map(msgHtml).join('')}</div></div>
+          <div class="composer"><div class="composer__inner">${emergency
+            ? `<div class="composer__closed"><span>這次預問診已暫停，訊息不會再送給 AI。</span><button class="btn btn-secondary" type="button">開始新的預問診</button></div>`
+            : `<label class="visually-hidden" for="msg-${Math.random().toString(36).slice(2, 7)}">輸入訊息</label><div class="composer__row"><textarea class="field" rows="1" placeholder="請描述您的狀況"></textarea><button class="btn btn-primary" type="button" aria-label="送出">${ic('send')}</button></div>
+               <div class="composer__foot"><span>Enter 送出，Shift＋Enter 換行・<span class="num">0／1,000</span></span><button class="btn btn-ghost" type="button" style="min-height:36px">結束並送出</button></div>`}
+          </div></div>
+        </section>
+        <aside class="panel" aria-label="輔助資訊">
+          <div class="panel-tabs" role="tablist" aria-label="輔助資訊">${panelTab('trace', '工具追蹤', emergency ? 2 : 7)}${panelTab('summary', '給醫師的摘要')}${panelTab('refill', '慢箋檢核')}</div>
+          <section class="pane pane--trace" role="tabpanel" aria-label="工具追蹤"><div class="pane__scroll">${traceHtml(emergency ? traceEmergency : trace, emergency)}</div></section>
+          <section class="pane pane--summary" role="tabpanel" aria-label="給醫師的摘要"><div class="pane__scroll">${summaryHtml()}</div></section>
+          <section class="pane pane--refill" role="tabpanel" aria-label="慢箋檢核"><div class="pane__scroll">${refillFormHtml(true)}</div></section>
+        </aside>
+      </div>
+      <nav class="tabbar" role="tablist" aria-label="切換畫面">${barBtn('chat', 'chat', '對話')}${barBtn('trace', 'list', '追蹤', emergency)}${barBtn('summary', 'doc', '摘要')}${barBtn('refill', 'pill', '慢箋')}</nav>
+    </div></div>`;
+    const app = el.querySelector('.app');
+    el.querySelectorAll('[data-panel-tab]').forEach((b) => b.addEventListener('click', () => {
+      app.dataset.panel = b.dataset.panelTab;
+      el.querySelectorAll('[data-panel-tab]').forEach((x) => { x.setAttribute('aria-selected', x === b); x.tabIndex = x === b ? 0 : -1; });
+    }));
+    el.querySelector('.panel-tabs').addEventListener('keydown', (e) => {
+      if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+      const tabs = [...el.querySelectorAll('[data-panel-tab]')]; const i = tabs.indexOf(document.activeElement);
+      const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; next.focus(); next.click();
+    });
+    el.querySelectorAll('[data-bar]').forEach((b) => b.addEventListener('click', () => {
+      app.dataset.active = b.dataset.bar;
+      el.querySelectorAll('[data-bar]').forEach((x) => x.setAttribute('aria-selected', x === b));
+    }));
+  }
+
+  const visits = [
+    { urg: 'urgent', cc: '胸口悶痛、左手麻，約 30 分鐘', sub: '紅旗：胸痛／胸悶・轉交單 1', st: ['red_flag', 'alert', '紅旗'], t: 1, time: '09:42' },
+    { urg: 'urgent', cc: '說最近常常想不開，覺得活著沒有意義', sub: '紅旗：自傷念頭・轉交單 1', st: ['red_flag', 'alert', '紅旗'], t: 1, time: '09:15' },
+    { urg: 'soon', cc: 'Metformin 慢箋第 3 次領藥，症狀有變化（頭暈、手抖），想確認 HbA1c 7.9% 是否要調整用藥', sub: '慢箋：請洽藥師或醫師', st: ['submitted', 'doc', '待審閱'], t: 1, time: '10:58' },
+    { urg: 'routine', cc: '咳嗽 3 天，夜間加劇，黃痰', sub: '摘要已產生', st: ['submitted', 'doc', '待審閱'], t: 0, time: '14:06' },
+    { urg: 'routine', cc: null, sub: '病人未完成問診', st: ['active', 'chat', '問診中'], t: 0, time: '14:10' },
+    { urg: 'routine', cc: '右膝疼痛兩週，上下樓梯更痛', sub: '王醫師 已審閱', st: ['reviewed', 'check', '已審閱'], t: 0, time: '昨天' },
+  ];
+  const urgLabel = { urgent: '緊急', soon: '盡快', routine: '一般' };
+  const urgIcon = { urgent: 'alert', soon: 'clock', routine: 'list' };
+
+  function clinicianHeader(title) {
+    return `<header class="app-header"><a class="brand" href="#"><svg aria-hidden="true"><use href="#i-logo"/></svg><span class="brand__name">PreVisit Desk</span><span class="brand__sub">醫師端</span></a>
+      <div class="app-header__actions"><span class="text-sm text-muted" style="padding:0 var(--space-2)">陳醫師</span><button class="btn btn-ghost" type="button">登出</button></div></header>`;
+  }
+
+  document.getElementById('clinicianList').innerHTML = `<div class="cl">${clinicianHeader()}<main class="cl-main">
+    <div class="detail-head"><h2>預問診清單</h2><span class="text-sm text-muted">待處理 4 筆，其中 2 筆緊急</span></div>
+    <div class="toolbar" role="group" aria-label="篩選">
+      <button class="filter" aria-pressed="true" type="button">全部 <span class="num">6</span></button><button class="filter" aria-pressed="false" type="button">${ic('alert', 'icon icon-sm')}紅旗 <span class="num">2</span></button>
+      <button class="filter" aria-pressed="false" type="button">待審閱 <span class="num">2</span></button><button class="filter" aria-pressed="false" type="button">已審閱</button>
+      <label class="visually-hidden" for="cl-q">搜尋主訴</label><input id="cl-q" class="field search" type="search" placeholder="搜尋主訴">
+    </div>
+    <div class="vlist" role="table" aria-label="預問診清單">
+      <div class="vrow vrow--head" role="row"><span role="columnheader">緊急程度</span><span role="columnheader">主訴</span><span role="columnheader">狀態</span><span role="columnheader">轉交單</span><span role="columnheader" style="text-align:right">最後活動</span></div>
+      ${visits.map((v) => `<a class="vrow ${v.urg === 'urgent' ? 'vrow--urgent' : ''}" role="row" href="#clinician">
+        <span role="cell"><span class="urg urg--${v.urg}">${ic(urgIcon[v.urg], 'icon icon-sm')}${urgLabel[v.urg]}</span></span>
+        <span role="cell" class="vrow__cc"><b title="${v.cc || ''}">${v.cc || '<span class="missing">尚未取得主訴</span>'}</b><small>${v.sub}</small></span>
+        <span role="cell"><span class="vstatus vstatus--${v.st[0]}">${ic(v.st[1], 'icon icon-sm')}${v.st[2]}</span></span>
+        <span role="cell" class="vrow__tickets">${v.t ? v.t + ' 張' : '—'}</span>
+        <span role="cell" class="vrow__time"><time>${v.time}</time></span></a>`).join('')}
+    </div></main></div>`;
+
+  document.getElementById('clinicianDetail').innerHTML = `<div class="cl">${clinicianHeader()}<main class="cl-main">
+    <a class="btn btn-ghost" href="#clinician" style="align-self:flex-start;padding-left:var(--space-2)">${ic('back')}回清單</a>
+    <div class="detail-head"><span class="urg urg--urgent">${ic('alert', 'icon icon-sm')}緊急</span><h2>胸口悶痛、左手麻</h2><span class="text-sm text-muted">紅旗命中・09:42・訊息 3 則</span></div>
+    <div class="detail">
+      <div class="stack">
+        <section class="card"><h3>${ic('doc')}預問診摘要</h3>
+          <p class="text-sm" style="margin-bottom:var(--space-3)">病人自述胸口悶痛、像被重物壓住，左手麻木，持續約 30 分鐘。紅旗規則命中後問診即停止，以下欄位多數未取得。</p>
+          <dl class="kv"><dt>何時開始</dt><dd>約 30 分鐘前</dd><dt>性質</dt><dd>壓迫感</dd><dt>部位</dt><dd>胸口，左手麻</dd><dt>嚴重度</dt><dd><span class="missing">尚未取得</span></dd><dt>用藥</dt><dd><span class="missing">尚未取得</span></dd><dt>過敏</dt><dd><span class="missing">尚未取得</span></dd></dl>
+          <p class="note-box">由程式依現有欄位產生（未經 AI）。</p></section>
+        <section class="card"><h3>${ic('ticket')}轉交單</h3>
+          <div class="ticket"><span class="urg urg--urgent">${ic('alert', 'icon icon-sm')}緊急</span><div><b class="mono">T-20261125-0007</b><div class="text-muted">紅旗：胸痛／胸悶，已提示撥打 119</div></div><button class="btn btn-secondary" type="button">標記已處理</button></div></section>
+      </div>
+      <div class="stack">
+        <section class="card"><h3>${ic('chat')}完整對話</h3><div class="convo">
+          <div class="line"><span class="who">AI</span><span>您好，我是 AI 預問診助理，不是醫師……</span></div>
+          <div class="line"><span class="who">病人</span><span>胸口很悶，像被石頭壓住，左手也有點麻，已經半小時了。</span></div>
+          <div class="line"><span class="who">規則</span><span>您描述的症狀可能需要立即處理。請現在就撥打 119……</span></div></div></section>
+        <section class="card"><h3>${ic('list')}工具追蹤</h3>${traceHtml(traceEmergency, true)}</section>
+      </div>
+    </div>
+    <section class="card"><h3>${ic('check-circle')}審閱</h3><div class="review-box"><div class="form-field" style="flex:1 1 260px"><label for="rv-note">備註（選填）</label><textarea id="rv-note" class="field" rows="2" placeholder="例如：已電話聯絡，病人已到急診"></textarea></div><button class="btn btn-primary" type="button">標記已審閱</button></div></section>
+  </main></div>`;
+
+  const boundaries = [
+    ['開場就說明 AI 身分', '每次對話第一則是固定文字：「我是 AI 預問診助理，不是醫師」。', '固定文字・不經模型'],
+    ['紅旗規則先於 AI', '胸痛、呼吸困難、自傷念頭等先由程式比對，命中就固定回覆並顯示 119／1925。', '程式規則'],
+    ['不診斷、不開藥、不給劑量', '提示詞限制，加上輸出檢查；違反就改寫或拒絕。', '輸出檢查'],
+    ['慢箋只回四種結果', '由程式依健保規則計算；管制藥、症狀變化、副作用一律轉給藥師或醫師。', '程式計算'],
+    ['每一步都可追查', '工具呼叫、紅旗結果、模型名稱都記在追蹤面板與資料庫。', '追蹤紀錄'],
+    ['不收個資', '不問姓名與身分證字號；只存去識別化摘要，保留 14 天。', '保留 14 天'],
+  ];
+  const evals = [['問診完整度', 18, 20], ['紅旗偵測', 40, 40], ['慢箋檢核', 32, 32], ['範圍外問題', 14, 15], ['越界指令', 19, 20]];
+  document.getElementById('safetyPage').innerHTML = `<div class="cl"><main class="cl-main">
+    <div class="detail-head">${ic('shield', 'icon icon-lg')}<h2>安全界線</h2></div>
+    <div class="safety-grid">${boundaries.map(([t, d, how], i) => `<section class="card boundary"><span class="boundary__num">${i + 1}</span><div><h3>${t}</h3><p>${d}</p><span class="chip boundary__how">${ic('check', 'icon icon-sm')}${how}</span></div></section>`).join('')}</div>
+    <section class="card"><h3>${ic('list')}評測結果 <span class="text-xs text-muted" style="font-weight:400">2026-11-25 08:30・gemini-3.5-flash・共 <span class="num">127</span> 題</span></h3>
+      <div class="eval">${evals.map(([k, p, t]) => `<div class="eval-row"><span>${k}</span><div class="meter" role="img" aria-label="${k} ${p}／${t} 通過"><span style="width:${(p / t * 100).toFixed(1)}%"></span></div><span class="eval-row__num">${p}／${t}・${Math.round(p / t * 100)}%</span></div>`).join('')}</div></section>
+  </main></div>`;
+
+  document.getElementById('outcomeCards').innerHTML = outcomes.map(cardHtml).join('');
+
+  document.getElementById('stateCards').innerHTML = `
+    <section class="card"><h3>空白：工具追蹤</h3><div class="empty">${ic('list')}<p>還沒有工具呼叫。<br>開始對話後，每一步都會列在這裡。</p></div></section>
+    <section class="card"><h3>載入中</h3><div class="stack-sm" aria-busy="true" aria-label="載入中"><div class="skel" style="width:60%"></div><div class="skel"></div><div class="skel" style="width:80%"></div></div><div class="typing" aria-label="AI 正在輸入"><span></span><span></span><span></span></div></section>
+    <section class="card"><h3>錯誤（非緊急，不用紅色）</h3><div class="notice" role="status">${ic('alert')}<div><b>AI 暫時無法回覆</b><p>今天的使用額度已滿。紅旗檢查與慢箋檢核仍可使用，您也可以按「結束並送出」把目前內容交給醫師。</p></div></div></section>
+    <section class="card"><h3>超長文字・中英混排</h3><div class="msg msg--patient" style="animation:none"><div class="msg__body" style="max-width:100%"><div class="msg__bubble">我在吃 Metformin 500mg、Amlodipine 和 Rosuvastatin，藥袋上寫 https://www.example-hospital.org.tw/pharmacy/medication-guide?drug=rosuvastatin-calcium-10mg 要看說明，HbA1c 上次 7.9%。</div></div></div></section>`;
+
+  document.querySelectorAll('[data-mount="patient"]').forEach(patientApp);
+
+  /* ---------- Theme toggle ---------- */
+  const root = document.documentElement;
+  const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  function paint() {
+    const d = isDark(); const t = document.getElementById('themeToggle');
+    t.setAttribute('aria-pressed', d); t.querySelector('span').textContent = d ? '切換淺色' : '切換深色';
+    t.querySelector('use').setAttribute('href', d ? '#i-sun' : '#i-moon');
+  }
+  function toggle() { root.dataset.theme = isDark() ? 'light' : 'dark'; try { localStorage.setItem('pv-theme', root.dataset.theme); } catch (e) {} paint(); }
+  try { const s = localStorage.getItem('pv-theme'); if (s) root.dataset.theme = s; } catch (e) {}
+  const q = new URLSearchParams(location.search).get('theme'); if (q === 'dark' || q === 'light') root.dataset.theme = q;
+  if (!root.dataset.theme) root.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.getElementById('themeToggle').addEventListener('click', toggle);
+  document.querySelectorAll('.js-theme').forEach((b) => b.addEventListener('click', toggle));
+  paint();
+})();
+</script>
+</body>
+</html>
