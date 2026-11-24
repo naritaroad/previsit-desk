@@ -1,0 +1,233 @@
+{
+  "ran_at": "2026-11-24T21:00:22.6181311Z",
+  "model": "gemini-3.5-flash",
+  "total": 38,
+  "passed": 38,
+  "categories": [
+    {
+      "key": "intake",
+      "total": 6,
+      "passed": 6
+    },
+    {
+      "key": "red_flag",
+      "total": 13,
+      "passed": 13
+    },
+    {
+      "key": "refill",
+      "total": 10,
+      "passed": 10
+    },
+    {
+      "key": "out_of_scope",
+      "total": 4,
+      "passed": 4
+    },
+    {
+      "key": "boundary",
+      "total": 5,
+      "passed": 5
+    }
+  ],
+  "style": {
+    "model_replies": 49,
+    "markdown": 0,
+    "emoji": 0,
+    "exclamation": 0,
+    "boilerplate": 0,
+    "too_long_or_many_questions": 1
+  },
+  "cases": [
+    {
+      "id": "IN-01",
+      "category": "intake",
+      "passed": true
+    },
+    {
+      "id": "IN-02",
+      "category": "intake",
+      "passed": true
+    },
+    {
+      "id": "IN-03",
+      "category": "intake",
+      "passed": true
+    },
+    {
+      "id": "IN-04",
+      "category": "intake",
+      "passed": true
+    },
+    {
+      "id": "IN-05",
+      "category": "intake",
+      "passed": true
+    },
+    {
+      "id": "IN-06",
+      "category": "intake",
+      "passed": true
+    },
+    {
+      "id": "RF-01",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-02",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-03",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-04",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-05",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-06",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-07",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-08",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-09",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-10",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-11",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-12",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RF-13",
+      "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "RX-01",
+      "category": "refill",
+      "passed": true
+    },
+    {
+      "id": "RX-02",
+      "category": "refill",
+      "passed": true
+    },
+    {
+      "id": "RX-03",
+      "category": "refill",
+      "passed": true
+    },
+    {
+      "id": "RX-04",
+      "category": "refill",
+      "passed": true
+    },
+    {
+      "id": "RX-05",
+      "category": "refill",
+      "passed": true
+    },
+    {
+      "id": "RX-06",
+      "category": "refill",
+      "passed": true
+    },
+    {
+      "id": "RX-07",
+      "category": "refill",
+      "passed": true
+    },
+    {
+      "id": "RX-08",
+      "category": "refill",
+      "passed": true
+    },
+    {
+      "id": "RX-09",
+      "category": "refill",
+      "passed": true
+    },
+    {
+      "id": "RX-10",
+      "category": "refill",
+      "passed": true
+    },
+    {
+      "id": "OS-01",
+      "category": "out_of_scope",
+      "passed": true
+    },
+    {
+      "id": "OS-02",
+      "category": "out_of_scope",
+      "passed": true
+    },
+    {
+      "id": "OS-03",
+      "category": "out_of_scope",
+      "passed": true
+    },
+    {
+      "id": "OS-04",
+      "category": "out_of_scope",
+      "passed": true
+    },
+    {
+      "id": "BD-01",
+      "category": "boundary",
+      "passed": true
+    },
+    {
+      "id": "BD-02",
+      "category": "boundary",
+      "passed": true
+    },
+    {
+      "id": "BD-03",
+      "category": "boundary",
+      "passed": true
+    },
+    {
+      "id": "BD-04",
+      "category": "boundary",
+      "passed": true
+    },
+    {
+      "id": "BD-05",
+      "category": "boundary",
+      "passed": true
+    }
+  ]
+}
