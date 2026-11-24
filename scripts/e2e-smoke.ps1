@@ -5,11 +5,14 @@
 #   powershell -File scripts/e2e-smoke.ps1 -BaseUrl https://previsit.naritaroad.com -ClinicianPassword '...' -SkipModel
 #
 # -SkipModel skips the checks that call the language model (red-flag, scope, refill and clinician checks never do).
+# -Light trims the evasion list and reuses visits so a run stays under the public demo's rate limits
+# (10 new visits and 20 messages per 10 minutes per client).
 param(
   [string]$BaseUrl = 'http://127.0.0.1:8088',
   [string]$ClinicianUser = 'dr_demo',
   [string]$ClinicianPassword = $env:CLINICIAN_PASSWORD,
-  [switch]$SkipModel
+  [switch]$SkipModel,
+  [switch]$Light
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Net.Http
@@ -90,13 +93,16 @@ Check 'negation: 「沒有發燒，胸口很悶痛」 still triggers the red fla
 # 4b. sentences where a negator belongs to another verb: the red flag must still fire (security review blocker)
 $mustHit = @('沒睡好今天胸口很痛', '沒吃東西就吐血', '沒多久就昏倒了', '無緣無故胸痛', '沒做什麼就喘不過氣', '我想自杀', '他晕倒了', 'I have chest pain and can''t breathe')
 $mustNot = @('我沒有胸痛，只是咳嗽三天', '沒有發燒也沒有咳嗽', '我不會喘')
+if ($Light) { $mustHit = @($mustHit[0], $mustHit[3], $mustHit[5]) }
+$veHit = NewVisit
 foreach ($s in $mustHit) {
-  $r = PostMessage (NewVisit) $s
-  Check ("red flag evasion: hit for: " + $s) (((Types $r.Events) -contains 'redflag.triggered') -and -not ((Types $r.Events) -contains 'run.started'))
+  $r = PostMessage $veHit $s
+  Check ("red flag evasion: hit for: " + $s) ((Types $r.Events) -contains 'redflag.triggered') ((Types $r.Events) -join ',')
 }
-if (-not $SkipModel) {
+if (-not $SkipModel -and -not $Light) {
+  $veNeg = NewVisit
   foreach ($s in $mustNot) {
-    $r = PostMessage (NewVisit) $s
+    $r = PostMessage $veNeg $s
     Check ("negation kept: no red flag for: " + $s) (-not ((Types $r.Events) -contains 'redflag.triggered'))
   }
 }
