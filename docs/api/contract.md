@@ -51,7 +51,7 @@ interface IntakeState {
     modifiers: string | null   // P 加重／緩解
     character: string | null   // Q 性質
     location: string | null    // R 部位／放射
-    severity: number | null    // S 0–10
+    severity: number | 'n/a' | null  // S 0–10；'n/a'＝病人無法或不需評分（視為已取得）
     course: string | null      // T 病程變化／持續多久
     associated: string | null  // 伴隨症狀
   }
@@ -67,13 +67,13 @@ interface IntakeView {
   progress: { done: number; total: number }
 }
 
-interface RedFlagHit { category: RedFlagCategory; label: string; matched_at: string; message_id: string }
+interface RedFlagHit { category: RedFlagCategory; label: string; matched_at: string /* ISO 時間戳，不是命中的文字 */; message_id: string }
 
 interface ToolCall {          // 追蹤面板的一列
   id: string
   run_id: string | null
   step: number
-  name: 'red_flag_precheck' | 'scope_precheck' | 'output_guard' | 'record_intake'
+  name: 'red_flag_precheck' | 'scope_precheck' | 'pii_filter' | 'output_guard' | 'record_intake'
       | 'search_health_education' | 'check_chronic_refill' | 'transfer_to_clinician' | 'save_previsit_summary'
   source: 'code' | 'model' | 'form'
   status: 'ok' | 'rejected' | 'error'
@@ -118,7 +118,7 @@ interface RefillResult {
 
 interface PrevisitSummary {
   visit_id: string
-  chief_complaint: string
+  chief_complaint: string | null  // 提早送出且尚無主訴時為 null
   hpi: IntakeState['hpi']
   past_history: string[]; medications: string[]; allergies: string[]
   not_collected: string[]         // 病人未回答的欄位鍵
@@ -232,3 +232,58 @@ data: {"v":1,"seq":<n>,"type":"<type>","data":{...}}
 - 靜態網站由同一個程序從 `WEB_DIR` 提供；未知路徑回 `index.html`（SPA）。`/api/*` 未知路徑回 404 JSON。
 - 回應加 `x-content-type-options: nosniff`、`referrer-policy: same-origin`、`x-frame-options: DENY`；SSE 回應加 `cache-control: no-store`、`x-accel-buffering: no`。
 - 日誌不得包含訊息內容、IP 原文、cookie、金鑰。IP 只以加鹽雜湊存於速率限制記憶體，不入資料庫。
+
+## 7. 補充定案（2026-11-25 規格檢驗後；與前文衝突時**以本節為準**）
+
+### 7.1 visit 狀態轉移
+
+| 事件 | 從 | 到 | 備註 |
+|---|---|---|---|
+| 建立 | — | `active`，stage `chief_complaint` | |
+| 紅旗命中 | `active`／`submitted`／`reviewed`／`red_flag` | `red_flag` | **任何狀態都先跑紅旗**。同一 visit 已有未結案的紅旗轉交單就不重複開單（但仍存 `red_flag_events` 並回固定文字）|
+| `POST /submit` | `active`、`red_flag` | `active`→`submitted`；`red_flag` **維持** `red_flag`（仍寫入 `submitted_at` 與摘要）| `submitted`／`reviewed` 再 submit → 200 冪等回傳現有摘要 |
+| 醫師 `review` | `submitted`、`red_flag` | `reviewed` | 其他狀態 → 409 `invalid_state` |
+| 病人訊息（未命中紅旗）| `submitted`／`reviewed` | 不變，回 409 `visit_closed` | 命中紅旗則走紅旗流程並回到 `red_flag` |
+| 病人訊息（未命中）| `red_flag` | 不變 | 回固定提醒（kind `notice`），不呼叫模型 |
+
+前端：緊急卡片由 `VisitDetail.red_flag != null` 決定（取**最近一次**命中），不是由 status 推斷；已結束（closed）畫面也要保留 119／1925 卡片。`POST /visits/{id}/handoff` 的備註文字同樣先跑 PII 遮蔽與紅旗檢查。
+
+### 7.2 紅旗事件的標準順序
+
+`message.accepted` → `precheck.completed` → `redflag.triggered` → （`ticket.created`，若有新單）→ `message.completed`（kind `red_flag`）→ `visit.updated` → `run.completed`（status `skipped`）。其他順序：越界拒絕為 `message.accepted` → `precheck.completed` → （`ticket.created`）→ `message.completed`（kind `refusal`）→ `run.completed`(skipped)。一般回合：`message.accepted` → `precheck.completed` → `run.started` → `tool.*`／`intake.updated`／`ticket.created`／`summary.updated`（任意穿插）→ `guard.rewrote`（若有）→ `message.delta` → `message.completed` → `visit.updated`（階段或狀態改變時）→ `run.completed`。
+
+### 7.3 病人端投影
+
+病人持 UUID 呼叫 `GET /visits/{id}` 時，回傳形狀與 `VisitDetail` 相同，但**醫師私有欄位為 null**：`visit.review_note`、`visit.reviewed_by`、`tickets[].resolved_by`、`tickets[].resolution_note`。（追蹤面板的 `tool_calls`、`runs`、`refill_checks` 屬於病人可見功能，照給。）`GET /clinician/visits/{id}` 給完整內容。前端以 localStorage 保存 visit id；不用網址帶 id。
+
+### 7.4 型別與命名補充
+
+- `Stage` 不含 `opening`（開場訊息只是第一則 assistant 訊息，kind `opening`）。
+- `IntakeState` 的「不適用」以**固定字串 `不適用`**儲存（後端會把 `N/A`／`n/a`／`not applicable`／`不適用` 正規化成它；`severity` 用 `'n/a'`）。en 介面由前端顯示成 "N/A"。
+- 欄位鍵（`IntakeView.missing`、`PrevisitSummary.not_collected`）固定為：`chief_complaint, hpi.onset, hpi.course, hpi.location, hpi.character, hpi.severity, hpi.modifiers, hpi.associated, past_history, medications, allergies`（依此順序）。`stage` 只看核心欄位（`chief_complaint`、`hpi.onset`、`hpi.course`、`hpi.severity`、`hpi.associated`、三個 ListField）；`missing` 與 `progress`（total 11）列**全部**欄位，所以到 `confirm` 階段時 progress 可能是 8/11 並且 `missing` 仍列出 `hpi.location` 等非核心欄位，這是預期行為，前端顯示成「建議補充」。
+- 新增錯誤碼：`conflict`(409，同一 visit 已有訊息在處理中)、`invalid_state`(409)、`unsupported_media_type`(415)。`error.fields` 的形狀為 `{ "<欄位名>": "<訊息>" }`。
+- `POST /visits/{id}/refill-check` 的 `fills_done` 為 1–3（3＝已領完三次 → `revisit`）。
+- `check_chronic_refill` 給模型的工具參數**沒有 `today`**；`today` 只在表單與評測路徑接受，一律以 Asia/Taipei 解讀。`GET /meta` 另回 `server_today`（`YYYY-MM-DD`，Asia/Taipei），供前端表單預設日期。
+- `GET /clinician/visits?status=` 可為 `pending`（＝`submitted` 或 `red_flag`，預設）、`submitted`、`red_flag`、`reviewed`、`all`；`limit` 預設 50、最大 200。
+- 速率限制涵蓋**所有** POST（visits、messages、refill-check、submit、handoff、login）與 `GET /visits/{id}`（防列舉）；超過回 429 `rate_limited`。
+
+### 7.5 追蹤列的 `arguments`／`result` 形狀（前端以此渲染；未知的 `name` 也要能用通用方式顯示）
+
+| name | arguments | result |
+|---|---|---|
+| `red_flag_precheck` | `{chars:number}` | `{hit:false}` 或 `{hit:true, category, label, rule_id}` |
+| `scope_precheck` | `{chars:number}` | `{verdict:'ok'\|'prescription_request'\|'controlled_drug'\|'injection'}` |
+| `pii_filter` | `{chars:number}` | `{masked:number, kinds:string[]}`（只在有遮蔽時才寫入）|
+| `record_intake` | 模型送的 patch（部分 `IntakeState`）| `{applied:string[], rejected:{field:string, reason:string}[]}` |
+| `search_health_education` | `{query, top_k}` | `{hits:[{section, title, source_type, source_name, source_url, verified_on, score}]}`（空陣列＝手冊沒有）|
+| `check_chronic_refill` | `RefillInput`（模型路徑沒有 `today`）| `RefillResult` |
+| `transfer_to_clinician` | `{reason, urgency, summary}` | `{ticket_no, deduped:boolean}` |
+| `save_previsit_summary` | 模型送的摘要草稿 | `{saved:true, not_collected:string[]}` |
+| `output_guard` | `{chars:number}` | `{passed:boolean, violations:('diagnosis'\|'dosage'\|'prescribing')[], action:'none'\|'rewritten'\|'replaced'}` |
+
+### 7.6 串流規則
+
+- `message.delta` 一律在 `output_guard` **之後**才送；用戶端收到 `message.completed` 時，以其 `content` **取代**氣泡內容（它才是權威文字）。
+- 串流每 15 秒送一個 SSE 註解行 `: keep-alive`；整個 run 有總逾時（`LLM_TIMEOUT_SECS × 2`，上限 90 秒），到時 `run.failed(timeout)`。
+- 同一 visit 同時只處理一則訊息（以資料庫 advisory lock 或程序內鎖），第二則 → 409 `conflict`。
+- 前端用 `fetch` 讀串流（POST 不能用 `EventSource`）。

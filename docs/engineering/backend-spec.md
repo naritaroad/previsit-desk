@@ -159,3 +159,27 @@ PostgreSQL 18。主鍵：`visits.id` 用 `gen_random_uuid()`（v4，不可猜）
 ```powershell
 powershell -File scripts/check-forbidden-names.ps1
 ```
+
+## 13. 補充定案（2026-11-25 規格檢驗後；與前文衝突時**以本節為準**；HTTP 形狀另見 contract §7）
+
+1. **否定處理（修正 §4）**：先依標點（，。；！？、換行與全形對應）把訊息切成子句，**再**對每個子句各自正規化（全形轉半形、去空白）與比對。否定詞只作用在**同一子句內**命中詞之前的 6 字內；子句內若在否定詞與命中詞之間或命中詞之後出現「但／但是／可是／卻／然而／不過／只是／不過是」就取消否定。因此下列**必須命中**：「我沒有發燒，胸口很悶痛」「沒發燒但胸痛」「我沒有睡好。胸口悶痛」「沒有咳嗽，但是胸痛」；**必須不命中**：「我沒有胸痛」「我沒有喘」。英文例句也要有：「I have chest pain」「can't breathe」「I want to kill myself」必須命中；「no chest pain」「I don't have trouble breathing」必須不命中。`red_flags.csv`／`scope_rules.csv` 加 `lang` 欄（`zh`｜`en`）：zh 規則跑在去空白後的子句上；en 規則跑在小寫、空白合併為單一空格的子句上（可用 `\b`），英文否定詞 `no|not|don't|dont|without|never|haven't|didn't` 同樣限同一子句、前 4 個詞內。
+2. **已結束的 visit 也先跑紅旗**：`POST /messages` 的順序是 visit 存在檢查 → 速率限制 → PII 遮蔽 → 紅旗 → （若 visit 已 `submitted`／`reviewed` 且未命中）409 `visit_closed`。見 contract §7.1。
+3. **紅旗單去重**：同一 visit 有未結案的 `reason=red_flag` 轉交單時不再開新單，但仍寫 `red_flag_events`、回固定文字。
+4. **PII 遮蔽（新）**：在存檔與呼叫模型**之前**對病人訊息與 `/handoff` 備註做遮蔽：身分證 `[A-Za-z][12]\d{8}`、手機 `09\d{2}-?\d{3}-?\d{3}`、市話 `0\d{1,2}-?\d{6,8}`、電子郵件、連續 8 位以上數字（健保卡號等）→ 換成 `【已遮蔽】`；有遮蔽就寫一列 `tool_calls`（`pii_filter`），並在該回合助理回覆後附一則固定 `notice`（「偵測到疑似個資，已遮蔽；請勿輸入個資」）。姓名無法可靠偵測，由介面提示負責；README 與產品文件據實描述。`record_intake` 的 §5 拒絕規則維持。
+5. **慢箋（修正 §7）**：(a) `fills_done` 接受 1..=`max_fills`；`fills_done >= max_fills` → `revisit`（已領完全部次數）。(b) **每一個 `consult` 都 `handoff:true` 並建單**，包含特殊身分（reason `special_status`，urgency `routine`）。(c) 日數不符規定（總日數 > 上限、每次日數 > 上限、每次×次數 < 總日數）→ `consult`（reason `other`），不是 `revisit`；`revisit` 只用於已逾期或已領完。(d) 日期慣例寫進 csv 的 note：`supply_end = last_fill_date + days_per_fill`（藥用完後的第一天）；可領窗口 `[supply_end − early_window_days, 慢箋有效期限]`，窗口之後（`today > supply_end`）仍可領但附「藥量中斷」提醒。(e) 必測的輸入明確寫成：`prescription_date = last_fill_date = D, total_days = 90, days_per_fill = 30, fills_done = 1`；`D+20 → eligible`、`D+10 → too_early(earliest D+20)`、`D+19 → too_early`、`D+95 → revisit`、`fills_done=3 → revisit`、`total_days=100 → consult`。(f) 轉交單 reason 優先序：`controlled_drug` > `symptom_change` > `side_effects` > `special_status` > `other`；summary 列出**所有**成因；urgency：前三者 `soon`，其餘 `routine`。同一 (visit, reason) 有未結案單就回傳既有單（`deduped:true`）。
+6. **時間**：全程使用一個 Asia/Taipei `Clock`（固定 +08:00，台灣無日光節約）：慢箋預設 `today`、轉交單單號日期、`usage_daily` 的日界、保留期限都用它。`Clock` 可注入，測試用假時鐘（含 `2026-11-24T17:00:00Z` ＝ 台北 11-25 01:00）。`check_chronic_refill` 給模型的 JSON schema **不含 `today`**，表單與評測路徑才接受。`/meta` 回 `server_today`。
+7. **轉交單觸發表**：
+
+| 觸發 | reason | urgency | created_by |
+|---|---|---|---|
+| 紅旗命中 | `red_flag` | `urgent` | code |
+| 範圍規則：要求處方／管制藥 | `prescription_request`／`controlled_drug` | `soon` | code |
+| 慢箋檢核 `consult` | 見 5(f) | 見 5(f) | form（表單）或 model（模型呼叫）|
+| 模型 `transfer_to_clinician` | 限 `patient_request`、`out_of_scope_medical`、`symptom_change`、`side_effects`、`prescription_request`、`controlled_drug`、`other`（**不得** `red_flag`）| 限 `routine`／`soon`（**不得** `urgent`）| model |
+| 病人按「請醫師聯絡我」 | `patient_request` | `routine` | form |
+
+模型工具 schema：`{reason: enum, urgency: 'routine'|'soon', summary: string ≤300}`。系統提示詞要說明：程式已自動開單的情況（紅旗、範圍規則命中、慢箋 consult）不必再呼叫 `transfer_to_clinician`。所有開單都做 (visit, reason) 未結案去重。
+8. **`ticket_counters` 取號**要用單一原子操作（`insert … on conflict do update set n = n + 1 returning n`）。
+9. **串流**：`message.delta` 在 `output_guard` 之後才送；每 15 秒送 `: keep-alive` 註解；run 總逾時 `min(LLM_TIMEOUT_SECS × 2, 90)` 秒；同一 visit 同時只處理一則訊息（`pg_try_advisory_xact_lock` 或程序內 per-visit 鎖），第二則 409 `conflict`。
+10. **思考等級**：Gemini 3 系列預設會思考（延遲 4–7 秒）；實測 `gemini-3.5-flash` 設 thinking level `minimal` 約 2.4 秒、答覆品質足夠。genai 0.7.1 以模型名稱後綴解析推理強度（例如 `gemini-3.5-flash-minimal`）；請驗證後端實際把 `thinkingLevel` 送出（讀 genai 原始碼或看請求），並新增環境變數 `LLM_THINKING`（`minimal|low|medium|high|default`，預設 `minimal`）由程式組成模型名稱後綴；`LLM_MODEL` 本身仍是不含後綴的乾淨模型名，回報與追蹤面板顯示乾淨名稱。`gemini-3.8-flash` 不支援 `minimal`（400），用 `low`；每個模型的可用等級由設定決定，備援模型 `gemini-3.1-flash-lite` 沒有思考，不帶後綴。
+11. **其他**：`GET /visits/{id}` 也納入速率限制；病人端投影見 contract §7.3；`error.fields` 為 `{欄位: 訊息}`；`red_flag_events`／`guard_events` 等稽核列隨 visit 依保留期限一併刪除（README 據實寫明）；`data/seed/refill_rules.csv` 欄位改為 `key,value,unit,source_type,source_url,verified_on,text_zh,text_en,note`（`text_*` 是顯示給使用者的規則說明，`note` 只給維護者、**不得顯示給使用者**；`verified_on` 只有真的查證才填，沒查證留空並在 note 寫「未查證」）；`rules[]` 取 `key`、依 locale 的 `text_*`、`source_url`。
