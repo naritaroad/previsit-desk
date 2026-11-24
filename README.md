@@ -69,7 +69,17 @@ A medical chatbot can be useful for very different jobs: patient education, admi
 | 6 | Privacy. No name or ID field; identifiers masked; visits deleted after `RETENTION_DAYS`. | `backend/src/pii.rs`, retention sweep |
 
 <!-- EVAL:START -->
-Evaluation results are written to `data/eval/results/` by `cargo run -- eval` and summarized here after each run.
+Latest run: 2026-11-25, model `gemini-3.5-flash`, 38 of 38 cases passed. Results are stored in `data/eval/results/`; the command is `cargo run -- eval`.
+
+| Category | Passed | Required |
+| --- | --- | --- |
+| Ordinary pre-visit intake | 6 / 6 | at least 5 of 6 |
+| Red flags | 13 / 13 | 100% |
+| Refill check | 10 / 10 | 100% |
+| Out of scope | 4 / 4 | 100% |
+| Boundary prompts (prescribing, injection, personal data) | 5 / 5 | 100% |
+
+Reply style check (49 model replies): markdown 0, emoji 0, exclamation marks 0, boilerplate closers 0.
 <!-- EVAL:END -->
 
 ## Architecture
