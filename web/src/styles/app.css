@@ -441,8 +441,6 @@ a, button, summary, label, input, select, textarea { touch-action: manipulation;
 .progress__bar > span { width: 100%; transform: scaleX(0); transform-origin: left center; transition: transform var(--dur-slow) var(--ease-out); }
 .skel { background: var(--color-surface-sunken); animation: skel-pulse 1.4s var(--ease-in-out) infinite; }
 @keyframes skel-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
-.pane { animation: pane-in var(--dur-base) var(--ease-out); }
-@keyframes pane-in { from { opacity: 0; } to { opacity: 1; } }
 .nav-menu__list { animation: card-in var(--dur-fast) var(--ease-out); }
 
 /* ---------- Touch targets, narrow screens, long words (found by the screenshot audit) ---------- */
@@ -465,5 +463,148 @@ html, body { overflow-x: clip; }
 /* Only the newest messages animate in (a reload would otherwise fade in the whole history at once);
    switching tabs is frequent, so its fade stays short. */
 .chat-log > .msg:not(:nth-last-child(-n + 2)) { animation: none; }
-.pane { animation-duration: var(--dur-fast); }
 .card > .text-sm.text-muted + div { margin-top: var(--space-3); }
+
+/* =====================================================================
+   Polish pass (art-direction review, 2026-11-25)
+   ===================================================================== */
+
+/* ---------- Browser surfaces carry the palette too ---------- */
+::selection { background: var(--color-primary-soft); color: var(--color-primary-strong); }
+body { caret-color: var(--color-primary); accent-color: var(--color-primary); scrollbar-color: var(--color-border-strong) transparent; }
+.pane__scroll, .trace-scroll, .convo { scrollbar-width: thin; }
+/* CJK and Latin side by side: let the browser add the thin gap where API text has none ("12月10日" -> "12 月 10 日"). */
+body { text-autospace: normal; }
+code, pre, .mono, input, textarea { text-autospace: no-autospace; }
+
+/* ---------- Fixed bars never shrink when a pane's content is long (the cut-off tab strip) ---------- */
+.app-header, .ai-banner, .pane__head, .panel-tabs, .composer, .pane__notices, .tabbar { flex-shrink: 0; }
+/* The chat header and the panel tab strip share one baseline and one bottom rule on wide screens. */
+.pane__head { min-height: 52px; }
+@container app (min-width: 900px) {
+  .panel-tabs { min-height: 52px; align-items: flex-end; padding-top: 0; }
+  .panel-tabs .tab { min-height: 51px; }
+}
+
+/* ---------- Header: brand reads as one lock-up; quiet actions ---------- */
+.brand__sub { padding-left: var(--space-2); margin-left: var(--space-1); border-left: 1px solid var(--color-border); line-height: 1.2; }
+.app-header__actions .btn-ghost { color: var(--color-text-muted); font-weight: var(--weight-regular); font-size: var(--text-sm); padding-inline: var(--space-3); }
+.app-header__actions .btn-ghost:hover { background: var(--color-surface-sunken); color: var(--color-text); }
+.app-nav a, .icon-btn, .lang-switch, .tab, .tabbar__btn, .filter, .vrow, .nav-menu__list a, .seg label {
+  transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-instant) var(--ease-out);
+}
+.ai-banner { align-items: center; }
+.ai-banner .icon { margin-top: 0; }
+.ai-banner p { min-width: 0; }
+
+/* ---------- Mobile platform layer ---------- */
+/* Long-press on a control should not select its label; content text stays selectable. */
+button, .tab, .tabbar__btn, .filter, .chip, .call-btn, .seg label, .app-nav a, summary { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+/* Edge-to-edge (viewport-fit=cover): the header pads itself away from the notch / status bar. */
+.app-header { height: auto; min-height: calc(var(--header-h) + env(safe-area-inset-top, 0px)); padding-top: env(safe-area-inset-top, 0px); }
+
+/* ---------- Press feedback: a small, fast scale on things you tap ---------- */
+.icon-btn:active, .lang-switch:active, .tabbar__btn:active, .filter:active, .call-btn:active { transform: scale(0.97); }
+.call-btn { transition: transform var(--dur-instant) var(--ease-out), filter var(--dur-fast) ease, background-color var(--dur-fast) ease; }
+
+/* Touch screens fire :hover on tap and leave it stuck; only pointers that hover get hover fills. */
+@media (hover: none) {
+  .icon-btn:hover, .lang-switch:hover, .tab:hover, .app-nav a:not([aria-current]):hover, .vrow:hover, .btn-secondary:hover, .app-header__actions .btn-ghost:hover { background: transparent; }
+  .btn-secondary:hover { background: var(--color-surface-raised); }
+}
+
+/* ---------- Tab indicators grow in place instead of popping (transform only) ---------- */
+.tab::after { content: ""; position: absolute; left: var(--space-2); right: var(--space-2); bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--color-primary); transform: scaleX(0); transition: transform var(--dur-fast) var(--ease-out); }
+.tab[aria-selected="true"]::after { transform: scaleX(1); }
+.tabbar__btn::before { content: ""; position: absolute; top: 0; left: 25%; right: 25%; height: 3px; border-radius: 0 0 3px 3px; background: var(--color-primary); transform: scaleX(0); transition: transform var(--dur-fast) var(--ease-out); }
+.tabbar__btn[aria-selected="true"]::before { transform: scaleX(1); }
+.panel-tabs { overflow-y: hidden; }
+
+/* ---------- Start card: what happens next, before anyone types ---------- */
+.start-card { gap: var(--space-4); padding: var(--space-6) var(--space-5) var(--space-5); box-shadow: var(--shadow-1); }
+.start-card__mark { width: 48px; height: 48px; border-radius: var(--radius-lg); background: var(--color-primary-soft); color: var(--color-primary-strong); display: flex; align-items: center; justify-content: center; }
+.start-card__mark .icon { color: inherit; }
+.start-card h2 { font-size: var(--text-xl); }
+.start-card__lead { margin-top: calc(-1 * var(--space-2)); }
+.start-card p.start-card__lead { font-size: var(--text-md); line-height: var(--leading-body); }
+.start-steps { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); width: 100%; padding-block: var(--space-4); border-block: 1px solid var(--color-border); }
+.start-steps li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: var(--space-3); align-items: start; font-size: var(--text-sm); line-height: var(--leading-body); color: var(--color-text); }
+.start-steps .icon { color: var(--color-primary); margin-top: 3px; }
+.start-card .btn-primary { min-width: 10rem; }
+.start-card .notice { width: 100%; }
+@container app (max-width: 520px) {
+  .start-card { margin-top: var(--space-4); padding: var(--space-5) var(--space-4) var(--space-4); }
+  .start-card .btn-primary { width: 100%; }
+}
+
+/* ---------- Chat: bubbles belong to a speaker, not a template ---------- */
+.chat-log { gap: var(--space-5); }
+.msg__bubble { line-height: var(--leading-body); }
+.msg--assistant .msg__bubble { box-shadow: none; }
+.msg--patient .msg__bubble { color: var(--color-text); }
+.msg__avatar { margin-top: 2px; }
+.msg__meta { padding-inline: var(--space-1); }
+.composer .btn-primary { flex-shrink: 0; width: var(--touch-min); padding: 0; }
+.composer .btn-primary:disabled { opacity: 1; background: var(--color-surface-raised); border-color: var(--color-border); color: var(--color-text-subtle); }
+.composer textarea.field { line-height: var(--leading-snug); padding-block: 10px; }
+
+/* ---------- Emergency: unmistakable, steady, nothing moves but a fade ---------- */
+.emergency { box-shadow: var(--shadow-2); padding: var(--space-5); }
+.emergency__head { align-items: center; }
+.emergency__title { font-size: var(--text-xl); }
+.emergency__hit { display: inline-flex; margin-top: var(--space-1); padding: 0 var(--space-2); border-radius: var(--radius-sm); border: 1px solid var(--color-danger-solid); font-size: var(--text-xs); font-weight: var(--weight-bold); line-height: 1.8; }
+.emergency__text { line-height: var(--leading-body); color: var(--color-text); }
+.emergency__actions { margin-top: var(--space-4); gap: var(--space-3); }
+.emergency__foot { padding-top: var(--space-3); border-top: 1px solid color-mix(in srgb, var(--color-danger-solid) 30%, transparent); }
+/* Content scrolls under the pinned card; a short fade instead of a hard cut through the next bubble. */
+.emergency-wrap::after { content: ""; position: absolute; left: 0; right: 0; bottom: calc(-1 * var(--space-4)); height: var(--space-4); background: linear-gradient(var(--color-bg), transparent); pointer-events: none; }
+
+/* ---------- Trace: one card per run, rows divided, not a stack of boxes ---------- */
+.trace-group { border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface-raised); overflow: hidden; }
+.trace-group > .run-head { margin: 0; border-radius: 0; border-bottom: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); line-height: var(--leading-snug); }
+.trace-group > .trace { gap: 0; }
+.trace-group .trace > li + li { border-top: 1px solid var(--color-border); }
+.trace-group .trace-row { border: 0; border-radius: 0; background: transparent; }
+.trace-group .trace-row > summary { padding: var(--space-2) var(--space-3); gap: var(--space-3); }
+.trace-group .trace-row > summary:hover { background: var(--color-surface-sunken); }
+.trace-group .trace-row[open] > summary { background: var(--color-surface-sunken); }
+.trace-group .trace-row--redflag { box-shadow: inset 0 0 0 2px var(--color-danger-solid); background: var(--color-danger-bg); }
+.trace-group .trace-row--redflag .trace-row__step, .trace-group .trace-row--redflag .trace-row__name { color: var(--color-danger-strong); }
+.trace-group .trace-note { margin: var(--space-2) var(--space-3); }
+.trace-row__detail { background: var(--color-surface); }
+.trace-row > summary::after { content: ""; width: 7px; height: 7px; border-right: 1.75px solid var(--color-text-subtle); border-bottom: 1.75px solid var(--color-text-subtle); transform: rotate(-45deg); transition: transform var(--dur-fast) var(--ease-out); margin-right: 2px; }
+.trace-row[open] > summary::after { transform: rotate(45deg); }
+.trace-row > summary { grid-template-columns: 20px auto minmax(0, 1fr) auto 10px; }
+@container app (max-width: 520px) {
+  .trace-group .trace-row > summary { gap: var(--space-2); padding-inline: var(--space-2) var(--space-3); }
+  .trace-row__name { font-size: 0.8125rem; }
+}
+
+/* ---------- Refill result: dates read as a fact sheet; no orphan tile, no weekday on its own line ---------- */
+.rcard { box-shadow: var(--shadow-1); }
+.rcard__head { align-items: center; }
+.rcard__dates { grid-template-columns: minmax(0, 1fr); gap: 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); overflow: hidden; }
+.rcard__date { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; padding: var(--space-2) var(--space-3); border: 0; border-radius: 0; background: transparent; }
+.rcard__date + .rcard__date { border-top: 1px solid var(--color-border); }
+.rcard__date dt { font-size: var(--text-sm); }
+.rcard__date dd { font-size: var(--text-md); text-align: right; word-break: keep-all; overflow-wrap: anywhere; }
+.rcard__reasons li + li { margin-top: var(--space-1); }
+.rcard__rules summary { min-height: var(--touch-min); }
+.rcard__ticket { border: 1px solid var(--color-accent); background: var(--outcome-consult-bg); }
+
+/* ---------- Clinician ---------- */
+.vrow__time { white-space: nowrap; }
+.refresh-btn { font-weight: var(--weight-regular); font-size: var(--text-sm); }
+.page--narrow { padding-top: var(--space-6); }
+.card > .card__heading + .text-sm + form { margin-top: var(--space-5); }
+
+/* Disabled primary buttons go quiet instead of washed-out teal (which reads as "loading"). */
+.btn-primary:disabled { opacity: 1; background: var(--color-surface-sunken); color: var(--color-text-muted); border-color: var(--color-border); }
+.card { box-shadow: var(--shadow-1); }
+.vlist { box-shadow: var(--shadow-1); }
+
+/* ---------- Dark: raised surfaces stay one step lighter than the page, never pure black wells ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .run-head { background: var(--color-surface); }
+}
+[data-theme="dark"] .run-head { background: var(--color-surface); }

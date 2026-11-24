@@ -49,6 +49,10 @@
     "startTitle": "Start a pre-visit",
     "startBody": "Answer a few questions and we will put them into a summary for your doctor. Finish it before your appointment.",
     "start": "Start pre-visit",
+    "startStepsLabel": "How the pre-visit works",
+    "startStep1": "One question at a time. Answer in your own words.",
+    "startStep2": "You check the summary before it goes to your doctor.",
+    "startStep3": "If you mention danger signs like chest pain or trouble breathing, you are told to get care right away. The AI is not involved.",
     "missingTitle": "This pre-visit was not found",
     "missingBody": "It may be past the retention period. Start a new pre-visit.",
     "piiMasked": "Your message had what looks like personal details. They were masked before processing. Please don't enter real personal details."

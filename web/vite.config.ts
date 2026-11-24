@@ -15,5 +15,6 @@ export default defineConfig({
     port: 4173,
     proxy: { "/api": { target: api, changeOrigin: false } },
   },
-  build: { outDir: "dist", sourcemap: true },
+  // No source maps in production: they would ship inside the image next to dist/.
+  build: { outDir: "dist", sourcemap: false },
 });

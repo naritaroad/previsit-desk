@@ -164,7 +164,7 @@ export function TracePanel({ trace, runs, guards }: { trace: TraceRow[]; runs: R
   return (
     <div className="stack">
       {groups.map((g) => (
-        <section key={g.key} aria-label={g.run ? g.run.model || t("trace.noModel") : t("trace.formGroup")}>
+        <section key={g.key} className="trace-group" aria-label={g.run ? g.run.model || t("trace.noModel") : t("trace.formGroup")}>
           <RunHead run={g.run} guards={guards.filter((x) => x.run_id === g.run?.id)} />
           {g.rows.length ? (
             <ol className="trace" role="list">

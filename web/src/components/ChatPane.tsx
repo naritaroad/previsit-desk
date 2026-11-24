@@ -291,9 +291,27 @@ export function ChatPane({ visit, phase, maxChars, onFinish, onHandoff }: ChatPa
 
         {phase === "idle" || phase === "missing" ? (
           <div className="start-card">
-            <Icon name="chat" size="lg" />
+            <div className="start-card__mark" aria-hidden="true">
+              <Icon name="chat" size="lg" />
+            </div>
             <h2>{t(phase === "missing" ? "chat.missingTitle" : "chat.startTitle")}</h2>
-            <p>{t(phase === "missing" ? "chat.missingBody" : "chat.startBody")}</p>
+            <p className="start-card__lead">{t(phase === "missing" ? "chat.missingBody" : "chat.startBody")}</p>
+            {phase === "idle" ? (
+              <ul className="start-steps" aria-label={t("chat.startStepsLabel")}>
+                <li>
+                  <Icon name="chat" size="sm" />
+                  <span>{t("chat.startStep1")}</span>
+                </li>
+                <li>
+                  <Icon name="doc" size="sm" />
+                  <span>{t("chat.startStep2")}</span>
+                </li>
+                <li>
+                  <Icon name="shield" size="sm" />
+                  <span>{t("chat.startStep3")}</span>
+                </li>
+              </ul>
+            ) : null}
             <button type="button" className="btn btn-primary" onClick={() => void visit.start()}>
               {t(phase === "missing" ? "composer.startNew" : "chat.start")}
             </button>
