@@ -15,12 +15,12 @@ use uuid::Uuid;
 
 use crate::error::AppError;
 use crate::guard::{self, GuardAction};
+use crate::limits::ClientKey;
 use crate::llm::ModelGateway;
 use crate::pii;
 use crate::precheck::RedFlagMatch;
 use crate::prompt::{self, PromptContext};
 use crate::state::{AppState, Rules};
-use crate::style;
 use crate::texts::{self, T, fmt, t};
 use crate::tickets::{self, NewTicket};
 use crate::tools::{self, ToolCtx};
@@ -55,6 +55,8 @@ pub struct Prepared {
     pub red_flag: Option<RedFlagMatch>,
     pub scope: ScopeVerdict,
     pub precheck_ms: u64,
+    /// Who sent it (salted hash), for the per-client daily model-call cap. `None` in the eval runner.
+    pub client: Option<ClientKey>,
 }
 
 pub fn prepare(rules: &Rules, raw: &str) -> Prepared {
@@ -70,6 +72,7 @@ pub fn prepare(rules: &Rules, raw: &str) -> Prepared {
         red_flag,
         scope,
         precheck_ms: started.elapsed().as_millis() as u64,
+        client: None,
     }
 }
 
@@ -441,6 +444,8 @@ struct RunCounters {
     output_tokens: i64,
     fallback_used: bool,
     model_used: String,
+    /// A fixed notice other than the default one for the failure code (the per-visit cap).
+    notice: Option<T>,
 }
 
 struct LoopDone;
@@ -469,9 +474,18 @@ async fn model_turn(
         ..RunCounters::default()
     };
 
+    let day = state.clock.today();
     let preflight = if !cfg.model_ready() {
         Some("not_configured")
     } else if limits::calls_today(db, &state.clock).await? >= cfg.daily_model_call_limit {
+        Some("daily_budget_exceeded")
+    } else if prepared.client.is_some_and(|c| {
+        i64::from(state.limiter.client_calls(c, day)) >= cfg.per_ip_daily_call_limit
+    }) {
+        // One client has used its share of today's model calls; everyone else is unaffected.
+        Some("daily_budget_exceeded")
+    } else if visits::patient_message_count(db, visit.id).await? > cfg.max_messages_per_visit {
+        counters.notice = Some(T::NoticeVisitLimit);
         Some("daily_budget_exceeded")
     } else {
         None
@@ -574,13 +588,13 @@ async fn fail_run(
         },
     )
     .await?;
-    let text_key = match code {
+    let text_key = counters.notice.unwrap_or(match code {
         "max_steps" => T::NoticeMaxSteps,
         "timeout" => T::NoticeTimeout,
         "not_configured" => T::NoticeNotConfigured,
         "daily_budget_exceeded" => T::NoticeDailyBudget,
         _ => T::NoticeModelError,
-    };
+    });
     let text = t(text_key, visit.locale);
     let notice = visits::insert_message(
         db,
@@ -676,6 +690,7 @@ async fn run_loop(
         .as_deref()
         .map(|m| state.ai.gateway(m, None));
     let mut using_fallback = false;
+    let day = state.clock.today();
     let mut ctx = ToolCtx {
         state,
         visit_id: visit.id,
@@ -699,6 +714,11 @@ async fn run_loop(
         {
             return Err("daily_budget_exceeded");
         }
+        if let Some(client) = prepared.client
+            && i64::from(state.limiter.client_calls(client, day)) >= cfg.per_ip_daily_call_limit
+        {
+            return Err("daily_budget_exceeded");
+        }
         // One call: primary first, then the fallback model once if the primary fails or times out.
         let reply = loop {
             let gateway: &dyn ModelGateway = match (using_fallback, fallback.as_deref()) {
@@ -706,6 +726,10 @@ async fn run_loop(
                 _ => primary.as_ref(),
             };
             counters.model_used = gateway.model_name().to_string();
+            // Every attempt costs quota on the provider's side, so every attempt counts here too.
+            if let Some(client) = prepared.client {
+                state.limiter.add_client_calls(client, day, 1);
+            }
             let failure = match tokio::time::timeout(cfg.llm_timeout, gateway.chat(request.clone()))
                 .await
             {
@@ -726,10 +750,16 @@ async fn run_loop(
                 }
                 Ok(Err(e)) => {
                     tracing::warn!(model = gateway.model_name(), step, error = %redact(&format!("{e:#}")), "model call failed");
+                    limits::record_call(db, &state.clock, gateway.model_name(), 0, 0)
+                        .await
+                        .map_err(db_fail)?;
                     "model_error"
                 }
                 Err(_) => {
                     tracing::warn!(model = gateway.model_name(), step, "model call timed out");
+                    limits::record_call(db, &state.clock, gateway.model_name(), 0, 0)
+                        .await
+                        .map_err(db_fail)?;
                     "timeout"
                 }
             };
@@ -761,10 +791,13 @@ async fn run_loop(
         request = request.append_message(assistant);
         for call in &reply.tool_calls {
             let call_id = Uuid::new_v4();
+            // The arguments are model-written: mask personal data and drop diagnosis or dose wording before they
+            // are stored or shown in the trace panel. The tool itself still gets the original arguments.
+            let shown_args = tools::sanitize_args(&call.fn_arguments, locale, &ctx.patient_text);
             emit(
                 sink,
                 "tool.started",
-                json!({ "call_id": call_id, "step": step, "name": call.fn_name, "source": "model", "arguments": call.fn_arguments }),
+                json!({ "call_id": call_id, "step": step, "name": call.fn_name, "source": "model", "arguments": shown_args }),
             );
             let outcome = tools::dispatch(&mut ctx, &call.fn_name, &call.fn_arguments).await;
             visits::record_tool_call(
@@ -777,7 +810,7 @@ async fn run_loop(
                     name: &call.fn_name,
                     source: ToolSource::Model.as_str(),
                     status: outcome.status.as_str(),
-                    arguments: &call.fn_arguments,
+                    arguments: &shown_args,
                     result: &outcome.stored_result,
                     duration_ms: outcome.duration_ms,
                 },
@@ -857,8 +890,8 @@ async fn finish_reply(
         allowed.push('\n');
         allowed.push_str(item);
     }
-    let report = guard::check(&text, locale, &allowed);
-    let violations: Vec<&str> = report.violations.iter().map(|v| v.as_str()).collect();
+    let sanitized = guard::sanitize_reply(&text, locale, &allowed);
+    let violations: Vec<&str> = sanitized.violations.iter().map(|v| v.as_str()).collect();
     visits::record_tool_call(
         db,
         visits::NewToolCall {
@@ -868,33 +901,32 @@ async fn finish_reply(
             step,
             name: "output_guard",
             source: ToolSource::Code.as_str(),
-            status: if report.passed() { ToolStatus::Ok.as_str() } else { ToolStatus::Rejected.as_str() },
+            status: if sanitized.violations.is_empty() {
+                ToolStatus::Ok.as_str()
+            } else {
+                ToolStatus::Rejected.as_str()
+            },
             arguments: &json!({ "chars": text.chars().count() }),
-            result: &json!({ "passed": report.passed(), "violations": violations, "action": report.action.as_str() }),
+            result: &json!({ "passed": sanitized.violations.is_empty(), "violations": violations, "action": sanitized.action.as_str() }),
             duration_ms: 0,
         },
     )
     .await
     .map_err(db_fail)?;
-    if report.action != GuardAction::None {
+    if sanitized.action != GuardAction::None {
         for violation in &violations {
-            visits::insert_guard_event(db, visit.id, run_id, violation, report.action.as_str())
+            visits::insert_guard_event(db, visit.id, run_id, violation, sanitized.action.as_str())
                 .await
                 .map_err(db_fail)?;
         }
         emit(
             sink,
             "guard.rewrote",
-            json!({ "kind": violations.first().copied().unwrap_or("other"), "action": report.action.as_str() }),
+            json!({ "kind": violations.first().copied().unwrap_or("other"), "action": sanitized.action.as_str() }),
         );
     }
 
-    let cleaned = style::style_cleanup(&report.text, locale);
-    let final_text = if cleaned.is_empty() {
-        report.text
-    } else {
-        cleaned
-    };
+    let final_text = sanitized.text;
     emit(sink, "message.delta", json!({ "text": final_text }));
     let message = visits::insert_message(
         db,

@@ -70,3 +70,26 @@ export function isRedFlagHitResult(result: unknown): boolean {
 export function piiMasked(result: unknown): number {
   return isObj(result) ? Number(result.masked) || 0 : 0;
 }
+
+export interface HandbookHit {
+  title: string;
+  section: string;
+  sourceName: string;
+  /** http(s) only; anything else is dropped. */
+  url: string | null;
+}
+
+/** Hits of search_health_education (contract 7.5), for a readable list under the trace row. */
+export function handbookHits(result: unknown): HandbookHit[] {
+  if (!isObj(result) || !Array.isArray(result.hits)) return [];
+  return result.hits.filter(isObj).map((h) => {
+    let url: string | null = null;
+    try {
+      const u = new URL(str(h.source_url));
+      url = u.protocol === "https:" || u.protocol === "http:" ? u.toString() : null;
+    } catch {
+      url = null;
+    }
+    return { title: str(h.title), section: str(h.section), sourceName: str(h.source_name), url };
+  });
+}

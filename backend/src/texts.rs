@@ -54,8 +54,8 @@ texts! {
         "If someone next to you is having the seizure, move hard objects away and do not put anything in their mouth."
     ),
     RedFlagSuicide => (
-        "聽起來您現在很辛苦。請先撥 1925 安心專線（24 小時、免費），會有人陪您談。如果您已經有傷害自己的行動，或身邊有立即的危險，請撥 119。我已通知醫療團隊。",
-        "It sounds like you are going through a lot right now. Please call the 1925 hotline first (free, 24 hours); someone will talk with you. If you have already hurt yourself, or you are in immediate danger, call 119. I have alerted the care team."
+        "聽起來您現在很辛苦。請先撥 1925 安心專線（24 小時、免費），會有人陪您談。如果您已經有傷害自己的行動，或身邊有立即的危險，請撥 119。如果已經吃了過量的藥，或喝了不該喝的東西，請立刻撥 119，不要等。我已通知醫療團隊。",
+        "It sounds like you are going through a lot right now. Please call the 1925 hotline first (free, 24 hours); someone will talk with you. If you have already hurt yourself, or you are in immediate danger, call 119. If you have already taken too much medicine or swallowed something you should not have, call 119 right away and do not wait. I have alerted the care team."
     ),
     RedFlagReminder => (
         "這次問診已經因為您先前描述的症狀暫停。請先就醫，或撥 119；1925 安心專線隨時有人接聽。如果要為別的事重新問診，請按「開始新的預問診」。",
@@ -98,6 +98,14 @@ texts! {
     NoticeMaxSteps => (
         "這個問題一次處理不完，我先停下來。請換個方式再說一次。",
         "That took too many steps, so I stopped. Please say it again in a different way."
+    ),
+    NoticeVisitLimit => (
+        "這次預問診的對話已經很長，我先停在這裡。請按「結束並送出」，把目前整理好的內容交給醫師；要補充別的事，請開始新的預問診。",
+        "This pre-visit conversation has become very long, so I will stop here. Choose \"Finish and submit\" to hand what is collected to the doctor, or start a new pre-visit to add something else."
+    ),
+    TransferSummaryFallback => (
+        "病人請醫師留意，詳細內容請見對話紀錄。",
+        "The patient asked the clinician to take a look. See the conversation for details."
     ),
     SubmittedThanks => (
         "摘要已送出，醫師看診前會看到。如果之後出現胸痛、喘不過氣這類緊急狀況，請直接撥 119。",

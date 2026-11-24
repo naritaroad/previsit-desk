@@ -1,7 +1,10 @@
-// Clinician session: GET /auth/me on load, login and logout. The cookie is HttpOnly, so the page
-// only ever knows the display name.
+// Clinician session: GET /auth/me when a clinician page is first opened, login and logout. Patients never
+// trigger the call (it would answer 401 and put a red line in their console). The cookie is HttpOnly, so
+// the page only ever knows the display name.
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+
+import { useLocation } from "react-router";
 
 import { ApiError, api } from "./api/client.ts";
 import type { ClinicianUser } from "./api/types.ts";
@@ -19,26 +22,30 @@ const AuthContext = createContext<AuthValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<ClinicianUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [checked, setChecked] = useState(false);
+  const onClinicianRoute = useLocation().pathname.startsWith("/clinician");
+  const loading = onClinicianRoute && !checked;
 
   useEffect(() => {
+    if (!onClinicianRoute || checked) return;
     let alive = true;
     api.me().then(
-      ({ user }) => alive && (setUser(user), setLoading(false)),
+      ({ user }) => alive && (setUser(user), setChecked(true)),
       (e: unknown) => {
         if (!alive) return;
         if (!(e instanceof ApiError && e.code === "unauthorized")) setUser(null);
-        setLoading(false);
+        setChecked(true);
       },
     );
     return () => {
       alive = false;
     };
-  }, []);
+  }, [onClinicianRoute, checked]);
 
   const login = useCallback(async (username: string, password: string) => {
     const { user } = await api.login(username, password);
     setUser(user);
+    setChecked(true);
   }, []);
 
   const logout = useCallback(async () => {

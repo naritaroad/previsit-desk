@@ -223,6 +223,25 @@ pub fn build(input: SummaryInput<'_>) -> PrevisitSummary {
     }
 }
 
+/// Recomputes the red-flag screen from the visit's red-flag events. The summary is saved once, but flags can
+/// fire afterwards (a closed visit still runs the red-flag rules), so it is refreshed whenever it is read.
+pub fn refresh_screen(summary: &mut PrevisitSummary, flags: Vec<TriggeredFlag>, locale: Locale) {
+    let note = t(
+        if flags.is_empty() {
+            T::RedFlagNoteClear
+        } else {
+            T::RedFlagNoteHit
+        },
+        locale,
+    )
+    .to_string();
+    summary.red_flag_screen = RedFlagScreen {
+        checked: true,
+        triggered: flags,
+        note,
+    };
+}
+
 pub async fn save(db: &PgPool, summary: &PrevisitSummary) -> sqlx::Result<()> {
     let content = serde_json::to_value(summary).unwrap_or(Value::Null);
     sqlx::query(
@@ -356,5 +375,36 @@ mod tests {
             serde_json::from_value(serde_json::to_value(&summary).expect("json")).expect("back");
         assert_eq!(back.chief_complaint.as_deref(), Some("咳嗽"));
         assert_eq!(back.refill, Some(json!({"outcome": "eligible"})));
+    }
+
+    #[test]
+    fn the_red_flag_screen_is_recomputed_when_a_flag_fires_after_the_summary_was_saved() {
+        let s = intake(json!({"chief_complaint": "咳嗽"}));
+        let mut summary = build(SummaryInput {
+            visit_id: Uuid::nil(),
+            intake: &s,
+            locale: Locale::ZhTw,
+            flags: vec![],
+            refill: None,
+            narrative: None,
+            model: None,
+            now: datetime!(2026-11-25 00:00 UTC),
+        });
+        assert!(
+            summary.red_flag_screen.triggered.is_empty()
+                && summary.red_flag_screen.note.contains("沒有命中")
+        );
+        refresh_screen(
+            &mut summary,
+            vec![TriggeredFlag {
+                category: "dyspnea".into(),
+                label: "呼吸困難".into(),
+            }],
+            Locale::ZhTw,
+        );
+        assert_eq!(summary.red_flag_screen.triggered.len(), 1);
+        assert!(summary.red_flag_screen.note.contains("命中紅旗規則"));
+        refresh_screen(&mut summary, vec![], Locale::En);
+        assert!(summary.red_flag_screen.note.contains("None matched"));
     }
 }

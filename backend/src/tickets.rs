@@ -38,6 +38,30 @@ pub struct Created {
     pub deduped: bool,
 }
 
+/// The longest ticket summary after notes were appended.
+const MAX_SUMMARY_CHARS: usize = 600;
+
+/// The old summary with a new note appended on its own line, capped. `None` when there is nothing new to add
+/// (the note is empty or already part of the summary).
+pub fn merge_summary(old: &str, note: &str, max_chars: usize) -> Option<String> {
+    let mut note = note.trim();
+    // Notes repeat the same opening sentence ("病人按了「請醫師聯絡我」。"); only what is new is appended.
+    if let Some(opening) = old.split_inclusive('。').next().filter(|l| !l.is_empty())
+        && let Some(rest) = note.strip_prefix(opening)
+    {
+        note = rest.trim();
+    }
+    if note.is_empty() || old.contains(note) {
+        return None;
+    }
+    let merged = format!("{old}\n{note}");
+    if merged.chars().count() <= max_chars {
+        return Some(merged);
+    }
+    let cut: String = merged.chars().take(max_chars.saturating_sub(1)).collect();
+    Some(format!("{cut}…"))
+}
+
 fn urgency_rank(u: Urgency) -> u8 {
     match u {
         Urgency::Routine => 0,
@@ -65,6 +89,14 @@ pub async fn create_or_get(
         .fetch_optional(&mut *tx)
         .await?;
     if let Some(mut ticket) = existing {
+        if let Some(merged) = merge_summary(&ticket.summary, new.summary, MAX_SUMMARY_CHARS) {
+            sqlx::query("UPDATE clinician_tickets SET summary = $2 WHERE id = $1")
+                .bind(ticket.id)
+                .bind(&merged)
+                .execute(&mut *tx)
+                .await?;
+            ticket.summary = merged;
+        }
         if urgency_rank(new.urgency) > urgency_rank(ticket.urgency) {
             sqlx::query("UPDATE clinician_tickets SET urgency = $2 WHERE id = $1")
                 .bind(ticket.id)
@@ -202,5 +234,36 @@ mod tests {
     fn urgency_ranks_order_routine_soon_urgent() {
         assert!(urgency_rank(Urgency::Urgent) > urgency_rank(Urgency::Soon));
         assert!(urgency_rank(Urgency::Soon) > urgency_rank(Urgency::Routine));
+    }
+
+    #[test]
+    fn a_repeated_note_is_appended_once_and_capped() {
+        assert_eq!(
+            merge_summary("病人請醫師聯絡。", "備註：下午比較方便", 600).as_deref(),
+            Some("病人請醫師聯絡。\n備註：下午比較方便")
+        );
+        assert_eq!(merge_summary("A\nB", "B", 600), None, "already there");
+        assert_eq!(
+            merge_summary(
+                "病人按了「請醫師聯絡我」。備註：下午",
+                "病人按了「請醫師聯絡我」。備註：改打家裡電話",
+                600
+            )
+            .as_deref(),
+            Some("病人按了「請醫師聯絡我」。備註：下午\n備註：改打家裡電話"),
+            "the repeated opening sentence is not appended again"
+        );
+        assert_eq!(
+            merge_summary(
+                "病人按了「請醫師聯絡我」。",
+                "病人按了「請醫師聯絡我」。",
+                600
+            ),
+            None
+        );
+        assert_eq!(merge_summary("A", "   ", 600), None, "nothing to add");
+        let long = merge_summary(&"字".repeat(590), &"新".repeat(50), 600).expect("merged");
+        assert_eq!(long.chars().count(), 600);
+        assert!(long.ends_with('…'));
     }
 }

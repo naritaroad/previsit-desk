@@ -46,6 +46,7 @@
     "tagOpening": "固定開場說明",
     "tagRule": "規則回覆・未經 AI",
     "tagNotice": "系統提醒",
+    "ticketLine": "已通知醫療團隊，轉交單",
     "startTitle": "開始預問診",
     "startBody": "先回答幾個問題，我們會整理成給醫師看的摘要。看診前完成即可。",
     "start": "開始預問診",
@@ -171,6 +172,7 @@
     "arguments": "參數",
     "result": "結果",
     "running": "執行中…",
+    "hitSource": "來源",
     "runStatus": {
       "running": "進行中",
       "completed": "完成",

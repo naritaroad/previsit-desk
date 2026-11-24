@@ -219,10 +219,20 @@ pub async fn messages(db: &PgPool, visit_id: Uuid) -> sqlx::Result<Vec<Message>>
     sqlx::query_as("SELECT id, role, kind, content, created_at, run_id FROM messages WHERE visit_id = $1 ORDER BY created_at, id").bind(visit_id).fetch_all(db).await
 }
 
-/// What the patient said in this visit, newest last (for the output guard's "restating is fine" rule).
+/// What the patient said in this visit, newest last, the most recent 200 messages (for the output guard's
+/// "restating is fine" rule).
 pub async fn patient_text(db: &PgPool, visit_id: Uuid) -> sqlx::Result<String> {
-    let rows: Vec<String> = sqlx::query_scalar("SELECT content FROM messages WHERE visit_id = $1 AND role = 'patient' ORDER BY created_at, id LIMIT 200").bind(visit_id).fetch_all(db).await?;
+    let mut rows: Vec<String> = sqlx::query_scalar("SELECT content FROM messages WHERE visit_id = $1 AND role = 'patient' ORDER BY created_at DESC, id DESC LIMIT 200").bind(visit_id).fetch_all(db).await?;
+    rows.reverse();
     Ok(rows.join("\n"))
+}
+
+/// How many messages the patient has sent in this visit (for the per-visit cap).
+pub async fn patient_message_count(db: &PgPool, visit_id: Uuid) -> sqlx::Result<i64> {
+    sqlx::query_scalar("SELECT count(*) FROM messages WHERE visit_id = $1 AND role = 'patient'")
+        .bind(visit_id)
+        .fetch_one(db)
+        .await
 }
 
 pub struct NewToolCall<'a> {
@@ -447,6 +457,9 @@ pub async fn build_detail(
     let mut summary = crate::summary::load(db, id).await?;
     if let Some(s) = summary.as_mut() {
         s.refill = refill_checks.last().map(|c| c.result.clone());
+        // A red flag after the summary was saved must still show to the clinician.
+        let flags = triggered_flags(db, &rules.red_flags, id, visit.locale).await?;
+        crate::summary::refresh_screen(s, flags, visit.locale);
     }
     let red_flag = latest_red_flag(db, &rules.red_flags, id, visit.locale).await?;
     let mut visit = visit;

@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import i18n, { currentLocale } from "../i18n/index.ts";
 import { formatCount, formatDuration, prettyJson } from "../lib/format.ts";
-import { isRedFlagHitResult, piiMasked, traceBrief } from "../lib/trace.ts";
+import { handbookHits, isRedFlagHitResult, piiMasked, traceBrief } from "../lib/trace.ts";
 import { groupTrace, type GuardNote, type RunView, type TraceRow, type TraceStatus } from "../state/visitReducer.ts";
 import { Icon, type IconName } from "./Icon.tsx";
 
@@ -126,6 +126,24 @@ function Row({ row, index }: { row: TraceRow; index: number }) {
           </div>
           {toolLabel ? <div className="trace-row__what">{toolLabel}</div> : null}
           {brief ? <div className="trace-row__brief">{t(brief.key, { ...brief.params, violations: violationText(brief.params?.violations) })}</div> : null}
+          {row.name === "search_health_education" && handbookHits(row.result).length ? (
+            <ul className="trace-hits">
+              {handbookHits(row.result).map((h, i) => (
+                <li key={i}>
+                  {h.title} <span className="text-muted">{h.section}</span>
+                  {h.url ? (
+                    <>
+                      {" "}
+                      <a href={h.url} target="_blank" rel="noopener noreferrer">
+                        {h.sourceName || t("trace.hitSource")}
+                        <span className="visually-hidden">{t("refill.opensNewTab")}</span>
+                      </a>
+                    </>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          ) : null}
           {hasArgs ? (
             <>
               <div className="trace-row__label">{t("trace.arguments")}</div>

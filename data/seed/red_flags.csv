@@ -1,41 +1,43 @@
 id,category,severity,lang,label_zh,label_en,pattern,note
 cp-01,chest_pain,emergency,zh,胸痛或胸悶,chest pain or tightness,"胸[口部前腔]?[^|沒無不未]{0,3}(痛|悶|緊|壓|刺|絞|難受|不舒服)",胸口或胸部的痛悶壓緊；空隙不含否定字，所以「胸口不悶」不會命中
 cp-02,chest_pain,emergency,zh,胸痛或胸悶,chest pain or tightness,"心[口臟][^|沒無不未]{0,2}(痛|悶|絞|壓|緊)",心口或心臟處的痛悶
-cp-03,chest_pain,emergency,zh,胸痛或胸悶,chest pain or tightness,"心絞痛|心肌梗塞|心肌梗死|急性心梗|心臟病發",病名直述
-cp-04,chest_pain,emergency,en,胸痛或胸悶,chest pain or tightness,"chest ?(pain|tightness|pressure|discomfort|ache)|(pain|pressure|tightness) (in|on) (my |the )?(left )?chest|(chest|heart) (is )?(hurts?|aching|tight)|heart attack|angina",英文
-dy-01,dyspnea,emergency,zh,呼吸困難,difficulty breathing,"喘(不過氣|不上氣|不上來|不過來|不出氣|不了氣|不過去|得很|得厲害|不停|不止)",喘不過氣等
+cp-03,chest_pain,emergency,zh,胸痛或胸悶,chest pain or tightness,心絞痛|心肌梗塞|心肌梗死|急性心梗|心臟病發,病名直述
+cp-04,chest_pain,emergency,en,胸痛或胸悶,chest pain or tightness,"chest ?(pain|tightness|pressure|discomfort|ache)|(pain|pressure|tightness) (in|on) (my |the )?(left )?chest|chest[a-z' ]{0,15}(hurts?|tight|pain|pressure|aching|burning|crushing|heavy|squeez)|heart attack|angina",英文；my chest really hurts / chest feels tight 也命中
+dy-01,dyspnea,emergency,zh,呼吸困難,difficulty breathing,喘(不過氣|不上氣|不上來|不過來|不出氣|不了氣|不過去|得很|得厲害|不停|不止),喘不過氣等
 dy-02,dyspnea,emergency,zh,呼吸困難,difficulty breathing,"呼吸[^|沒無不未]{0,3}(困難|不順|不過來|不上來|急促|窘迫|費力|不到)",呼吸困難；「呼吸沒有困難」空隙含否定字不命中
-dy-03,dyspnea,emergency,zh,呼吸困難,difficulty breathing,"(?:^|[^氣])(?P<m>喘)",單獨的「喘」；「氣喘」（病名）不命中，「氣喘發作」見 dy-04
+dy-03,dyspnea,emergency,zh,呼吸困難,difficulty breathing,(?:^|[^氣])(?P<m>喘),單獨的「喘」；「氣喘」（病名）不命中，「氣喘發作」見 dy-04
 dy-04,dyspnea,emergency,zh,呼吸困難,difficulty breathing,"氣喘[^|沒無不未]{0,3}(發作|發了|又發|在發|嚴重|很嚴重)",氣喘發作
-dy-05,dyspnea,emergency,zh,呼吸困難,difficulty breathing,"無法呼吸|不能呼吸|沒辦法呼吸|窒息|缺氧",無法呼吸
+dy-05,dyspnea,emergency,zh,呼吸困難,difficulty breathing,無法呼吸|不能呼吸|沒辦法呼吸|窒息|缺氧,無法呼吸
 dy-06,dyspnea,emergency,zh,咳血,coughing blood,"(?:^|[^氣])(?P<m>咳血)|咳出血|痰[^|沒無不未]{0,2}帶血|痰裡有血",咳血
-dy-07,dyspnea,emergency,en,呼吸困難,difficulty breathing,"short(ness)? of breath|can'?t breathe|cannot breathe|hard to breathe|difficulty breathing|trouble breathing|struggling to breathe|gasping|choking",英文
+dy-07,dyspnea,emergency,en,呼吸困難,difficulty breathing,short(ness)? of breath|(can'?t|cannot|barely|hardly|unable to|struggling to) (catch my |get my )?breath(e|ing)?|hard to breathe|difficulty breathing|trouble breathing|struggling to breathe|gasping|choking|out of breath,英文；can barely breathe / can't catch my breath 也命中
 st-01,stroke,emergency,zh,臉歪或嘴歪,facial droop,"(臉|嘴|口角|嘴角|面部)[^|沒無不未]{0,3}(歪|斜|下垂|垂下|不對稱)",臉歪嘴歪
 st-02,stroke,emergency,zh,口齒不清,slurred speech,"(口齒|說話|講話|言語|舌頭)[^|沒無不未]{0,4}(不清|含糊|不順|說不出|講不出|不出來|打結|怪怪)",口齒不清講話含糊
-st-03,stroke,emergency,zh,口齒不清,slurred speech,"說不出話|講不出話",說不出話
+st-03,stroke,emergency,zh,口齒不清,slurred speech,說不出話|講不出話,說不出話
 st-04,stroke,emergency,zh,單側無力或麻木,one-sided weakness or numbness,"(單側|一側|半邊|半側|半身|單邊)[^|沒無不未]{0,6}(無力|沒力|沒有力|麻|癱|不能動|動不了|不聽使喚|軟掉)",半邊身體
 st-05,stroke,emergency,zh,單側無力或麻木,one-sided weakness or numbness,"(左|右)(手|腳|腿|臂|半身|半邊|側)[^|沒無不未]{0,4}(無力|沒力|沒有力|癱|不能動|動不了|不聽使喚|抬不起|軟)",右手突然沒力
 st-06,stroke,emergency,zh,突發神經症狀,sudden neurological symptoms,"(突然|忽然|一下子)[^|沒無不未]{0,8}(麻|無力|沒力|癱|看不見|看不到|看不清|複視|重影|站不穩|走不穩|歪|說不出話|劇烈頭痛|頭痛欲裂)",突然發作的症狀；手腳慢性麻木不算
 st-07,stroke,emergency,zh,疑似中風,suspected stroke,"(疑似|懷疑|好像|像是|是不是|感覺像|可能是|怕是)[^|沒無不未]{0,3}(中風|腦中風|腦出血)|(中風|腦中風)(了|發作|症狀|徵兆)|腦出血|腦溢血",單說「有中風病史」不命中
 st-08,stroke,emergency,en,中風徵兆,stroke signs,"face (is )?droop|facial droop|slurred speech|speech (is )?slurred|(sudden|suddenly)[^|]{0,20}(weak|numb|confus|vision|trouble speaking)|(one|half)[ -]sided (weakness|numbness)|having a stroke|can'?t (move|lift) (my|his|her) (arm|leg|hand)",英文
-co-01,consciousness,emergency,zh,意識不清,altered consciousness,"叫不醒|喚不醒|叫不起來|叫不動|喊不醒|搖不醒|推不醒",叫不醒
-co-02,consciousness,emergency,zh,意識不清或昏倒,altered consciousness or fainting,"不省人事|昏迷|意識不清|意識模糊|意識不明|神智不清|神志不清|失去意識|喪失意識|昏倒|暈倒|昏厥|暈厥|倒地不起|突然倒下|癱倒|休克",昏倒意識不清；頭暈不算
+co-01,consciousness,emergency,zh,意識不清,altered consciousness,叫不醒|喚不醒|叫不起來|叫不動|喊不醒|搖不醒|推不醒,叫不醒
+co-02,consciousness,emergency,zh,意識不清或昏倒,altered consciousness or fainting,不省人事|昏迷|意識不清|意識模糊|意識不明|神智不清|神志不清|失去意識|喪失意識|昏倒|暈倒|昏厥|暈厥|倒地不起|突然倒下|癱倒|休克,昏倒意識不清；頭暈不算
 co-03,consciousness,emergency,zh,意識不清,altered consciousness,"(叫|喊|拍|搖|推)[^|沒無不未]{0,3}(沒有?反應|不理|沒回應|沒有回應|不應)",叫他沒反應
-co-04,consciousness,emergency,zh,意識混亂,acute confusion,"(意識|神智|神志)(混亂|恍惚)|胡言亂語",急性意識混亂
-co-05,consciousness,emergency,en,意識不清或昏倒,altered consciousness or fainting,"unconscious|unresponsive|passed out|pass out|fainted|fainting|collapsed|won'?t wake|can'?t wake|not waking|lost consciousness|blacked out|not responding",英文
+co-04,consciousness,emergency,zh,意識混亂,acute confusion,(意識|神智|神志)(混亂|恍惚)|胡言亂語,急性意識混亂
+co-05,consciousness,emergency,en,意識不清或昏倒,altered consciousness or fainting,unconscious|unresponsive|passed out|pass out|fainted|fainting|collapsed|won'?t wake|can'?t wake|not waking|lost consciousness|blacked out|not responding,英文
 gi-01,gi_bleeding,emergency,zh,吐血,vomiting blood,"吐[^|沒無不未]{0,3}血|嘔血|吐咖啡|嘔吐物[^|沒無不未]{0,4}(血|咖啡色|黑色|黑)",吐血
 gi-02,gi_bleeding,emergency,zh,解黑便或便血,black stool or blood in stool,"(解|拉|排|大|糞)[^|沒無不未]{0,3}(黑便|黑色|黑黑|柏油|血便|帶血|出血|見血)|黑便|柏油便|血便|便血|解血|拉血|大便出血|肛門出血",黑便柏油便便血
-gi-03,gi_bleeding,emergency,en,吐血或解黑便,vomiting blood or black stool,"vomit(ing|ed)? (up )?blood|blood in (my |the )?(stool|vomit|poop)|(black|tarry) (tarry )?(stool|poop)|bloody (stool|poop|vomit)|bloody diarrhea|throwing up blood|coughing (up )?blood|hematemesis",英文
+gi-03,gi_bleeding,emergency,en,吐血或解黑便,vomiting blood or black stool,vomit(ing|ed)? (up )?blood|blood in (my |the )?(stool|vomit|poop)|(black|tarry) (tarry )?(stool|poop)|bloody (stool|poop|vomit)|bloody diarrhea|throwing up blood|coughing (up )?blood|hematemesis,英文
 an-01,anaphylaxis,emergency,zh,喉嚨緊或腫（疑似嚴重過敏）,throat tightness or swelling,"(喉嚨|喉頭|喉|氣管)[^|沒無不未]{0,2}(緊|縮|卡住|閉住|發緊|變緊|腫起來|腫脹|腫大|腫得)",喉嚨緊；一般喉嚨痛或腫痛不命中
 an-02,anaphylaxis,emergency,zh,臉或嘴唇舌頭腫,facial or lip swelling,"(嘴唇|舌頭|整張臉|眼皮|臉)[^|沒無不未]{0,2}(腫起來|腫脹|腫大|腫得|腫了起來)|(嘴唇|舌頭)腫",臉腫唇腫
 an-03,anaphylaxis,emergency,zh,全身起疹合併喘或喉嚨症狀,hives with breathing trouble,"(全身|滿身|整身|身上|整個身體)[^|沒無不未]{0,4}(疹|蕁麻疹|風疹塊|紅腫|癢)[^|沒無不未]{0,8}(喘|呼吸|喉嚨|昏|暈|胸悶|腫)",全身起疹子還喘
 an-04,anaphylaxis,emergency,zh,全身起疹合併喘,hives with breathing trouble,"(喘|呼吸困難|呼吸不順)[^|沒無不未]{0,8}(全身|滿身|整身)[^|沒無不未]{0,4}(疹|蕁麻疹|癢)",順序相反
-an-05,anaphylaxis,emergency,zh,嚴重過敏,severe allergic reaction,"嚴重過敏|過敏性休克|過敏休克|急性過敏",病名直述
+an-05,anaphylaxis,emergency,zh,嚴重過敏,severe allergic reaction,嚴重過敏|過敏性休克|過敏休克|急性過敏,病名直述
 an-06,anaphylaxis,emergency,zh,用藥或進食後急性過敏症狀,acute allergic symptoms after exposure,"(打針|注射|打完針|打了針|疫苗|吃了|吃藥|服藥|蜂|被叮|被螫|被咬)[^|沒無不未]{0,10}(喘|喉嚨緊|喉嚨腫|全身起疹|全身發癢|全身蕁麻疹|嘴唇腫|臉腫|呼吸困難|臉都腫)",打針後或吃了某物後
 an-07,anaphylaxis,emergency,en,疑似嚴重過敏,suspected anaphylaxis,"anaphyla|throat (is |feels? )?(closing|tight|swelling|swollen)|swollen (lips?|tongue|face|throat)|(lips?|tongue|face|throat) (is |are )?swelling|hives[^|]{0,20}(breath|wheez|throat|dizz)|allergic reaction[^|]{0,25}(breath|swell|throat|faint)",英文
 se-01,seizure,emergency,zh,抽搐或癲癇發作,seizure,"(?:^|[^皮角])(?P<m>抽搐)|癲癇[^|沒無不未]{0,3}(發作|發了|又發|在發|大發作)|(發作|發生|一直)[^|沒無不未]{0,3}癲癇|羊癲瘋|口吐白沫|吐白沫|翻白眼|全身(僵硬|僵直|抽|痙攣)|四肢(抽|僵硬|痙攣)|痙攣發作|倒地抽|抽起來",抽搐；「眼皮抽搐」與單純的癲癇病史不命中
-se-02,seizure,emergency,en,抽搐或癲癇發作,seizure,"seizure|convuls|epileptic fit|having a fit|foaming at the mouth|shaking uncontrollably|eyes rolled",英文
-su-01,suicide,crisis,zh,自殺或自傷念頭,suicidal thoughts or self-harm,"不想(再|繼續)?活|活不下去|不如死|死了算了|一了百了|想(去|要)?死|不想存在|想消失|想離開(這個)?世界",不想活想死
-su-02,suicide,crisis,zh,自殺或自傷念頭,suicidal thoughts or self-harm,"自殺|輕生|尋短|自盡|自我了斷|自我傷害|自殘|自傷|傷害自己|傷害我自己|割腕|上吊|跳樓|燒炭|結束(自己的)?(生命|性命|人生)|結束一切|了結(自己|生命)",自殺自傷
+se-02,seizure,emergency,en,抽搐或癲癇發作,seizure,seizure|convuls|epileptic fit|having a fit|foaming at the mouth|shaking uncontrollably|eyes rolled,英文
+su-01,suicide,crisis,zh,自殺或自傷念頭,suicidal thoughts or self-harm,不想(再|繼續)?活|活不下去|不如死|死了算了|一了百了|想(去|要)?死|不想存在|想消失|想離開(這個)?世界,不想活想死
+su-02,suicide,crisis,zh,自殺或自傷念頭,suicidal thoughts or self-harm,自殺|輕生|尋短|自盡|自我了斷|自我傷害|自殘|自傷|傷害自己|傷害我自己|割腕|上吊|跳樓|燒炭|結束(自己的)?(生命|性命|人生)|結束一切|了結(自己|生命),自殺自傷
 su-03,suicide,crisis,zh,自殺或自傷念頭,suicidal thoughts or self-harm,"活著[^|沒無不未]{0,2}(沒意義|沒有意義|沒意思|沒有意思|沒希望|沒有希望|好累|沒用)|活著(就)?(是)?(多餘|負擔)",活著沒意義
-su-04,suicide,crisis,en,自殺或自傷念頭,suicidal thoughts or self-harm,"suicid|kill (myself|me)|end (my life|it all)|want(ed)? to die|wanna die|don'?t want to (live|be alive|exist)|better off dead|hurt(ing)? myself|self[- ]?harm|cut(ting)? myself|no reason to live|take my own life",英文
+su-04,suicide,crisis,en,自殺或自傷念頭,suicidal thoughts or self-harm,suicid|kill (myself|me)|end (my life|it all)|want(ed)? to die|wanna die|don'?t want to (live|be alive|exist)|better off dead|hurt(ing)? myself|self[- ]?harm|cut(ting)? myself|no reason to live|take my own life,英文
+su-05,suicide,crisis,zh,自殺或自傷念頭,suicidal thoughts or self-harm,(喝|飲|吞|灌|服)(了)?(農藥|巴拉刈|除草劑|殺蟲劑|漂白水|毒藥|鹽酸)|吞藥自殺|服藥自殺|(吃|吞|服|喝)了?(一整瓶|整瓶|一整罐|整罐|一整盒|整盒|一大把|一把|很多|一堆|大量)(的)?(藥|安眠藥|止痛藥|藥丸|藥物|感冒藥|成藥)|(過量|大量)(服用|服藥|吃)|(服藥|藥物|藥)過量|燒炭|割腕|跳樓|跳河|跳海|上吊|吊死|想睡不醒|不想醒來|不想再醒來|睡了就不要醒,過量用藥、毒物與自傷方式；簡體字由正規化折成繁體後比對
+su-06,suicide,crisis,en,自殺或自傷念頭,suicidal thoughts or self-harm,took (all|a bunch of|too many|a lot of|an overdose of|the whole bottle of)( of)?( my| the)? (pills|medication|medications|meds|tablets|painkillers|sleeping pills)|overdos(e|ed|ing)|swallowed (all|a bunch of|too many|a lot of)( of)?( my| the)? (pills|meds|tablets)|(going|want|wanna|plan|planning|about) to end (it|things|my life|it all)|end it all|ending it all|don'?t want to wake up|do not want to wake up|poison(ed)? myself|drank (bleach|poison|pesticide)|hang(ing)? myself|jump off|slit my wrists|cut my wrists,"English overdose, poisoning and self-harm phrases"

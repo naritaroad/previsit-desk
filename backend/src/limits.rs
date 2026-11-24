@@ -7,11 +7,20 @@ use std::time::{Duration, Instant};
 
 use sha2::{Digest, Sha256};
 use sqlx::PgPool;
+use time::Date;
 
 use crate::clock::Clock;
 
 pub const WINDOW: Duration = Duration::from_secs(600);
-const SWEEP_AT: usize = 5_000;
+/// Expired entries are swept at least this often, and whenever the map passes `SWEEP_AT` entries.
+const SWEEP_EVERY: Duration = Duration::from_secs(60);
+const SWEEP_AT: usize = 2_000;
+/// Under pressure (many entries) a sweep may run this often, so a flood cannot make every request scan the map.
+const SWEEP_BUSY: Duration = Duration::from_secs(5);
+/// Hard ceiling on tracked (bucket, client) pairs. A new client past it is told to wait, so memory stays bounded
+/// even when an attacker rotates addresses.
+const MAX_ENTRIES: usize = 20_000;
+const MAX_CLIENT_DAYS: usize = 50_000;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Bucket {
@@ -29,9 +38,16 @@ pub enum Bucket {
 
 pub type ClientKey = [u8; 16];
 
+struct Inner {
+    hits: HashMap<(Bucket, ClientKey), VecDeque<Instant>>,
+    last_sweep: Instant,
+    /// Model calls per client and Taipei day (kept in memory only, like the rate limits).
+    calls: HashMap<(ClientKey, Date), u32>,
+}
+
 pub struct Limiter {
     salt: [u8; 16],
-    hits: Mutex<HashMap<(Bucket, ClientKey), VecDeque<Instant>>>,
+    inner: Mutex<Inner>,
 }
 
 impl Default for Limiter {
@@ -46,8 +62,18 @@ impl Limiter {
         rand::fill(&mut salt[..]);
         Self {
             salt,
-            hits: Mutex::new(HashMap::new()),
+            inner: Mutex::new(Inner {
+                hits: HashMap::new(),
+                last_sweep: Instant::now(),
+                calls: HashMap::new(),
+            }),
         }
+    }
+
+    fn lock(&self) -> std::sync::MutexGuard<'_, Inner> {
+        self.inner
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
     }
 
     /// Salted hash of the client address; the salt changes on every restart.
@@ -74,17 +100,20 @@ impl Limiter {
         window: Duration,
         now: Instant,
     ) -> Result<(), u64> {
-        let mut map = self
-            .hits
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner());
-        if map.len() > SWEEP_AT {
-            map.retain(|_, hits| {
+        let mut inner = self.lock();
+        let since_sweep = now.duration_since(inner.last_sweep);
+        if since_sweep >= SWEEP_EVERY || (inner.hits.len() > SWEEP_AT && since_sweep >= SWEEP_BUSY)
+        {
+            inner.hits.retain(|_, hits| {
                 hits.back()
                     .is_some_and(|last| now.duration_since(*last) < window)
             });
+            inner.last_sweep = now;
         }
-        let hits = map.entry((bucket, key)).or_default();
+        if inner.hits.len() >= MAX_ENTRIES && !inner.hits.contains_key(&(bucket, key)) {
+            return Err(60);
+        }
+        let hits = inner.hits.entry((bucket, key)).or_default();
         while hits
             .front()
             .is_some_and(|first| now.duration_since(*first) >= window)
@@ -98,6 +127,27 @@ impl Limiter {
         }
         hits.push_back(now);
         Ok(())
+    }
+
+    /// Model calls this client has cost today.
+    pub fn client_calls(&self, key: ClientKey, day: Date) -> u32 {
+        self.lock().calls.get(&(key, day)).copied().unwrap_or(0)
+    }
+
+    /// Adds `n` model calls (every attempt counts, failed ones too) to this client's day.
+    pub fn add_client_calls(&self, key: ClientKey, day: Date, n: u32) {
+        let mut inner = self.lock();
+        if inner.calls.len() >= MAX_CLIENT_DAYS || inner.calls.keys().any(|(_, d)| *d != day) {
+            inner.calls.retain(|(_, d), _| *d == day);
+        }
+        if inner.calls.len() < MAX_CLIENT_DAYS {
+            *inner.calls.entry((key, day)).or_insert(0) += n;
+        }
+    }
+
+    #[cfg(test)]
+    fn tracked(&self) -> usize {
+        self.lock().hits.len()
     }
 }
 
@@ -288,6 +338,98 @@ mod tests {
                 .is_ok(),
             "another bucket"
         );
+    }
+
+    #[test]
+    fn expired_entries_are_swept_and_the_map_stays_bounded() {
+        let limiter = Limiter::new();
+        let t0 = Instant::now();
+        for i in 0..50u32 {
+            let key = limiter.key(&format!("client-{i}"));
+            assert!(
+                limiter
+                    .check_at(Bucket::Reads, key, 5, TEN_MINUTES, t0)
+                    .is_ok()
+            );
+        }
+        assert_eq!(limiter.tracked(), 50);
+        // A minute later the sweep runs, but nothing has expired yet.
+        let key = limiter.key("late");
+        assert!(
+            limiter
+                .check_at(
+                    Bucket::Reads,
+                    key,
+                    5,
+                    TEN_MINUTES,
+                    t0 + Duration::from_secs(61)
+                )
+                .is_ok()
+        );
+        assert_eq!(limiter.tracked(), 51);
+        // After the window the old clients are dropped by the next sweep.
+        assert!(
+            limiter
+                .check_at(
+                    Bucket::Reads,
+                    key,
+                    5,
+                    TEN_MINUTES,
+                    t0 + Duration::from_secs(700)
+                )
+                .is_ok()
+        );
+        assert_eq!(limiter.tracked(), 1);
+    }
+
+    #[test]
+    fn a_flood_of_new_clients_hits_the_hard_cap() {
+        let limiter = Limiter::new();
+        let t0 = Instant::now();
+        let mut refused = 0;
+        for i in 0..(MAX_ENTRIES + 50) {
+            let key = limiter.key(&format!("flood-{i}"));
+            if limiter
+                .check_at(Bucket::Visits, key, 1, TEN_MINUTES, t0)
+                .is_err()
+            {
+                refused += 1;
+            }
+        }
+        assert_eq!(refused, 50);
+        assert!(limiter.tracked() <= MAX_ENTRIES);
+        // A client already tracked is still served by its own bucket.
+        let known = limiter.key("flood-0");
+        assert!(
+            limiter
+                .check_at(Bucket::Visits, known, 1, TEN_MINUTES, t0)
+                .is_err(),
+            "its own limit, not the cap"
+        );
+    }
+
+    #[test]
+    fn per_client_daily_calls_count_and_reset_on_a_new_day() {
+        let limiter = Limiter::new();
+        let (a, b) = (limiter.key("a"), limiter.key("b"));
+        let day = time::macros::date!(2026 - 11 - 25);
+        let next = time::macros::date!(2026 - 11 - 26);
+        assert_eq!(limiter.client_calls(a, day), 0);
+        limiter.add_client_calls(a, day, 2);
+        limiter.add_client_calls(a, day, 1);
+        limiter.add_client_calls(b, day, 5);
+        assert_eq!(
+            (limiter.client_calls(a, day), limiter.client_calls(b, day)),
+            (3, 5)
+        );
+        assert_eq!(limiter.client_calls(a, next), 0);
+        limiter.add_client_calls(a, next, 1);
+        assert_eq!(
+            limiter.client_calls(b, day),
+            0,
+            "yesterday's counters are dropped"
+        );
+        assert_eq!(limiter.client_calls(a, next), 1);
     }
 
     #[test]

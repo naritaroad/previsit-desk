@@ -74,11 +74,19 @@ pub async fn ensure_account(db: &PgPool, config: &Config) -> Result<()> {
             .await?;
     match existing {
         Some((id, hash)) => {
-            let hash = if verify_password(&account.password, &hash) {
-                hash
-            } else {
+            let changed = !verify_password(&account.password, &hash);
+            let hash = if changed {
                 hash_password(&account.password)?
+            } else {
+                hash
             };
+            if changed {
+                // A new password ends every session opened with the old one.
+                sqlx::query("DELETE FROM sessions WHERE account_id = $1")
+                    .bind(id)
+                    .execute(db)
+                    .await?;
+            }
             sqlx::query("UPDATE accounts SET password_hash = $2, display_name = $3 WHERE id = $1")
                 .bind(id)
                 .bind(hash)

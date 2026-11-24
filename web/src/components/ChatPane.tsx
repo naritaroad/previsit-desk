@@ -10,11 +10,12 @@ import { charCount, composerBlock, counterState, shouldSendOnKey } from "../lib/
 import { describeFailure } from "../lib/errors.ts";
 import { formatCount, formatTime } from "../lib/format.ts";
 import type { VisitController, VisitPhase } from "../hooks/useVisit.ts";
-import { composerMode, redFlagText, showEmergency, type ChatMessage } from "../state/visitReducer.ts";
+import { ticketForMessage } from "../lib/tickets.ts";
+import { composerMode, failureBannerVisible, redFlagText, showEmergency, type ChatMessage } from "../state/visitReducer.ts";
 import { Icon } from "./Icon.tsx";
 import { ProgressBar } from "./SummaryPanel.tsx";
 
-function MessageBubble({ m, onRetry }: { m: ChatMessage; onRetry: () => void }) {
+function MessageBubble({ m, ticketNo, onRetry }: { m: ChatMessage; ticketNo: string | null; onRetry: () => void }) {
   const { t } = useTranslation();
   const locale = currentLocale();
   const time = formatTime(m.created_at, locale);
@@ -73,6 +74,14 @@ function MessageBubble({ m, onRetry }: { m: ChatMessage; onRetry: () => void }) 
           <time dateTime={m.created_at}>{time}</time>
           {tag}
         </div>
+        {ticketNo && m.kind === "refusal" ? (
+          <div className="msg__ticket">
+            <Icon name="ticket" size="sm" />
+            <span>
+              {t("chat.ticketLine")} <b className="mono">{ticketNo}</b>
+            </span>
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -243,11 +252,7 @@ export function ChatPane({ visit, phase, maxChars, onFinish, onHandoff }: ChatPa
   const stick = useRef(true);
   const emergency = showEmergency(state);
   const mode = composerMode(state.visit);
-  const lastMessage = state.messages.at(-1);
-  const failure = state.failure;
-  // The server also stores a fixed notice for failed runs; do not show the same news twice.
-  const noticeAlreadyShown = failure && lastMessage?.kind === "notice" && lastMessage.role === "assistant";
-  const failureText = failure && !noticeAlreadyShown ? describeFailure(failure) : null;
+  const failureText = state.failure && failureBannerVisible(state) ? describeFailure(state.failure) : null;
   const ticketNo = state.tickets.find((x) => x.reason === "red_flag" && x.status === "open")?.ticket_no ?? state.tickets.find((x) => x.reason === "red_flag")?.ticket_no ?? null;
 
   // Keep the newest text in view unless the reader scrolled up.
@@ -342,7 +347,7 @@ export function ChatPane({ visit, phase, maxChars, onFinish, onHandoff }: ChatPa
         {phase === "ready" ? (
           <div className="chat-log" role="log" aria-live="polite" aria-relevant="additions" aria-busy={state.busy} aria-label={t("chat.logLabel")}>
             {state.messages.map((m) => (
-              <MessageBubble key={m.id} m={m} onRetry={visit.retry} />
+              <MessageBubble key={m.id} m={m} ticketNo={ticketForMessage(m, state.tickets)?.ticket_no ?? null} onRetry={visit.retry} />
             ))}
             {state.streaming ? (
               <div className="msg msg--assistant">

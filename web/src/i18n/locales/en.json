@@ -46,6 +46,7 @@
     "tagOpening": "Fixed opening note",
     "tagRule": "Rule reply, not AI",
     "tagNotice": "System notice",
+    "ticketLine": "The care team has been notified. Ticket",
     "startTitle": "Start a pre-visit",
     "startBody": "Answer a few questions and we will put them into a summary for your doctor. Finish it before your appointment.",
     "start": "Start pre-visit",
@@ -172,6 +173,7 @@
     "arguments": "Arguments",
     "result": "Result",
     "running": "Running…",
+    "hitSource": "Source",
     "runStatus": {
       "running": "running",
       "completed": "completed",

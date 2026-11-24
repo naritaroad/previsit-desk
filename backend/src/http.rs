@@ -1,6 +1,6 @@
 //! Request extractors shared by the routes: JSON bodies with the contract's error codes, and the client key.
 
-use std::net::SocketAddr;
+use std::net::{IpAddr, SocketAddr};
 
 use axum::body::Bytes;
 use axum::extract::{ConnectInfo, FromRequest, FromRequestParts, Request};
@@ -35,6 +35,11 @@ async fn read_json<T: DeserializeOwned, S: Send + Sync>(
         }
     })?;
     if bytes.iter().all(u8::is_ascii_whitespace) {
+        // An empty body is fine without a content type, but a form post (urlencoded, text/plain) is not:
+        // that is the shape a cross-site HTML form produces.
+        if allow_empty && json == Some(false) {
+            return Err(AppError::UnsupportedMediaType);
+        }
         return if allow_empty {
             Ok(None)
         } else {
@@ -73,6 +78,22 @@ impl<T: DeserializeOwned + Default, S: Send + Sync> FromRequest<S> for OptionalJ
     }
 }
 
+/// The address as the limiter should see it: an IPv6 address stands for its whole /64 (one subscriber can
+/// rotate through billions of addresses inside it), an IPv4-mapped IPv6 address is the IPv4 address.
+pub fn client_address(raw: &str) -> String {
+    match raw.trim().parse::<IpAddr>() {
+        Ok(IpAddr::V4(v4)) => v4.to_string(),
+        Ok(IpAddr::V6(v6)) => match v6.to_ipv4_mapped() {
+            Some(v4) => v4.to_string(),
+            None => {
+                let s = v6.segments();
+                format!("{:x}:{:x}:{:x}:{:x}::/64", s[0], s[1], s[2], s[3])
+            }
+        },
+        Err(_) => raw.trim().to_string(),
+    }
+}
+
 /// Salted hash of the client address, from `CLIENT_IP_HEADER` when set, else the socket address.
 pub struct ClientId(pub ClientKey);
 
@@ -101,7 +122,7 @@ impl FromRequestParts<AppState> for ClientId {
                     .map(|c| c.0.ip().to_string())
             })
             .unwrap_or_default();
-        Ok(Self(state.limiter.key(&address)))
+        Ok(Self(state.limiter.key(&client_address(&address))))
     }
 }
 
@@ -173,5 +194,61 @@ mod tests {
             OptionalJson::<Probe>::from_request(make(Some("text/plain"), r#"{"a":1}"#), &()).await,
             Err(AppError::UnsupportedMediaType)
         ));
+    }
+
+    #[test]
+    fn ipv6_clients_are_keyed_by_their_slash_64() {
+        assert_eq!(client_address("203.0.113.9"), "203.0.113.9");
+        assert_eq!(
+            client_address("2001:db8:1:2:aaaa:bbbb:cccc:dddd"),
+            "2001:db8:1:2::/64"
+        );
+        assert_eq!(
+            client_address("2001:db8:1:2:1111:2222:3333:4444"),
+            client_address("2001:db8:1:2:aaaa:bbbb:cccc:dddd")
+        );
+        assert_ne!(
+            client_address("2001:db8:1:3::1"),
+            client_address("2001:db8:1:2::1")
+        );
+        assert_eq!(client_address("::ffff:203.0.113.9"), "203.0.113.9");
+        assert_eq!(client_address(" not an ip "), "not an ip");
+    }
+
+    #[tokio::test]
+    async fn an_empty_form_post_is_refused_but_a_bare_empty_post_is_fine() {
+        use axum::body::Body;
+        #[derive(serde::Deserialize, Default)]
+        struct Probe {}
+        let post = |ct: Option<&str>| {
+            let mut builder = Request::builder().method("POST").uri("/x");
+            if let Some(ct) = ct {
+                builder = builder.header(CONTENT_TYPE, ct);
+            }
+            builder.body(Body::empty()).expect("request")
+        };
+        assert!(
+            OptionalJson::<Probe>::from_request(post(None), &())
+                .await
+                .is_ok()
+        );
+        assert!(
+            OptionalJson::<Probe>::from_request(post(Some("application/json")), &())
+                .await
+                .is_ok()
+        );
+        for ct in [
+            "application/x-www-form-urlencoded",
+            "text/plain",
+            "multipart/form-data; boundary=x",
+        ] {
+            assert!(
+                matches!(
+                    OptionalJson::<Probe>::from_request(post(Some(ct)), &()).await,
+                    Err(AppError::UnsupportedMediaType)
+                ),
+                "{ct}"
+            );
+        }
     }
 }

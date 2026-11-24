@@ -391,14 +391,36 @@ export interface TraceGroup {
   rows: TraceRow[];
 }
 
+/** Code checks that run before a run exists: the server stores them with run_id null (found against the real backend). */
+const PRECHECK_NAMES = new Set<string>(["red_flag_precheck", "scope_precheck", "pii_filter"]);
+
+/**
+ * The run a stored row belongs to. Prechecks come without a run id, so they join the first run that
+ * was created after them (the run row is written a few milliseconds later, also when it is skipped).
+ * Every other row without a run (refill checks and handoffs from forms) stays in the form group.
+ */
+function runIdOf(row: TraceRow, runs: RunView[]): string | null {
+  if (row.run_id !== null) return row.run_id;
+  if (!PRECHECK_NAMES.has(row.name)) return null;
+  const at = Date.parse(row.created_at);
+  if (Number.isNaN(at)) return null;
+  let best: RunView | null = null;
+  for (const r of runs) {
+    const t = Date.parse(r.created_at);
+    if (!Number.isNaN(t) && t >= at - 1 && (best === null || t < Date.parse(best.created_at))) best = r;
+  }
+  return best?.id ?? null;
+}
+
 export function groupTrace(trace: TraceRow[], runs: RunView[]): TraceGroup[] {
   const groups: TraceGroup[] = [];
   const byKey = new Map<string, TraceGroup>();
   for (const row of trace) {
-    const key = row.run_id ?? "form";
+    const runId = runIdOf(row, runs);
+    const key = runId ?? "form";
     let g = byKey.get(key);
     if (!g) {
-      g = { key, run: runs.find((r) => r.id === row.run_id) ?? null, rows: [] };
+      g = { key, run: runs.find((r) => r.id === runId) ?? null, rows: [] };
       byKey.set(key, g);
       groups.push(g);
     }
@@ -432,6 +454,16 @@ export function isSent(visit: Visit | null): boolean {
 export function composerMode(visit: Visit | null): "open" | "paused" | "closed" {
   if (visit?.status === "red_flag") return "paused";
   return isClosed(visit) ? "closed" : "open";
+}
+
+/**
+ * Whether to show the failure banner. A failed run also leaves a fixed `notice` message in the chat
+ * (stored and streamed before run.failed), and that bubble already says it, so the banner stays away.
+ */
+export function failureBannerVisible(state: Pick<VisitState, "failure" | "messages">): boolean {
+  if (!state.failure) return false;
+  const last = state.messages[state.messages.length - 1];
+  return !(last && last.role === "assistant" && last.kind === "notice");
 }
 
 /** Fixed text of the latest red_flag message, used by the emergency card. */

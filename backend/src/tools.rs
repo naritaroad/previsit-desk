@@ -18,7 +18,7 @@ use crate::pii;
 use crate::refill::{self, RefillInput};
 use crate::state::AppState;
 use crate::summary::{self, PrevisitSummary, SummaryInput};
-use crate::texts::field_label;
+use crate::texts::{T, field_label, t};
 use crate::tickets::{self, NewTicket};
 use crate::types::{
     CreatedBy, Locale, Stage, Ticket, TicketReason, ToolStatus, Urgency, VisitStatus,
@@ -201,7 +201,12 @@ async fn record_intake(
         Ok(p) => p,
         Err(e) => return rejected(e),
     };
-    let outcome = ctx.intake.apply(&patch);
+    // Model-written values get the same guard as a reply: a diagnosis or a dose the patient never said
+    // does not become part of the record.
+    let mut patch = patch;
+    let removed = guard_patch(&mut patch, ctx.locale, &ctx.patient_text);
+    let mut outcome = ctx.intake.apply(&patch);
+    outcome.rejected.extend(removed);
     if !outcome.applied.is_empty() {
         let new_stage = if ctx.stage == Stage::Done {
             Stage::Done
@@ -391,10 +396,14 @@ async fn transfer_to_clinician(
             );
         }
     };
-    let summary = pii::mask(parsed.summary.trim()).text;
+    let mut summary = pii::mask(parsed.summary.trim()).text;
     let length = summary.chars().count();
     if length == 0 || length > 300 {
         return rejected("summary must be 1 to 300 characters");
+    }
+    // The ticket text reaches the clinician and the patient's own view: no diagnosis or dose wording.
+    if !guard::is_clean(&summary, ctx.locale, &ctx.patient_text) {
+        summary = t(T::TransferSummaryFallback, ctx.locale).to_string();
     }
     let reason = TicketReason::parse(&parsed.reason).unwrap_or(TicketReason::Other);
     match tickets::create_or_get(
@@ -418,6 +427,201 @@ async fn transfer_to_clinician(
             }
             (ToolStatus::Ok, body.clone(), body)
         }
+    }
+}
+
+const GUARD_REASON: &str =
+    "wording that diagnoses or advises on medicine or doses; record only what the patient said";
+
+fn guard_text(
+    field: &str,
+    slot: &mut Option<String>,
+    locale: Locale,
+    patient_text: &str,
+    rejected: &mut Vec<(String, String)>,
+) {
+    if slot
+        .as_deref()
+        .is_some_and(|v| !guard::is_clean(v, locale, patient_text))
+    {
+        rejected.push((field.to_string(), GUARD_REASON.to_string()));
+        *slot = None;
+    }
+}
+
+fn guard_list(
+    field: &str,
+    items: &mut Option<Vec<String>>,
+    locale: Locale,
+    patient_text: &str,
+    rejected: &mut Vec<(String, String)>,
+) {
+    if let Some(list) = items {
+        let before = list.len();
+        list.retain(|item| guard::is_clean(item, locale, patient_text));
+        if list.len() != before {
+            rejected.push((field.to_string(), GUARD_REASON.to_string()));
+        }
+    }
+}
+
+/// Removes the values of a `record_intake` patch that fail the output guard and reports each as rejected.
+pub fn guard_patch(
+    patch: &mut IntakePatch,
+    locale: Locale,
+    patient_text: &str,
+) -> Vec<(String, String)> {
+    let mut rejected = Vec::new();
+    guard_text(
+        "chief_complaint",
+        &mut patch.chief_complaint,
+        locale,
+        patient_text,
+        &mut rejected,
+    );
+    guard_text(
+        "hpi.onset",
+        &mut patch.onset,
+        locale,
+        patient_text,
+        &mut rejected,
+    );
+    guard_text(
+        "hpi.modifiers",
+        &mut patch.modifiers,
+        locale,
+        patient_text,
+        &mut rejected,
+    );
+    guard_text(
+        "hpi.character",
+        &mut patch.character,
+        locale,
+        patient_text,
+        &mut rejected,
+    );
+    guard_text(
+        "hpi.location",
+        &mut patch.location,
+        locale,
+        patient_text,
+        &mut rejected,
+    );
+    guard_text(
+        "hpi.course",
+        &mut patch.course,
+        locale,
+        patient_text,
+        &mut rejected,
+    );
+    guard_text(
+        "hpi.associated",
+        &mut patch.associated,
+        locale,
+        patient_text,
+        &mut rejected,
+    );
+    if let Some(hpi) = patch.hpi.as_mut() {
+        guard_text(
+            "hpi.onset",
+            &mut hpi.onset,
+            locale,
+            patient_text,
+            &mut rejected,
+        );
+        guard_text(
+            "hpi.modifiers",
+            &mut hpi.modifiers,
+            locale,
+            patient_text,
+            &mut rejected,
+        );
+        guard_text(
+            "hpi.character",
+            &mut hpi.character,
+            locale,
+            patient_text,
+            &mut rejected,
+        );
+        guard_text(
+            "hpi.location",
+            &mut hpi.location,
+            locale,
+            patient_text,
+            &mut rejected,
+        );
+        guard_text(
+            "hpi.course",
+            &mut hpi.course,
+            locale,
+            patient_text,
+            &mut rejected,
+        );
+        guard_text(
+            "hpi.associated",
+            &mut hpi.associated,
+            locale,
+            patient_text,
+            &mut rejected,
+        );
+    }
+    guard_list(
+        "past_history",
+        &mut patch.past_history,
+        locale,
+        patient_text,
+        &mut rejected,
+    );
+    guard_list(
+        "medications",
+        &mut patch.medications,
+        locale,
+        patient_text,
+        &mut rejected,
+    );
+    guard_list(
+        "allergies",
+        &mut patch.allergies,
+        locale,
+        patient_text,
+        &mut rejected,
+    );
+    guard_list(
+        "patient_questions",
+        &mut patch.patient_questions,
+        locale,
+        patient_text,
+        &mut rejected,
+    );
+    rejected
+}
+
+const REMOVED: &str = "【已移除】";
+
+/// Tool arguments are model-written. Before they are stored or shown in the trace panel, mask personal data
+/// and replace any string that fails the output guard.
+pub fn sanitize_args(value: &Value, locale: Locale, patient_text: &str) -> Value {
+    match value {
+        Value::String(text) => {
+            let masked = pii::mask(text).text;
+            if guard::is_clean(&masked, locale, patient_text) {
+                Value::String(masked)
+            } else {
+                Value::String(REMOVED.to_string())
+            }
+        }
+        Value::Array(items) => Value::Array(
+            items
+                .iter()
+                .map(|v| sanitize_args(v, locale, patient_text))
+                .collect(),
+        ),
+        Value::Object(map) => Value::Object(
+            map.iter()
+                .map(|(k, v)| (k.clone(), sanitize_args(v, locale, patient_text)))
+                .collect(),
+        ),
+        other => other.clone(),
     }
 }
 
@@ -579,6 +783,54 @@ mod tests {
             json!(["routine", "soon"])
         );
         assert_eq!(MODEL_TICKET_REASONS.len(), reasons.len());
+    }
+
+    fn patch(value: Value) -> IntakePatch {
+        serde_json::from_value(value).expect("patch")
+    }
+
+    #[test]
+    fn diagnosis_and_dose_wording_never_reaches_the_record() {
+        let mut p = patch(json!({
+            "chief_complaint": "疑似胃炎",
+            "onset": "昨天",
+            "associated": "建議吃兩顆止痛藥",
+            "medications": ["降血壓藥 5mg", "每天加到 10mg"],
+            "patient_questions": ["我是不是得了肺炎"],
+            "hpi": { "course": "您可能是感冒" }
+        }));
+        let rejected = guard_patch(&mut p, Locale::ZhTw, "我吃降血壓藥 5mg，我是不是得了肺炎");
+        let fields: Vec<&str> = rejected.iter().map(|(f, _)| f.as_str()).collect();
+        assert!(
+            fields.contains(&"chief_complaint")
+                && fields.contains(&"hpi.associated")
+                && fields.contains(&"medications")
+                && fields.contains(&"hpi.course"),
+            "{fields:?}"
+        );
+        assert_eq!(p.chief_complaint, None);
+        assert_eq!(p.onset.as_deref(), Some("昨天"));
+        assert_eq!(
+            p.medications,
+            Some(vec!["降血壓藥 5mg".to_string()]),
+            "the patient's own dose stays"
+        );
+        assert_eq!(
+            p.patient_questions,
+            Some(vec!["我是不是得了肺炎".to_string()]),
+            "the patient's own question stays"
+        );
+        assert_eq!(p.hpi.expect("hpi").course, None);
+    }
+
+    #[test]
+    fn trace_arguments_are_masked_and_scrubbed() {
+        let args = json!({ "summary": "病人電話 0912345678，請聯絡", "note": "建議每天吃兩顆", "n": 3, "list": ["沒問題", "您可能是胃炎"] });
+        let shown = sanitize_args(&args, Locale::ZhTw, "");
+        assert_eq!(shown["summary"], json!("病人電話 【已遮蔽】，請聯絡"));
+        assert_eq!(shown["note"], json!("【已移除】"));
+        assert_eq!(shown["n"], json!(3));
+        assert_eq!(shown["list"], json!(["沒問題", "【已移除】"]));
     }
 
     #[test]
