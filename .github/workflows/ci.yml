@@ -1,0 +1,80 @@
+name: CI
+
+# Checks only. There is no deploy job and no secret here: images are built and shipped by hand
+# (see DEPLOY.md). Third-party actions are pinned to full commit SHAs (version in the comment).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  # Same toolchain as the Docker build stage (rust:1.99-slim-trixie resolves to 1.99.1).
+  RUST_VERSION: "1.99.1"
+
+jobs:
+  backend:
+    name: backend (fmt, clippy, test)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install Rust ${{ env.RUST_VERSION }}
+        run: |
+          rustup toolchain install "$RUST_VERSION" --profile minimal --component rustfmt --component clippy --no-self-update
+          rustup default "$RUST_VERSION"
+          rustc --version
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: backend
+      - name: cargo fmt --check
+        run: cargo fmt --check
+      - name: cargo clippy -D warnings
+        run: cargo clippy --all-targets --locked -- -D warnings
+      - name: cargo test
+        run: cargo test --locked
+
+  web:
+    name: web (build, test)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      # i18n check + type check + vite build
+      - run: npm run build
+      - run: npm test
+
+  deploy-files:
+    name: Dockerfile, compose and shell scripts (lint only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Dockerfile lint (no build)
+        run: docker buildx build --check .
+      - name: Production compose file validates (dummy values only)
+        env:
+          POSTGRES_PASSWORD: ci-dummy-value
+        run: docker compose -f deploy/compose.prod.yaml config -q
+      - name: shellcheck
+        run: shellcheck -x deploy/*.sh

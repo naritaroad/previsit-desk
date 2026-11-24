@@ -1,0 +1,136 @@
+# PreVisit Desk production stack: PostgreSQL + API + its own Cloudflare Tunnel connector.
+# Lives in its own compose project (name below) so it never shares networks, volumes or
+# containers with other projects on the host (for example the grex service).
+#
+# On the host this file sits next to `.env` (chmod 600) and `.deploy-state`, for example
+# ~/previsit-desk/compose.prod.yaml. ALWAYS scope commands to this project:
+#   docker compose -p previsit-desk -f compose.prod.yaml <command>
+# Never run `docker compose down`, `docker system prune`, `docker rm` or `docker volume rm`
+# on anything outside the previsit-desk project.
+#
+# Variables read from `.env` (list only; see .env.example and DEPLOY.md section 6):
+#   POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, TUNNEL_TOKEN, HOST_PORT, IMAGE_REPO, IMAGE_TAG,
+#   and everything the API reads (LLM_*, GEMINI_API_KEY, CLINICIAN_*, *_LIMIT, RATE_*, RETENTION_DAYS ...).
+name: previsit-desk
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  db:
+    image: postgres:18.6-trixie
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: "0.5"
+    logging: *default-logging
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-previsit}
+      POSTGRES_USER: ${POSTGRES_USER:-previsit}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    # Small-memory profile: the API pool is at most 5 connections, so 30 is generous.
+    command:
+      - postgres
+      - -c
+      - shared_buffers=48MB
+      - -c
+      - max_connections=30
+      - -c
+      - work_mem=4MB
+      - -c
+      - effective_cache_size=128MB
+      - -c
+      - maintenance_work_mem=32MB
+    volumes:
+      # PostgreSQL 18 images keep data under /var/lib/postgresql/<major>/; mount the parent.
+      - pgdata:/var/lib/postgresql
+    # No `ports:` on purpose: the database is reachable only from this project's network.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  api:
+    # Images are built locally and loaded with `docker load`; never pulled by default.
+    # GHCR alternative: IMAGE_REPO=ghcr.io/<owner>/previsit-desk and PULL_POLICY=missing in .env.
+    image: ${IMAGE_REPO:-previsit-desk}:${IMAGE_TAG:-latest-local}
+    pull_policy: ${PULL_POLICY:-never}
+    restart: unless-stopped
+    init: true
+    mem_limit: 256m
+    cpus: "1.0"
+    pids_limit: 256
+    logging: *default-logging
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # `environment:` wins over env_file, so a .env copied from .env.example cannot break these.
+      DATABASE_URL: postgres://${POSTGRES_USER:-previsit}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-previsit}
+      BIND_ADDR: 0.0.0.0:8088
+      WEB_DIR: /app/web
+      DATA_DIR: /app/data
+      # Behind the tunnel the real client address is in cf-connecting-ip; HTTPS makes Secure cookies work.
+      CLIENT_IP_HEADER: ${CLIENT_IP_HEADER:-cf-connecting-ip}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      # The app has no use for the tunnel token even though it sits in the same .env file.
+      TUNNEL_TOKEN: ""
+    ports:
+      # Loopback only: for smoke tests from the host. The public path is the tunnel.
+      - "127.0.0.1:${HOST_PORT:-18088}:8088"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app/previsit-api", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  cloudflared:
+    # Tag verified 2026-11-25 (released 2026-11-23). Auto-update is disabled; bump the tag on purpose.
+    image: cloudflare/cloudflared:2026.11.2
+    restart: unless-stopped
+    mem_limit: 128m
+    cpus: "0.5"
+    pids_limit: 256
+    logging: *default-logging
+    # Ingress (previsit.<domain> -> http://api:8088) is stored in Cloudflare and set by
+    # deploy/cloudflare-tunnel.ps1. The metrics listener stays inside this container
+    # (it does not clash with the 20241 used by a host-level cloudflared).
+    command: ["tunnel", "--no-autoupdate", "--metrics", "127.0.0.1:20241", "run"]
+    environment:
+      # Empty here means "start with `remote-up.sh --no-tunnel`"; remote-up.sh refuses to start
+      # this service with an empty token.
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "cloudflared", "tunnel", "--metrics", "127.0.0.1:20241", "ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  pgdata:

@@ -1,0 +1,50 @@
+# Build context filter. Anything listed here never reaches the builder, so it cannot end up in an image layer.
+# Paths are relative to the repository root. Use the **/ prefix for "at any depth".
+
+# --- Secrets and local settings: never in an image ---
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/*.token
+**/cf-*-token*
+**/.cloudflared
+
+# --- VCS and agent working files ---
+.git
+.gitignore
+.gitattributes
+.github
+.agent-context
+.claude
+.tmp
+tmp
+
+# --- Build output and dependencies (rebuilt inside the image) ---
+backend/target
+**/target
+**/node_modules
+web/dist
+web/.vite
+**/*.log
+.cargo-warm.log
+
+# --- Not needed at runtime ---
+docs
+deploy
+compose.yaml
+Dockerfile
+.dockerignore
+AGENTS.md
+README.md
+
+# --- Local databases and dumps ---
+**/*.sqlite
+**/*.sqlite3
+**/*.db
+**/*.dump
+**/pgdata
+
+# --- Eval output: keep only the summary that the API serves ---
+data/eval/results/*
+!data/eval/results/summary.json
