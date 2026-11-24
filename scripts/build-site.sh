@@ -15,10 +15,10 @@ cp web/public/favicon.svg "$out/assets/favicon.svg"
 pick() { # <dest-name> <preferred> <fallback>
   if [ -f "$2" ]; then cp "$2" "$out/assets/$1"; elif [ -f "$3" ]; then cp "$3" "$out/assets/$1"; else echo "missing screenshot for $1" >&2; fi
 }
-pick shot-patient-desktop.jpg    docs/assets/screenshots/patient-desktop-light.jpg   docs/design/shots/1280-light-patient-desktop.jpg
-pick shot-refill.jpg             docs/assets/screenshots/refill-outcomes-light.jpg   docs/design/shots/1280-light-refill-outcomes.jpg
-pick shot-emergency-mobile.jpg   docs/assets/screenshots/emergency-mobile-light.jpg  docs/design/shots/390-light-emergency.jpg
-pick shot-clinician.jpg          docs/assets/screenshots/clinician-list-mobile.jpg   docs/design/shots/390-light-clinician-list.jpg
+pick shot-patient-desktop.png    docs/assets/screenshots/patient-chat-1280-light.png        docs/design/shots/1280-light-patient-desktop.jpg
+pick shot-refill.png             docs/assets/screenshots/patient-refill-too-early-1280-light.png docs/design/shots/1280-light-refill-outcomes.jpg
+pick shot-emergency-mobile.png   docs/assets/screenshots/patient-redflag-390-light.png      docs/design/shots/390-light-emergency.jpg
+pick shot-clinician.png          docs/assets/screenshots/clinician-list-390-light.png       docs/design/shots/390-light-clinician-list.jpg
 
 # Latest eval summary, if one exists (the page hides the section otherwise).
 if [ -f data/eval/results/summary.json ]; then cp data/eval/results/summary.json "$out/eval-summary.json"; fi

@@ -1,0 +1,474 @@
+{
+  "app": {
+    "name": "PreVisit Desk",
+    "sub": "Pre-visit assistant",
+    "title": "PreVisit Desk",
+    "skip": "Skip to main content"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "patient": "Pre-visit",
+    "safety": "Safety",
+    "clinician": "Clinician",
+    "menu": "Menu"
+  },
+  "theme": {
+    "toDark": "Switch to dark mode",
+    "toLight": "Switch to light mode"
+  },
+  "lang": {
+    "switchTo": "Switch to {{language}}"
+  },
+  "common": {
+    "loading": "Loading",
+    "retry": "Try again",
+    "refresh": "Refresh",
+    "close": "Close",
+    "cancel": "Cancel"
+  },
+  "banner": {
+    "lead": "AI pre-visit assistant, not a doctor. ",
+    "rest": "No diagnosis, no prescriptions. Please don't enter real medical records or personal details.",
+    "more": "Safety"
+  },
+  "chat": {
+    "paneLabel": "Conversation",
+    "title": "Pre-visit",
+    "logLabel": "Pre-visit conversation",
+    "progress": "{{done}}/{{total}}",
+    "progressLabel": "Intake progress",
+    "paused": "Paused",
+    "sending": "Sending",
+    "notSent": "Not sent",
+    "resend": "Send again",
+    "replying": "Replying",
+    "typing": "The assistant is typing",
+    "tagOpening": "Fixed opening note",
+    "tagRule": "Rule reply, not AI",
+    "tagNotice": "System notice",
+    "startTitle": "Start a pre-visit",
+    "startBody": "Answer a few questions and we will put them into a summary for your doctor. Finish it before your appointment.",
+    "start": "Start pre-visit",
+    "missingTitle": "This pre-visit was not found",
+    "missingBody": "It may be past the retention period. Start a new pre-visit.",
+    "piiMasked": "Your message had what looks like personal details. They were masked before processing. Please don't enter real personal details."
+  },
+  "composer": {
+    "label": "Message",
+    "placeholder": "Describe how you're feeling",
+    "send": "Send",
+    "hint": "Enter to send, Shift+Enter for a new line",
+    "tooLong": "Over the limit. Shorten it before sending.",
+    "finish": "Finish and send",
+    "handoff": "Ask a doctor to contact me",
+    "startNew": "Start a new pre-visit",
+    "paused": "This pre-visit is paused. Messages won't be sent to the AI.",
+    "closed": "This pre-visit has been sent. You can't add to it.",
+    "emergencyNote": "If your symptoms get worse, call 119 or go to an emergency room."
+  },
+  "emergency": {
+    "title": "Get medical help now",
+    "titleMind": "You are not alone. Someone can talk with you right now.",
+    "hit": "Detected: {{label}}",
+    "call119": "Emergency",
+    "call1925": "Hotline, 24 hours",
+    "ticket": "The care team has been notified (ticket {{no}}).",
+    "fallback": "Your symptoms may be serious. Call 119 now, or have someone take you to the nearest emergency room. Don't drive yourself.",
+    "fallbackMind": "Call the 1925 hotline now. Someone answers 24 hours a day. In immediate danger, call 119."
+  },
+  "stage": {
+    "chief_complaint": "Main concern",
+    "hpi": "Current illness",
+    "background": "History and medicines",
+    "confirm": "Confirm summary",
+    "done": "Done"
+  },
+  "intake": {
+    "missing": "Not collected",
+    "notApplicable": "N/A",
+    "none": "None",
+    "listSeparator": ", ",
+    "field": {
+      "chief_complaint": "Main concern",
+      "hpi_onset": "Onset",
+      "hpi_course": "Course",
+      "hpi_location": "Location",
+      "hpi_character": "Character",
+      "hpi_severity": "Severity",
+      "hpi_modifiers": "Worse or better with",
+      "hpi_associated": "Other symptoms",
+      "past_history": "Past history",
+      "medications": "Medicines",
+      "allergies": "Allergies"
+    }
+  },
+  "summary": {
+    "progress": "Progress",
+    "chiefComplaint": "Main concern",
+    "hpi": "Current illness (OPQRST)",
+    "background": "History, medicines, allergies",
+    "questions": "Questions for the doctor",
+    "stillMissing": "Still needed",
+    "suggested": "Worth adding",
+    "complete": "All required fields are filled in.",
+    "narrative": "Summary",
+    "redFlagScreen": "Red-flag screen",
+    "redFlagNone": "Screened. No red-flag rule matched.",
+    "redFlagNotChecked": "Not screened.",
+    "redFlagHit": "Red flag matched: {{labels}}.",
+    "notCollected": "Fields not collected",
+    "refill": "Refill check",
+    "byModel": "Written by AI from the conversation ({{model}}, {{time}}).",
+    "byCode": "Built by code from the fields so far, not AI ({{time}}).",
+    "sent": "Sent to the doctor, who will read this summary before your visit."
+  },
+  "submit": {
+    "title": "Send to the doctor?",
+    "body": "You can't edit after sending. Send what you have to the doctor?",
+    "missing_one": "{{count}} item is unanswered. It will be marked as not collected.",
+    "missing_other": "{{count}} items are unanswered. They will be marked as not collected.",
+    "back": "Keep editing",
+    "confirm": "Send",
+    "sending": "Sending…"
+  },
+  "handoff": {
+    "title": "Ask a doctor to contact you",
+    "body": "We will open a handoff ticket, and a doctor or pharmacist will get in touch.",
+    "note": "Anything you want the doctor to know (optional)",
+    "tooLong": "Over the limit",
+    "send": "Send",
+    "done": "The care team has been notified. Ticket"
+  },
+  "panel": {
+    "label": "Details",
+    "barLabel": "Switch view",
+    "trace": "Tool trace",
+    "summary": "Doctor summary",
+    "refill": "Refill check",
+    "bar": {
+      "chat": "Chat",
+      "trace": "Trace",
+      "summary": "Summary",
+      "refill": "Refill"
+    }
+  },
+  "trace": {
+    "empty1": "No tool calls yet.",
+    "empty2": "Each step will appear here once you start.",
+    "model": "Model",
+    "noModel": "Not called (rule reply)",
+    "status": "Status",
+    "fallback": "Fallback",
+    "fallbackUsed": "used",
+    "usage": "Usage",
+    "tokens": "tokens",
+    "steps": "Steps",
+    "formGroup": "Form submissions",
+    "duration": "Duration",
+    "arguments": "Arguments",
+    "result": "Result",
+    "running": "Running…",
+    "runStatus": {
+      "running": "running",
+      "completed": "completed",
+      "failed": "failed",
+      "skipped": "skipped"
+    },
+    "source": {
+      "code": "Code",
+      "model": "Model",
+      "form": "Form"
+    },
+    "sourceNote": {
+      "code": "ran in code",
+      "model": "model call",
+      "form": "form submission"
+    },
+    "rowStatus": {
+      "ok": "Done",
+      "rejected": "Blocked",
+      "error": "Error",
+      "redflag": "Red flag",
+      "running": "Running"
+    },
+    "tool": {
+      "red_flag_precheck": "Red-flag check: code scans every message first",
+      "scope_precheck": "Scope check: is it asking for a prescription or out of bounds",
+      "pii_filter": "Personal-detail mask",
+      "output_guard": "Output check: looks for diagnosis, doses or prescriptions before a reply goes out",
+      "record_intake": "Writes what the patient said into the intake fields",
+      "search_health_education": "Looks up the health handbook",
+      "check_chronic_refill": "Refill check (computed by code)",
+      "transfer_to_clinician": "Creates a handoff ticket",
+      "save_previsit_summary": "Saves the pre-visit summary"
+    },
+    "guard": {
+      "rewritten": "The output check rewrote the reply ({{kind}})",
+      "replaced": "The output check replaced the reply ({{kind}})"
+    },
+    "guardKind": {
+      "diagnosis": "diagnosis",
+      "dosage": "dosage",
+      "prescribing": "prescribing",
+      "other": "other"
+    },
+    "brief": {
+      "redFlagHit": "Red flag matched: {{label}}",
+      "redFlagNone": "No red-flag rule matched",
+      "scopeOk": "Nothing out of bounds",
+      "scopePrescription": "Asked for a prescription or medicine advice",
+      "scopeControlled": "Mentioned a controlled drug",
+      "scopeInjection": "Asked to ignore the rules or reveal settings",
+      "pii": "Masked {{count}} possible personal detail(s) ({{kinds}})",
+      "intake": "Wrote {{applied}} field(s), rejected {{rejected}}",
+      "searchHits": "Found {{count}} handbook section(s)",
+      "searchNone": "Nothing relevant in the handbook",
+      "refillEligible": "Result: can refill",
+      "refillTooEarly": "Result: too early to refill",
+      "refillRevisit": "Result: needs a new visit",
+      "refillConsult": "Result: ask a pharmacist or doctor",
+      "transfer": "Created ticket {{ticket}}",
+      "transferDeduped": "An open ticket already existed; reused {{ticket}}",
+      "saved": "Summary saved, {{count}} field(s) not collected",
+      "guardPass": "Reply passed the check",
+      "guardRewritten": "Reply contained {{violations}} and was rewritten",
+      "guardReplaced": "Reply contained {{violations}} and was replaced with fixed text"
+    }
+  },
+  "refill": {
+    "intro": "Enter what is on the prescription. Code works out, by NHI rules, whether you can refill. No AI is involved.",
+    "exampleNote": "The form starts with example dates. Change them to the dates on the prescription.",
+    "prescriptionDate": "Prescription date",
+    "totalDays": "Total days prescribed",
+    "totalDaysHint": "At most 90 days",
+    "daysPerFill": "Days per fill",
+    "daysPerFillHint": "At most 30 days per fill",
+    "lastFillDate": "Last fill date",
+    "fillsDone": "Fills collected",
+    "fillsOption_one": "{{count}} time",
+    "fillsOption_other": "{{count}} times",
+    "fillsHint": "If all three fills are collected, choose 3.",
+    "controlled": "Does it include a Schedule 1 or 2 controlled drug",
+    "controlledOption": {
+      "no": "No",
+      "yes": "Yes",
+      "unsure": "Not sure"
+    },
+    "special": "Special status",
+    "specialOption": {
+      "none": "None",
+      "going_abroad": "Going abroad",
+      "returning_island": "Returning to an outlying island",
+      "ocean_fishing_crew": "Ocean fishing crew",
+      "international_crew": "International crew",
+      "rare_disease": "Rare disease"
+    },
+    "symptomChanged": "My symptoms changed recently",
+    "sideEffects": "I felt unwell after taking it (side effects)",
+    "demoTitle": "Change today's date",
+    "demoBadge": "Demo only",
+    "demoToggle": "Use the date below as today",
+    "today": "Today's date",
+    "todayHint": "When unchecked, the server date is used ({{date}}).",
+    "submit": "Check",
+    "checking": "Checking…",
+    "errors": {
+      "required": "Fill in this field",
+      "bad_date": "That date isn't valid",
+      "bad_number": "Enter a whole number",
+      "fills_range": "Fills collected is 1 to 3",
+      "after_today": "The date can't be after today",
+      "before_prescription": "The last fill can't be before the prescription date",
+      "per_fill_exceeds_total": "Days per fill can't exceed the total"
+    },
+    "outcome": {
+      "eligible": "Can refill",
+      "too_early": "Too early",
+      "revisit": "New visit needed",
+      "consult": "Ask a pharmacist or doctor"
+    },
+    "earliest": "Earliest refill date",
+    "windowFrom": "Refill from",
+    "waitLabel": "Wait",
+    "waitDays_one": "{{count}} day",
+    "waitDays_other": "{{count}} days",
+    "nextFill": "Next fill",
+    "fillNumber": "Fill {{n}}",
+    "validUntil": "Valid until",
+    "ticketLead": "The care team has been notified. Ticket",
+    "rules_one": "Rule behind this ({{count}})",
+    "rules_other": "Rules behind this ({{count}})",
+    "source": "Source",
+    "opensNewTab": " (opens in a new tab)"
+  },
+  "errors": {
+    "offlineTitle": "Can't reach the server",
+    "offline": "The connection dropped, so the message wasn't sent. Reconnect and try again.",
+    "offlineLoad": "This pre-visit couldn't be loaded. Check your connection and try again.",
+    "rateLimited": "Too many requests. Try again in {{seconds}} seconds.",
+    "notFound": "That wasn't found. It may be past the retention period.",
+    "visitClosed": "This pre-visit has been sent. You can't add to it.",
+    "conflict": "The previous message is still being processed. Wait for the reply, then send again.",
+    "unauthorized": "Your session ended. Sign in again.",
+    "invalidCredentials": "Incorrect username or password",
+    "tooLarge": "That's too long. Shorten it and send again.",
+    "invalidRequest": "Something in the form isn't valid. Check it and send again.",
+    "invalidState": "This can't be done in its current state. Refresh and try again.",
+    "internal": "The server couldn't finish that request. Try again in a moment.",
+    "budget": "The AI can't reply right now. Today's quota is used up. Red-flag checks and refill checks still work, and you can use \"Finish and send\" to hand what you have to the doctor.",
+    "timeout": "The AI took too long to reply. Send it again.",
+    "modelDown": "The AI can't reply right now. Red-flag checks and refill checks still work. Try again later, or use \"Finish and send\"."
+  },
+  "safety": {
+    "title": "Safety boundaries",
+    "lead": "This tool only organises information before a visit and works out, by NHI rules, whether a refill is allowed. Judgement stays with doctors and pharmacists. These six boundaries are the ones it will not cross, with how each is kept.",
+    "back": "Back to pre-visit",
+    "boundary": {
+      "disclosure": {
+        "title": "It says it is an AI from the start",
+        "body": "The first message of every pre-visit is fixed text: \"I am an AI pre-visit assistant, not a doctor.\"",
+        "how": "Fixed text, no model"
+      },
+      "redFlag": {
+        "title": "Red-flag rules come before the AI",
+        "body": "Chest pain, trouble breathing, thoughts of self-harm and similar are matched by code first. A match gets fixed text and shows 119 and 1925.",
+        "how": "Code rules"
+      },
+      "noAdvice": {
+        "title": "No diagnosis, no prescriptions, no doses",
+        "body": "Limits in the prompt, plus an output check. A reply that breaks them is rewritten or refused.",
+        "how": "Output check"
+      },
+      "refill": {
+        "title": "Refill checks give four results only",
+        "body": "Code applies the NHI rules. Controlled drugs, changed symptoms and side effects always go to a pharmacist or doctor.",
+        "how": "Computed by code"
+      },
+      "audit": {
+        "title": "Every step can be traced",
+        "body": "Tool calls, red-flag results and model names are recorded in the trace panel and the database.",
+        "how": "Trace records"
+      },
+      "privacy": {
+        "title": "No personal details collected",
+        "body": "It never asks for a name or ID number, and stores only a de-identified summary, kept for {{days}} days.",
+        "how": "Kept {{days}} days"
+      }
+    },
+    "evalTitle": "Latest evaluation",
+    "evalMeta": "{{time}}, {{model}}, {{total}} questions",
+    "evalNone": "No evaluation has been run yet.",
+    "evalAria": "{{name}}: {{passed}} of {{total}} passed",
+    "evalTotal": "Overall {{passed}}/{{total}} passed ({{percent}}).",
+    "eval": {
+      "intake": "Intake completeness",
+      "red_flag": "Red-flag detection",
+      "refill": "Refill check",
+      "out_of_scope": "Out-of-scope questions",
+      "boundary": "Boundary-crossing requests"
+    },
+    "loadFailed": "The evaluation results couldn't be loaded. Try again in a moment.",
+    "aboutTitle": "Models and data",
+    "primaryModel": "Primary model",
+    "fallbackModel": "Fallback model",
+    "retention": "Data retention",
+    "retentionValue": "Deleted after {{days}} days",
+    "version": "Version",
+    "demoNote": "This is a demo system. Enter made-up symptoms only. On the free tier, what you send may be used by the model provider to improve its products."
+  },
+  "clinician": {
+    "sub": "Clinician",
+    "logout": "Sign out",
+    "loginTitle": "Clinician sign-in",
+    "loginLead": "This demo has a single clinician account.",
+    "username": "Username",
+    "password": "Password",
+    "login": "Sign in",
+    "loggingIn": "Signing in…",
+    "listTitle": "Pre-visit list",
+    "summaryLine": "{{pending}} pending, {{urgent}} urgent",
+    "filterLabel": "Filter",
+    "filter": {
+      "pending": "Pending",
+      "red_flag": "Red flag",
+      "submitted": "To review",
+      "reviewed": "Reviewed",
+      "all": "All"
+    },
+    "search": "Search main concern",
+    "col": {
+      "urgency": "Urgency",
+      "complaint": "Main concern",
+      "status": "Status",
+      "tickets": "Tickets",
+      "activity": "Last activity"
+    },
+    "noComplaint": "No main concern yet",
+    "redFlagPrefix": "Red flag: {{label}}",
+    "hasSummary": "Summary ready",
+    "noSummary": "No summary yet",
+    "ticketCount_one": "{{count}} ticket",
+    "ticketCount_other": "{{count}} tickets",
+    "empty": "No pre-visits yet.",
+    "emptyFiltered": "Nothing matches.",
+    "clearFilter": "Clear filters",
+    "loadMore": "Load more",
+    "openTickets_one": "Open tickets ({{count}})",
+    "openTickets_other": "Open tickets ({{count}})",
+    "openVisit": "Open pre-visit",
+    "resolve": "Mark handled",
+    "resolved": "Handled",
+    "detailTitle": "Pre-visit details",
+    "backToList": "Back to list",
+    "visitMissing": "This pre-visit wasn't found. It may be past the retention period.",
+    "messageCount_one": "{{count}} message",
+    "messageCount_other": "{{count}} messages",
+    "redFlagBanner": "Red flag matched: {{label}} ({{time}}).",
+    "summaryTitle": "Pre-visit summary",
+    "noSummaryYet": "The patient hasn't sent it yet. These are the fields collected so far.",
+    "refillTitle": "Refill check",
+    "ticketsTitle": "Handoff tickets",
+    "noTickets": "No tickets.",
+    "resolvedBy": "Handled by {{name}} at {{time}}",
+    "conversationTitle": "Full conversation",
+    "who": {
+      "ai": "AI",
+      "patient": "Patient",
+      "rule": "Rule"
+    },
+    "traceTitle": "Tool trace",
+    "reviewTitle": "Review",
+    "reviewNote": "Note (optional)",
+    "reviewPlaceholder": "For example: phoned the patient, who is on the way to the ER",
+    "review": "Mark reviewed",
+    "reviewedBy": "Reviewed by {{name}}, {{time}}",
+    "reviewNotYet": "You can mark it reviewed after the patient sends it."
+  },
+  "visitStatus": {
+    "active": "In progress",
+    "red_flag": "Red flag",
+    "submitted": "To review",
+    "reviewed": "Reviewed"
+  },
+  "urgency": {
+    "urgent": "Urgent",
+    "soon": "Soon",
+    "routine": "Routine"
+  },
+  "ticketReason": {
+    "red_flag": "Red flag",
+    "prescription_request": "Prescription request",
+    "controlled_drug": "Controlled drug",
+    "symptom_change": "Symptom change",
+    "side_effects": "Side effects",
+    "special_status": "Special status",
+    "out_of_scope_medical": "Out-of-scope medical question",
+    "patient_request": "Patient asked for contact",
+    "other": "Other"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The address may be mistyped, or the page has been removed.",
+    "home": "Back to pre-visit"
+  }
+}

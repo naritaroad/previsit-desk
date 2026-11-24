@@ -1,0 +1,467 @@
+{
+  "app": {
+    "name": "PreVisit Desk",
+    "sub": "診前助理",
+    "title": "PreVisit Desk 診前助理",
+    "skip": "跳到主要內容"
+  },
+  "nav": {
+    "label": "主要導覽",
+    "patient": "預問診",
+    "safety": "安全說明",
+    "clinician": "醫師端",
+    "menu": "選單"
+  },
+  "theme": {
+    "toDark": "切換成深色模式",
+    "toLight": "切換成淺色模式"
+  },
+  "lang": {
+    "switchTo": "切換成{{language}}"
+  },
+  "common": {
+    "loading": "載入中",
+    "retry": "重試",
+    "refresh": "重新整理",
+    "close": "關閉",
+    "cancel": "取消"
+  },
+  "banner": {
+    "lead": "AI 預問診助理，不是醫師。",
+    "rest": "不做診斷、不開藥。請勿輸入真實病歷或個資。",
+    "more": "安全說明"
+  },
+  "chat": {
+    "paneLabel": "對話",
+    "title": "預問診",
+    "logLabel": "預問診對話",
+    "progress": "{{done}}／{{total}}",
+    "progressLabel": "問診進度",
+    "paused": "已暫停",
+    "sending": "傳送中",
+    "notSent": "沒有送出",
+    "resend": "重新傳送",
+    "replying": "正在回覆",
+    "typing": "AI 正在輸入",
+    "tagOpening": "固定開場說明",
+    "tagRule": "規則回覆・未經 AI",
+    "tagNotice": "系統提醒",
+    "startTitle": "開始預問診",
+    "startBody": "先回答幾個問題，我們會整理成給醫師看的摘要。看診前完成即可。",
+    "start": "開始預問診",
+    "missingTitle": "找不到這筆預問診",
+    "missingBody": "這筆預問診可能已超過保留期限。請開始新的預問診。",
+    "piiMasked": "您的訊息裡有疑似個資的內容，已先遮蔽再處理。請不要輸入真實個資。"
+  },
+  "composer": {
+    "label": "輸入訊息",
+    "placeholder": "請描述您的狀況",
+    "send": "送出",
+    "hint": "Enter 送出，Shift＋Enter 換行",
+    "tooLong": "字數超過上限，請縮短後再送出。",
+    "finish": "結束並送出",
+    "handoff": "請醫師聯絡我",
+    "startNew": "開始新的預問診",
+    "paused": "這次預問診已暫停，訊息不會再送給 AI。",
+    "closed": "這次預問診已送出，不能再補充。",
+    "emergencyNote": "如果症狀變嚴重，請直接撥打 119 或前往急診。"
+  },
+  "emergency": {
+    "title": "請立即就醫",
+    "titleMind": "您不是一個人，現在就有人可以陪您談",
+    "hit": "偵測到：{{label}}",
+    "call119": "緊急救護",
+    "call1925": "安心專線・24 小時",
+    "ticket": "已通知醫療團隊（轉交單 {{no}}）。",
+    "fallback": "您描述的症狀可能很危急。請馬上撥打 119，或請身邊的人陪您到最近的急診。不要自己開車。",
+    "fallbackMind": "現在就可以打 1925 安心專線，24 小時都有人接。情況危急時請撥 119。"
+  },
+  "stage": {
+    "chief_complaint": "主訴",
+    "hpi": "現病史",
+    "background": "過去史・用藥",
+    "confirm": "確認摘要",
+    "done": "已完成"
+  },
+  "intake": {
+    "missing": "尚未取得",
+    "notApplicable": "不適用",
+    "none": "無",
+    "listSeparator": "、",
+    "field": {
+      "chief_complaint": "主訴",
+      "hpi_onset": "何時開始",
+      "hpi_course": "病程變化",
+      "hpi_location": "部位",
+      "hpi_character": "性質",
+      "hpi_severity": "嚴重度",
+      "hpi_modifiers": "加重／緩解",
+      "hpi_associated": "伴隨症狀",
+      "past_history": "過去病史",
+      "medications": "用藥",
+      "allergies": "過敏"
+    }
+  },
+  "summary": {
+    "progress": "進度",
+    "chiefComplaint": "主訴",
+    "hpi": "現病史（OPQRST）",
+    "background": "過去病史・用藥・過敏",
+    "questions": "想問醫師的問題",
+    "stillMissing": "還需要補充",
+    "suggested": "建議補充",
+    "complete": "必要的欄位都有了。",
+    "narrative": "摘要",
+    "redFlagScreen": "紅旗篩檢",
+    "redFlagNone": "已篩檢，未命中紅旗規則。",
+    "redFlagNotChecked": "尚未篩檢。",
+    "redFlagHit": "命中紅旗：{{labels}}。",
+    "notCollected": "未取得欄位",
+    "refill": "慢箋檢核",
+    "byModel": "由 AI 依對話整理（{{model}}，{{time}}）。",
+    "byCode": "由程式依現有欄位產生，未經 AI（{{time}}）。",
+    "sent": "已交給醫師。看診時醫師會先看過這份摘要。"
+  },
+  "submit": {
+    "title": "送出給醫師？",
+    "body": "送出後就不能再修改。要把目前的內容交給醫師嗎？",
+    "missing_other": "還有 {{count}} 項沒回答，摘要會標示為未取得。",
+    "back": "回去補充",
+    "confirm": "送出",
+    "sending": "送出中…"
+  },
+  "handoff": {
+    "title": "請醫師聯絡您",
+    "body": "我們會建立一張轉交單，由醫師或藥師與您聯絡。",
+    "note": "想告訴醫師的事（選填）",
+    "tooLong": "超過字數上限",
+    "send": "送出",
+    "done": "已通知醫療團隊，轉交單"
+  },
+  "panel": {
+    "label": "輔助資訊",
+    "barLabel": "切換畫面",
+    "trace": "工具追蹤",
+    "summary": "給醫師的摘要",
+    "refill": "慢箋檢核",
+    "bar": {
+      "chat": "對話",
+      "trace": "追蹤",
+      "summary": "摘要",
+      "refill": "慢箋"
+    }
+  },
+  "trace": {
+    "empty1": "還沒有工具呼叫。",
+    "empty2": "開始對話後，每一步都會列在這裡。",
+    "model": "模型",
+    "noModel": "未呼叫（規則直接回覆）",
+    "status": "狀態",
+    "fallback": "備援",
+    "fallbackUsed": "已使用",
+    "usage": "用量",
+    "tokens": "tokens",
+    "steps": "步驟",
+    "formGroup": "表單送出",
+    "duration": "耗時",
+    "arguments": "參數",
+    "result": "結果",
+    "running": "執行中…",
+    "runStatus": {
+      "running": "進行中",
+      "completed": "完成",
+      "failed": "失敗",
+      "skipped": "略過"
+    },
+    "source": {
+      "code": "程式",
+      "model": "模型",
+      "form": "表單"
+    },
+    "sourceNote": {
+      "code": "程式執行",
+      "model": "模型呼叫",
+      "form": "表單送出"
+    },
+    "rowStatus": {
+      "ok": "完成",
+      "rejected": "已攔下",
+      "error": "錯誤",
+      "redflag": "紅旗命中",
+      "running": "執行中"
+    },
+    "tool": {
+      "red_flag_precheck": "紅旗檢查：每則訊息先由程式比對",
+      "scope_precheck": "範圍檢查：判斷是否要求開藥或越界",
+      "pii_filter": "個資遮蔽",
+      "output_guard": "輸出檢查：回覆送出前檢查是否含診斷、劑量或處方",
+      "record_intake": "把病人說的內容寫入問診欄位",
+      "search_health_education": "查衛教手冊",
+      "check_chronic_refill": "慢箋檢核（程式計算）",
+      "transfer_to_clinician": "建立轉交單",
+      "save_previsit_summary": "儲存預問診摘要"
+    },
+    "guard": {
+      "rewritten": "輸出檢查改寫了回覆（{{kind}}）",
+      "replaced": "輸出檢查替換了回覆（{{kind}}）"
+    },
+    "guardKind": {
+      "diagnosis": "診斷",
+      "dosage": "劑量",
+      "prescribing": "開藥",
+      "other": "其他"
+    },
+    "brief": {
+      "redFlagHit": "命中紅旗：{{label}}",
+      "redFlagNone": "沒有命中紅旗規則",
+      "scopeOk": "沒有越界要求",
+      "scopePrescription": "要求開藥或建議用藥",
+      "scopeControlled": "提到管制藥",
+      "scopeInjection": "要求忽略規則或洩漏設定",
+      "pii": "已遮蔽 {{count}} 項疑似個資（{{kinds}}）",
+      "intake": "寫入 {{applied}} 個欄位，退回 {{rejected}} 個",
+      "searchHits": "找到 {{count}} 段手冊內容",
+      "searchNone": "手冊裡沒有相關內容",
+      "refillEligible": "結果：可領",
+      "refillTooEarly": "結果：尚未到可領期間",
+      "refillRevisit": "結果：需回診",
+      "refillConsult": "結果：請洽藥師或醫師",
+      "transfer": "已建立轉交單 {{ticket}}",
+      "transferDeduped": "已有未結案的轉交單，沿用 {{ticket}}",
+      "saved": "摘要已儲存，{{count}} 個欄位未取得",
+      "guardPass": "回覆通過檢查",
+      "guardRewritten": "回覆含{{violations}}，已改寫",
+      "guardReplaced": "回覆含{{violations}}，已換成固定文字"
+    }
+  },
+  "refill": {
+    "intro": "輸入慢箋上的資料，由程式依健保規則算出能不能領。結果不經過 AI。",
+    "exampleNote": "表單先填入範例日期，請改成慢箋上的日期。",
+    "prescriptionDate": "慢箋開立日",
+    "totalDays": "總給藥日數",
+    "totalDaysHint": "最多 90 天",
+    "daysPerFill": "每次調劑日數",
+    "daysPerFillHint": "每次最多 30 天",
+    "lastFillDate": "上次領藥日",
+    "fillsDone": "已領幾次",
+    "fillsOption_other": "{{count}} 次",
+    "fillsHint": "三次都領完請選「3 次」。",
+    "controlled": "處方是否含第一、二級管制藥品",
+    "controlledOption": {
+      "no": "否",
+      "yes": "是",
+      "unsure": "不確定"
+    },
+    "special": "特殊身分",
+    "specialOption": {
+      "none": "無",
+      "going_abroad": "預定出國",
+      "returning_island": "返回離島",
+      "ocean_fishing_crew": "遠洋漁船船員",
+      "international_crew": "國際航線船員",
+      "rare_disease": "罕見疾病"
+    },
+    "symptomChanged": "最近症狀有變化",
+    "sideEffects": "吃藥後有不舒服（副作用）",
+    "demoTitle": "改變今天的日期",
+    "demoBadge": "僅供展示",
+    "demoToggle": "用下面的日期當作今天",
+    "today": "今天日期",
+    "todayHint": "不勾選時使用伺服器日期（{{date}}）。",
+    "submit": "檢核",
+    "checking": "檢核中…",
+    "errors": {
+      "required": "請填這一欄",
+      "bad_date": "日期格式不正確",
+      "bad_number": "請輸入正整數",
+      "fills_range": "已領次數是 1 到 3",
+      "after_today": "日期不能晚於今天",
+      "before_prescription": "上次領藥日不能早於開立日",
+      "per_fill_exceeds_total": "每次日數不能超過總日數"
+    },
+    "outcome": {
+      "eligible": "可領",
+      "too_early": "尚未到可領期間",
+      "revisit": "需回診",
+      "consult": "請洽藥師或醫師"
+    },
+    "earliest": "最早可領日",
+    "windowFrom": "可領日起",
+    "waitLabel": "還要等",
+    "waitDays_other": "{{count}} 天",
+    "nextFill": "下一次",
+    "fillNumber": "第 {{n}} 次領藥",
+    "validUntil": "慢箋到期",
+    "ticketLead": "已通知醫療團隊，轉交單",
+    "rules_other": "規則依據（{{count}} 條）",
+    "source": "來源",
+    "opensNewTab": "（另開新分頁）"
+  },
+  "errors": {
+    "offlineTitle": "連不上伺服器",
+    "offline": "連線中斷，訊息沒有送出。連上網路後再試一次。",
+    "offlineLoad": "沒辦法載入這筆預問診。請確認網路連線後再試。",
+    "rateLimited": "操作太頻繁，請 {{seconds}} 秒後再試。",
+    "notFound": "找不到這筆資料，可能已超過保留期限。",
+    "visitClosed": "這次預問診已送出，不能再補充。",
+    "conflict": "上一則訊息還在處理，請等回覆出現後再送出。",
+    "unauthorized": "登入已失效，請重新登入。",
+    "invalidCredentials": "帳號或密碼不正確",
+    "tooLarge": "內容太長，請縮短後再送出。",
+    "invalidRequest": "內容格式不正確，請檢查後再送出。",
+    "invalidState": "這筆資料目前不能這樣操作。請重新整理後再試。",
+    "internal": "伺服器沒有完成這個要求。請稍後再試一次。",
+    "budget": "AI 暫時無法回覆。今天的使用額度已用完；紅旗檢查與慢箋檢核仍可使用，您也可以按「結束並送出」把目前的內容交給醫師。",
+    "timeout": "AI 回覆逾時。請再送出一次。",
+    "modelDown": "AI 暫時無法回覆。紅旗檢查與慢箋檢核仍可使用，您也可以稍後再試，或按「結束並送出」。"
+  },
+  "safety": {
+    "title": "安全界線",
+    "lead": "這個工具只整理看診前的資料，並依健保規則算慢箋能不能領，判斷留給醫師與藥師。下面六條是它不會越過的界線，每一條都寫了做法。",
+    "back": "回預問診",
+    "boundary": {
+      "disclosure": {
+        "title": "一開始就說明 AI 身分",
+        "body": "每次預問診的第一則訊息都是固定文字：「我是 AI 預問診助理，不是醫師」。",
+        "how": "固定文字・不經模型"
+      },
+      "redFlag": {
+        "title": "紅旗規則先於 AI",
+        "body": "胸痛、呼吸困難、自傷念頭等，先由程式比對。命中就回固定文字，並顯示 119 與 1925。",
+        "how": "程式規則"
+      },
+      "noAdvice": {
+        "title": "不診斷、不開藥、不給劑量",
+        "body": "提示詞限制，加上輸出檢查。回覆違規時會改寫或拒絕。",
+        "how": "輸出檢查"
+      },
+      "refill": {
+        "title": "慢箋只回四種結果",
+        "body": "由程式依健保規則計算。管制藥、症狀變化與副作用一律轉給藥師或醫師。",
+        "how": "程式計算"
+      },
+      "audit": {
+        "title": "每一步都查得到",
+        "body": "工具呼叫、紅旗結果與模型名稱，都記在追蹤面板和資料庫。",
+        "how": "追蹤紀錄"
+      },
+      "privacy": {
+        "title": "不收個資",
+        "body": "不問姓名與身分證字號，只存去識別化的摘要，保留 {{days}} 天。",
+        "how": "保留 {{days}} 天"
+      }
+    },
+    "evalTitle": "最近一次評測",
+    "evalMeta": "{{time}}・{{model}}・共 {{total}} 題",
+    "evalNone": "尚未執行評測。",
+    "evalAria": "{{name}}：{{total}} 題中通過 {{passed}} 題",
+    "evalTotal": "整體通過 {{passed}}／{{total}} 題（{{percent}}）。",
+    "eval": {
+      "intake": "問診完整度",
+      "red_flag": "紅旗偵測",
+      "refill": "慢箋檢核",
+      "out_of_scope": "範圍外問題",
+      "boundary": "越界指令"
+    },
+    "loadFailed": "沒辦法載入評測結果。請稍後再試。",
+    "aboutTitle": "模型與資料",
+    "primaryModel": "主要模型",
+    "fallbackModel": "備援模型",
+    "retention": "資料保留",
+    "retentionValue": "{{days}} 天後刪除",
+    "version": "版本",
+    "demoNote": "這是展示用的系統，請只輸入虛構的病情。模型供應商可能會把免費層送出的內容拿來改善產品。"
+  },
+  "clinician": {
+    "sub": "醫師端",
+    "logout": "登出",
+    "loginTitle": "醫師登入",
+    "loginLead": "這個示範只有一組醫師帳號。",
+    "username": "帳號",
+    "password": "密碼",
+    "login": "登入",
+    "loggingIn": "登入中…",
+    "listTitle": "預問診清單",
+    "summaryLine": "待處理 {{pending}} 筆，其中 {{urgent}} 筆緊急",
+    "filterLabel": "篩選",
+    "filter": {
+      "pending": "待處理",
+      "red_flag": "紅旗",
+      "submitted": "待審閱",
+      "reviewed": "已審閱",
+      "all": "全部"
+    },
+    "search": "搜尋主訴",
+    "col": {
+      "urgency": "緊急程度",
+      "complaint": "主訴",
+      "status": "狀態",
+      "tickets": "轉交單",
+      "activity": "最後活動"
+    },
+    "noComplaint": "尚未取得主訴",
+    "redFlagPrefix": "紅旗：{{label}}",
+    "hasSummary": "摘要已產生",
+    "noSummary": "尚無摘要",
+    "ticketCount_other": "{{count}} 張",
+    "empty": "目前沒有預問診。",
+    "emptyFiltered": "沒有符合的資料。",
+    "clearFilter": "清除篩選",
+    "loadMore": "載入更多",
+    "openTickets_other": "待處理轉交單（{{count}}）",
+    "openVisit": "查看預問診",
+    "resolve": "標記已處理",
+    "resolved": "已處理",
+    "detailTitle": "預問診詳情",
+    "backToList": "回清單",
+    "visitMissing": "找不到這筆預問診，可能已超過保留期限。",
+    "messageCount_other": "訊息 {{count}} 則",
+    "redFlagBanner": "紅旗命中：{{label}}（{{time}}）。",
+    "summaryTitle": "預問診摘要",
+    "noSummaryYet": "病人還沒送出，下面是目前整理到的欄位。",
+    "refillTitle": "慢箋檢核",
+    "ticketsTitle": "轉交單",
+    "noTickets": "沒有轉交單。",
+    "resolvedBy": "{{name}} 於 {{time}} 處理",
+    "conversationTitle": "完整對話",
+    "who": {
+      "ai": "AI",
+      "patient": "病人",
+      "rule": "規則"
+    },
+    "traceTitle": "工具追蹤",
+    "reviewTitle": "審閱",
+    "reviewNote": "備註（選填）",
+    "reviewPlaceholder": "例如：已電話聯絡，病人已到急診",
+    "review": "標記已審閱",
+    "reviewedBy": "{{name}} 已審閱・{{time}}",
+    "reviewNotYet": "病人送出後才能標記已審閱。"
+  },
+  "visitStatus": {
+    "active": "問診中",
+    "red_flag": "紅旗",
+    "submitted": "待審閱",
+    "reviewed": "已審閱"
+  },
+  "urgency": {
+    "urgent": "緊急",
+    "soon": "盡快",
+    "routine": "一般"
+  },
+  "ticketReason": {
+    "red_flag": "紅旗",
+    "prescription_request": "要求處方",
+    "controlled_drug": "管制藥",
+    "symptom_change": "症狀變化",
+    "side_effects": "副作用",
+    "special_status": "特殊身分",
+    "out_of_scope_medical": "範圍外的醫療問題",
+    "patient_request": "病人要求聯絡",
+    "other": "其他"
+  },
+  "notFound": {
+    "title": "找不到這個頁面",
+    "body": "網址可能打錯了，或這個頁面已經移除。",
+    "home": "回預問診"
+  }
+}
