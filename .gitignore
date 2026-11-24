@@ -38,3 +38,6 @@ data/eval/results/raw/
 Thumbs.db
 .idea/
 .vscode/
+
+# Pages build output
+_site/

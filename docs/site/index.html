@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PreVisit Desk 診前助理</title>
+<meta name="description" content="AI 預問診與慢箋續領檢核助理：看診前先整理病史交給醫師，慢箋規則由程式確定性判斷。課堂展示專案，只用虛構資料。">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  html[data-lang="zh"] .en, html[data-lang="en"] .zh { display: none !important; }
+  body { background: var(--color-bg); }
+  .wrap { width: min(1120px, 100% - 2rem); margin-inline: auto; }
+  header.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--color-bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--color-border); }
+  header.top .wrap { display: flex; align-items: center; gap: var(--space-4); min-height: 60px; }
+  .brand { display: flex; align-items: center; gap: var(--space-2); font-weight: 700; color: var(--color-text); text-decoration: none; }
+  .brand img { width: 32px; height: 32px; }
+  .spacer { flex: 1; }
+  .langsw button { min-height: 44px; min-width: 44px; padding: 0 var(--space-3); border: 1px solid var(--color-border-strong); background: var(--color-surface-raised); color: var(--color-text); border-radius: var(--radius-md); font: inherit; cursor: pointer; }
+  .hero { padding: clamp(2.5rem, 7vw, 5rem) 0 clamp(2rem, 5vw, 3.5rem); display: grid; gap: var(--space-6); grid-template-columns: 1.1fr 0.9fr; align-items: center; }
+  .hero h1 { font-size: clamp(1.9rem, 4.6vw, 3rem); line-height: 1.25; margin: 0 0 var(--space-4); letter-spacing: 0; }
+  .hero p.lead { font-size: var(--text-lg); color: var(--color-text-muted); max-width: 38em; margin: 0 0 var(--space-5); }
+  .cta { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  .cta a { text-decoration: none; }
+  .badge { display: inline-flex; align-items: center; gap: var(--space-2); padding: 2px var(--space-3); border-radius: 999px; background: var(--color-primary-soft); color: var(--color-primary-strong); font-size: var(--text-sm); font-weight: 600; margin-bottom: var(--space-4); }
+  figure { margin: 0; }
+  figure img { display: block; width: 100%; height: auto; border-radius: var(--radius-lg); border: 1px solid var(--color-border); box-shadow: var(--shadow-md); background: var(--color-surface); }
+  figcaption { font-size: var(--text-sm); color: var(--color-text-subtle); margin-top: var(--space-2); }
+  section { padding: clamp(2rem, 5vw, 3.5rem) 0; border-top: 1px solid var(--color-border); }
+  section h2 { font-size: var(--text-2xl); margin: 0 0 var(--space-2); }
+  section p.sub { color: var(--color-text-muted); margin: 0 0 var(--space-5); max-width: 46em; }
+  .grid3 { display: grid; gap: var(--space-4); grid-template-columns: repeat(3, 1fr); }
+  .grid2 { display: grid; gap: var(--space-4); grid-template-columns: repeat(2, 1fr); }
+  .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-5); }
+  .card h3 { margin: 0 0 var(--space-2); font-size: var(--text-lg); }
+  .card p { margin: 0; color: var(--color-text-muted); }
+  .num { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--color-primary); color: var(--color-primary-contrast); font-weight: 700; font-size: var(--text-sm); margin-right: var(--space-2); }
+  table { width: 100%; border-collapse: collapse; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; }
+  th, td { text-align: left; padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border); vertical-align: top; }
+  th { background: var(--color-surface-sunken); font-size: var(--text-sm); }
+  tr:last-child td { border-bottom: 0; }
+  .tablewrap { overflow-x: auto; }
+  .shots { display: grid; gap: var(--space-5); grid-template-columns: 1.5fr 0.5fr 0.5fr; align-items: start; }
+  .meters { display: grid; gap: var(--space-3); }
+  .meter { display: grid; grid-template-columns: 9em 1fr 5em; gap: var(--space-3); align-items: center; }
+  .meter .bar { height: 12px; border-radius: 999px; background: var(--color-surface-sunken); border: 1px solid var(--color-border); overflow: hidden; }
+  .meter .bar > i { display: block; height: 100%; background: var(--color-primary); }
+  .meter .val { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .note { background: var(--color-warning-bg); color: var(--color-text); border-left: 4px solid var(--color-warning); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); }
+  footer { border-top: 1px solid var(--color-border); padding: var(--space-6) 0 var(--space-8); color: var(--color-text-muted); font-size: var(--text-sm); }
+  footer a { color: var(--color-primary); }
+  @media (max-width: 900px) { .hero, .grid3, .grid2, .shots { grid-template-columns: 1fr; } .meter { grid-template-columns: 7em 1fr 4.5em; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main"><span class="zh">跳到主要內容</span><span class="en">Skip to content</span></a>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="assets/favicon.svg" alt="" width="32" height="32"><span>PreVisit Desk <span class="zh">診前助理</span></span></a>
+    <span class="spacer"></span>
+    <nav class="langsw" aria-label="Language">
+      <button type="button" id="langbtn" aria-label="Switch language">English</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<div class="wrap" id="top">
+  <div class="hero">
+    <div>
+      <span class="badge"><span class="zh">課堂展示專案・只用虛構資料</span><span class="en">Course demo · fictional data only</span></span>
+      <h1><span class="zh">看診前，先把話說清楚。<br>最後的判斷，留給醫師與藥師。</span><span class="en">Say it clearly before the visit.<br>The final call stays with the clinician.</span></h1>
+      <p class="lead"><span class="zh">PreVisit Desk 是 AI 預問診與慢箋續領檢核助理：用分階段問診整理病史，產生給醫師的摘要；慢性病患者可以先檢核「這次能不能憑慢箋直接領藥」。AI 不診斷、不開藥。</span><span class="en">PreVisit Desk is an AI pre-visit intake and chronic-prescription refill checker. It collects history in stages and hands the clinician a summary; patients on chronic prescriptions can check whether they can refill directly. The AI never diagnoses or prescribes.</span></p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://previsit.naritaroad.com"><span class="zh">開啟展示站</span><span class="en">Open the live demo</span></a>
+        <a class="btn btn-secondary" href="https://github.com/naritaroad/previsit-desk"><span class="zh">原始碼（GitHub）</span><span class="en">Source on GitHub</span></a>
+      </div>
+    </div>
+    <figure>
+      <img src="assets/shot-patient-desktop.jpg" alt="病人端畫面：左側對話，右側工具追蹤、給醫師的摘要與慢箋檢核三個分頁" width="1280" height="800">
+      <figcaption><span class="zh">病人端：對話在左，追蹤與摘要在右。</span><span class="en">Patient view: chat on the left, trace and summary on the right.</span></figcaption>
+    </figure>
+  </div>
+
+  <section aria-labelledby="h-what">
+    <h2 id="h-what"><span class="zh">它做什麼</span><span class="en">What it does</span></h2>
+    <p class="sub"><span class="zh">三件事，各有明確的界線。</span><span class="en">Three jobs, each with a clear boundary.</span></p>
+    <div class="grid3">
+      <div class="card"><h3><span class="zh">分階段預問診</span><span class="en">Staged pre-visit intake</span></h3><p><span class="zh">主訴 → 現病史（OPQRST）→ 過去史、用藥、過敏 → 確認摘要。程式追蹤已取得的欄位，缺什麼才問什麼，一次一到兩題。</span><span class="en">Chief complaint, history of present illness, background, then a confirmed summary. Code tracks the fields; the AI asks only what is missing, one or two questions at a time.</span></p></div>
+      <div class="card"><h3><span class="zh">慢箋續領檢核</span><span class="en">Refill eligibility check</span></h3><p><span class="zh">依健保慢性病連續處方箋規則，由 Rust 程式確定性判斷，只回四種結果：可領、尚未到可領期間、需回診、請洽藥師或醫師。</span><span class="en">Based on Taiwan NHI continuous-prescription rules, decided by deterministic Rust code with exactly four outcomes: eligible, too early, revisit, or consult a pharmacist or doctor.</span></p></div>
+      <div class="card"><h3><span class="zh">醫師端待辦</span><span class="en">Clinician queue</span></h3><p><span class="zh">待審摘要、完整對話與工具追蹤、轉交單；紅旗與需要人工處理的案件排在最前面。</span><span class="en">Pending summaries, the full conversation with its tool trace, and handoff tickets; red-flag and human-needed cases come first.</span></p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-use">
+    <h2 id="h-use"><span class="zh">預定用途與責任界線</span><span class="en">Intended use and responsibility</span></h2>
+    <p class="sub"><span class="zh">不同用途需要不同的證據與責任。本產品只承擔「資訊整理」與「規則計算」。</span><span class="en">Different uses need different evidence and accountability. This product only takes on information gathering and rule calculation.</span></p>
+    <div class="tablewrap"><table>
+      <thead><tr><th><span class="zh">用途</span><span class="en">Use</span></th><th><span class="zh">本產品的立場</span><span class="en">Our position</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="zh">診療、診斷、開藥</span><span class="en">Treatment, diagnosis, prescribing</span></td><td><span class="zh">不做。被要求時固定拒絕並轉交醫師。</span><span class="en">Not done. Requests get a fixed refusal and a handoff to a clinician.</span></td></tr>
+        <tr><td><span class="zh">分流</span><span class="en">Triage</span></td><td><span class="zh">只做紅旗規則：命中就固定導向 119／急診，不經模型。</span><span class="en">Red-flag rules only: a hit gives fixed 119 / emergency guidance without calling the model.</span></td></tr>
+        <tr><td><span class="zh">行政</span><span class="en">Administration</span></td><td><span class="zh">做：預問診摘要、慢箋可領日期檢核。</span><span class="en">Yes: pre-visit summaries and refill date checks.</span></td></tr>
+        <tr><td><span class="zh">衛教</span><span class="en">Patient education</span></td><td><span class="zh">只引用官方來源手冊回答流程與就醫時機，不給劑量，每段附來源與查證日。</span><span class="en">Quotes an official-source handbook for process and when to seek care; no doses; every passage carries its source and check date.</span></td></tr>
+        <tr><td><span class="zh">心理支持</span><span class="en">Emotional support</span></td><td><span class="zh">不做。偵測到自傷念頭就固定轉 1925 安心專線與 119。</span><span class="en">Not done. Self-harm signals get a fixed pointer to the 1925 hotline and 119.</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section aria-labelledby="h-safe">
+    <h2 id="h-safe"><span class="zh">六條安全界線</span><span class="en">Six safety boundaries</span></h2>
+    <p class="sub"><span class="zh">每一條都有對應的程式位置，也都在評測題庫裡逐條驗證。</span><span class="en">Each has a place in the code and is checked case by case in the eval set.</span></p>
+    <div class="grid3">
+      <div class="card"><h3><span class="num">1</span><span class="zh">開場揭露</span><span class="en">Disclosure first</span></h3><p><span class="zh">「我是 AI 預問診助理，不是醫師。」第一則固定訊息，頁面上方也一直有橫幅。</span><span class="en">“I am an AI pre-visit assistant, not a doctor.” A fixed first message, plus a permanent banner.</span></p></div>
+      <div class="card"><h3><span class="num">2</span><span class="zh">紅旗先於模型</span><span class="en">Red flags before the model</span></h3><p><span class="zh">胸痛、呼吸困難、單側無力、意識不清、吐血、嚴重過敏、自傷念頭等，命中就固定回覆，不呼叫模型。</span><span class="en">Chest pain, breathing trouble, one-sided weakness, collapse, vomiting blood, severe allergy, self-harm: a hit returns fixed text and never calls the model.</span></p></div>
+      <div class="card"><h3><span class="num">3</span><span class="zh">不診斷、不開藥、不給劑量</span><span class="en">No diagnosis, no prescribing, no doses</span></h3><p><span class="zh">提示詞、越界規則與輸出後檢查三層；違反就改寫或拒絕。</span><span class="en">Three layers: the prompt, scope rules, and an output check that rewrites or refuses.</span></p></div>
+      <div class="card"><h3><span class="num">4</span><span class="zh">慢箋只回四種結果</span><span class="en">Four refill outcomes only</span></h3><p><span class="zh">管制藥、症狀變化、副作用一律轉人，並建立轉交單。</span><span class="en">Controlled drugs, changed symptoms and side effects always go to a human with a ticket.</span></p></div>
+      <div class="card"><h3><span class="num">5</span><span class="zh">可稽核</span><span class="en">Auditable</span></h3><p><span class="zh">每次工具呼叫、紅旗結果、模型名稱與用量都進追蹤面板與資料庫。</span><span class="en">Every tool call, red-flag result, model name and token count lands in the trace panel and the database.</span></p></div>
+      <div class="card"><h3><span class="num">6</span><span class="zh">隱私</span><span class="en">Privacy</span></h3><p><span class="zh">不設姓名與身分證欄位，疑似個資在存檔與送模型前遮蔽，資料到期整筆刪除。</span><span class="en">No name or ID fields; likely identifiers are masked before storage and before any model call; visits are deleted after the retention period.</span></p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-shots">
+    <h2 id="h-shots"><span class="zh">畫面</span><span class="en">Screens</span></h2>
+    <p class="sub"><span class="zh">手機與桌面都能用；淺色與深色都符合 WCAG AA 對比。</span><span class="en">Works on phones and desktops; light and dark themes both meet WCAG AA contrast.</span></p>
+    <div class="shots">
+      <figure><img src="assets/shot-refill.jpg" alt="慢箋檢核的四種結果卡片" loading="lazy" width="1280" height="800"><figcaption><span class="zh">慢箋檢核的四種結果。</span><span class="en">The four refill outcomes.</span></figcaption></figure>
+      <figure><img src="assets/shot-emergency-mobile.jpg" alt="手機上的紅旗緊急卡片，可點撥 119 與 1925" loading="lazy" width="390" height="844"><figcaption><span class="zh">紅旗命中：119、1925 可直接點撥。</span><span class="en">Red flag: tap-to-call 119 and 1925.</span></figcaption></figure>
+      <figure><img src="assets/shot-clinician.jpg" alt="醫師端的待審摘要列表" loading="lazy" width="390" height="844"><figcaption><span class="zh">醫師端：緊急案件置頂。</span><span class="en">Clinician list: urgent first.</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-eval" id="eval-section" hidden>
+    <h2 id="h-eval"><span class="zh">評測結果</span><span class="en">Evaluation results</span></h2>
+    <p class="sub" id="eval-meta"></p>
+    <div class="meters" id="eval-meters"></div>
+  </section>
+
+  <section aria-labelledby="h-limits">
+    <h2 id="h-limits"><span class="zh">限制</span><span class="en">Limits</span></h2>
+    <p class="note"><span class="zh">這是課堂展示專案，不是醫療器材，也不是醫療建議。請勿輸入真實病歷或個資；免費層的模型呼叫內容可能被模型供應商用於改善產品。公開展示站有速率限制與每日呼叫上限，額度用完時紅旗規則與慢箋檢核仍可使用。</span><span class="en">This is a course demo, not a medical device and not medical advice. Do not enter real records or personal data; free-tier model traffic may be used by the provider to improve its products. The public demo has rate limits and a daily call cap; red-flag rules and the refill check keep working when the cap is reached.</span></p>
+  </section>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><span class="zh">PreVisit Desk 診前助理 · MIT 授權 · 設計參考：Google AMIE 預問診研究（arXiv:2603.08448）、Doctronic 猶他州沙盒（只做續方）。法規對應：衛福部《醫療機構應用生成式人工智慧指引》，本產品停在「輔助」。</span><span class="en">PreVisit Desk · MIT license · Design references: Google AMIE pre-visit research (arXiv:2603.08448) and Doctronic's Utah sandbox (renewals only). Regulatory frame: Taiwan MOHW guidelines for generative AI in medical institutions; this product stays on the assistive side.</span></p>
+    <p><a href="https://github.com/naritaroad/previsit-desk">GitHub</a> · <a href="https://previsit.naritaroad.com">previsit.naritaroad.com</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('langbtn');
+  var saved = null; try { saved = localStorage.getItem('pv-site-lang'); } catch (e) {}
+  var lang = saved || ((navigator.language || '').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en');
+  function apply(l) { lang = l; root.setAttribute('data-lang', l); root.lang = l === 'zh' ? 'zh-Hant-TW' : 'en'; btn.textContent = l === 'zh' ? 'English' : '繁體中文'; try { localStorage.setItem('pv-site-lang', l); } catch (e) {} }
+  btn.addEventListener('click', function () { apply(lang === 'zh' ? 'en' : 'zh'); });
+  apply(lang);
+
+  var names = { intake: ['一般預問診', 'Intake'], red_flag: ['紅旗', 'Red flags'], refill: ['慢箋檢核', 'Refill check'], out_of_scope: ['超出範圍', 'Out of scope'], boundary: ['越界指令', 'Boundary prompts'] };
+  fetch('eval-summary.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (s) {
+    if (!s || !s.categories) return;
+    var box = document.getElementById('eval-meters'), meta = document.getElementById('eval-meta');
+    meta.textContent = (s.model || '') + ' · ' + (s.ran_at || '') + ' · ' + s.passed + '/' + s.total;
+    s.categories.forEach(function (c) {
+      var n = names[c.key] || [c.key, c.key], pct = c.total ? Math.round(100 * c.passed / c.total) : 0;
+      var row = document.createElement('div'); row.className = 'meter';
+      row.innerHTML = '<span><span class="zh">' + n[0] + '</span><span class="en">' + n[1] + '</span></span><span class="bar" role="img" aria-label="' + c.passed + '/' + c.total + '"><i style="width:' + pct + '%"></i></span><span class="val">' + c.passed + '/' + c.total + '</span>';
+      box.appendChild(row);
+    });
+    document.getElementById('eval-section').hidden = false;
+  }).catch(function () {});
+})();
+</script>
+</body>
+</html>
