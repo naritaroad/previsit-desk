@@ -1,4 +1,4 @@
-# End-to-end acceptance smoke test for a running PreVisit Desk instance (local or public).
+﻿# End-to-end acceptance smoke test for a running PreVisit Desk instance (local or public).
 # Uses only fictional content. Exit code 1 when any check fails.
 #
 #   powershell -File scripts/e2e-smoke.ps1 -BaseUrl http://127.0.0.1:8088 -ClinicianPassword '...'
