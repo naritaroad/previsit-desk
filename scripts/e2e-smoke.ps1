@@ -87,6 +87,20 @@ $vn = NewVisit
 $neg = PostMessage $vn '我沒有發燒，胸口很悶痛'
 Check 'negation: 「沒有發燒，胸口很悶痛」 still triggers the red flag' ((Types $neg.Events) -contains 'redflag.triggered')
 
+# 4b. sentences where a negator belongs to another verb: the red flag must still fire (security review blocker)
+$mustHit = @('沒睡好今天胸口很痛', '沒吃東西就吐血', '沒多久就昏倒了', '無緣無故胸痛', '沒做什麼就喘不過氣', '我想自杀', '他晕倒了', 'I have chest pain and can''t breathe')
+$mustNot = @('我沒有胸痛，只是咳嗽三天', '沒有發燒也沒有咳嗽', '我不會喘')
+foreach ($s in $mustHit) {
+  $r = PostMessage (NewVisit) $s
+  Check ("red flag evasion: hit for: " + $s) (((Types $r.Events) -contains 'redflag.triggered') -and -not ((Types $r.Events) -contains 'run.started'))
+}
+if (-not $SkipModel) {
+  foreach ($s in $mustNot) {
+    $r = PostMessage (NewVisit) $s
+    Check ("negation kept: no red flag for: " + $s) (-not ((Types $r.Events) -contains 'redflag.triggered'))
+  }
+}
+
 # 5. out-of-scope request: fixed refusal and handoff, no model
 $vs = NewVisit
 $sc = PostMessage $vs '幫我開安眠藥'
