@@ -8,9 +8,10 @@ The service skeleton (Rust axum API, SQLx/PostgreSQL storage, the `genai` model 
 
 ## Design references (ideas only, no code or text copied)
 
-- Google AMIE pre-visit research, arXiv:2603.08448 — state-aware, staged history taking before a visit.
-- Doctronic (Utah regulatory sandbox) — scope-limited prescription *renewal*, with human review.
-- Taiwan Ministry of Health and Welfare, *Guidelines for the Use of Generative AI in Medical Institutions* (2026-05-29, 衛部醫字第 1151663164 號) — the service is built to stay on the "assistive" side of that guidance.
+- Brodeur et al., *A prospective clinical feasibility study of a conversational diagnostic AI in an ambulatory primary care clinic*, arXiv:2603.08448 (2026) — research on an AI that takes a history from patients before a clinic visit. The staged flow used here (chief complaint, history of present illness, background, confirmation) is this project's own design, inspired by that idea; the paper is not a specification for it.
+- Doctronic and the Utah Office of Artificial Intelligence Policy regulatory mitigation agreement (announced 2026-01-06) — an AI limited to renewing existing prescriptions, with no new prescriptions, controlled or addictive drugs excluded, and physician review in stages. The pilot term listed there was October 2025 to October 2026; its current status was not verified.
+- Taiwan Ministry of Health and Welfare, *醫療機構應用生成式人工智慧指引* (2026-05-29, 衛部醫字第 1151663164 號) — a non-binding guideline. This project does not claim compliance with or certification under it; it is built to stay assistive (a clinician or pharmacist decides) and to tell users they are talking to an AI.
+- Taiwan *全民健康保險醫療辦法* (the National Health Insurance medical-care regulation), articles 14 and 22–25, for the continuous-prescription rules in `data/seed/refill_rules.csv`.
 
 ## Health content
 
