@@ -29,7 +29,7 @@ echo "-- swap"; swapon --show 2>/dev/null || echo "(no swap listed)"
 
 section "Disk (df -h)"
 df -h / 2>/dev/null
-[ -d /var/lib/docker ] && df -h /var/lib/docker 2>/dev/null | tail -n +2 || true
+if [ -d /var/lib/docker ]; then df -h /var/lib/docker 2>/dev/null | tail -n +2 || true; fi
 
 section "Listening TCP ports (ss -ltnp)"
 if sudo -n true 2>/dev/null; then sudo -n ss -ltnp; else ss -ltnp 2>/dev/null || ss -ltn; echo "(process names need root; showing what is visible)"; fi
