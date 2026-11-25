@@ -1,0 +1,210 @@
+/* Page patterns shared with the scenes in kit-gallery: public opening, feature strip, three acts, next visit,
+   conversation header, evidence list. Page engineers may use these classes as they are. */
+
+/* ===== Public: opening ===== */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.hero-text {
+  align-self: center;
+  padding-block: 3rem;
+}
+.hero-text h1 {
+  font-family: var(--font-read);
+  font-size: clamp(2.375rem, 1.25rem + 3.2vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: 0;
+}
+.hero-text p {
+  margin-top: 1.5rem;
+  max-width: 27em;
+  font-size: 1.1875rem;
+  line-height: 1.9;
+}
+/* One large, one small, and the caption between them, as on a contact sheet. */
+.hero-photos {
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+.hero-photos > .photo-figure:first-child,
+.hero-photos > .photo:first-child {
+  grid-row: 1 / span 2;
+  align-self: stretch;
+}
+.hero-photos > .photo-figure:first-child .photo {
+  flex: 1;
+  min-height: 20rem;
+}
+.hero-photos > p {
+  align-self: end;
+  padding: 1rem 0.5rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--fg-2);
+}
+@media (min-width: 64rem) {
+  .hero {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 2.5rem;
+    min-height: clamp(27rem, calc(100svh - 18rem), 38rem);
+  }
+}
+/* the signature, at full width, directly under the opening */
+.site-main .strip-feature {
+  display: grid;
+  gap: 1.5rem 4rem;
+  padding-block: 3.5rem;
+}
+.strip-feature h2,
+.three-acts h2,
+.not-list h2 {
+  font-family: var(--font-read);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2rem);
+  line-height: 1.45;
+}
+.strip-feature > div > p {
+  margin-top: 0.75rem;
+  color: var(--fg-2);
+  line-height: 1.9;
+}
+@media (min-width: 64rem) {
+  .site-main .strip-feature {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    padding-block: 3rem 5rem;
+  }
+}
+.three-acts {
+  border-top: 2px solid var(--ink);
+}
+.three-acts > li {
+  display: grid;
+  gap: 0.25rem 4rem;
+  padding-block: 2.25rem;
+  border-bottom: 1px solid var(--ink-line);
+}
+.three-acts .when {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--ink-text);
+  line-height: 2.2;
+}
+.three-acts p:not(.when) {
+  margin-top: 0.5rem;
+  max-width: 36em;
+  font-size: 1.0625rem;
+  line-height: 1.95;
+}
+@media (min-width: 64rem) {
+  .three-acts > li {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  }
+}
+.photo-band {
+  margin-top: 4rem;
+}
+.photo-band .photo {
+  aspect-ratio: auto !important;
+  height: clamp(16rem, 38vw, 34rem);
+}
+.not-list {
+  display: grid;
+  gap: 1.5rem 4rem;
+  padding-block: 4.5rem 6rem;
+}
+.not-list li {
+  padding-block: 0.9rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 1.1875rem;
+  line-height: 1.7;
+}
+.not-list li:first-child {
+  border-top: 1px solid var(--rule);
+}
+@media (min-width: 64rem) {
+  .not-list {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  }
+}
+
+/* ===== Patient ===== */
+.next-visit {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-cell);
+  background: var(--surface);
+  overflow: hidden;
+  padding-inline-end: 1.5rem;
+}
+.next-visit .date {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  align-self: stretch;
+  min-width: 7rem;
+  padding: 1rem;
+  background: var(--ink);
+  color: var(--on-ink);
+  line-height: 1.3;
+}
+.next-visit .date b {
+  font-size: 3.25rem;
+  font-weight: 800;
+  line-height: 1.05;
+}
+.next-visit > div:nth-child(2) {
+  padding-block: 1.25rem;
+}
+@media (max-width: 52rem) {
+  .next-visit {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding-inline-end: 0;
+  }
+  .next-visit .date {
+    min-width: 5.5rem;
+  }
+  .next-visit > div:nth-child(2) {
+    padding-inline-end: 1rem;
+  }
+  .next-visit > div:last-child {
+    grid-column: 1 / -1;
+    padding: 0 1rem 1rem;
+  }
+  .next-visit > div:last-child > .btn {
+    flex: 1 0 auto;
+  }
+}
+.chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.625rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+}
+.chat-head > .btn {
+  flex: none;
+  white-space: nowrap;
+}
+.chat-head h1 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-head p {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--fg-2);
+}

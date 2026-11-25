@@ -1,0 +1,245 @@
+{
+  "action": {
+    "cancel": "取消",
+    "clear": "清除",
+    "close": "關閉",
+    "loadMore": "載入更多",
+    "nextPage": "下一頁",
+    "open": "查看",
+    "prevPage": "上一頁",
+    "resend": "重新傳送",
+    "retry": "重試",
+    "search": "搜尋"
+  },
+  "field": {
+    "choose": "請選擇",
+    "decrease": "減少",
+    "hidePassword": "隱藏密碼",
+    "increase": "增加",
+    "optional": "選填",
+    "required": "必填",
+    "showPassword": "顯示密碼"
+  },
+  "state": {
+    "empty": "目前沒有資料",
+    "loading": "載入中",
+    "noMatch": "沒有符合的項目"
+  },
+  "error": {
+    "loadBody": "可能是網路不穩或伺服器沒有回應。已填的內容都還在。",
+    "loadTitle": "資料沒有載入成功"
+  },
+  "save": {
+    "conflict": "內容有衝突",
+    "error": "沒有存成功",
+    "offline": "離線，先存在這台裝置",
+    "resolve": "查看差異",
+    "saved": "已儲存",
+    "savedAt": "已儲存 {{time}}",
+    "saving": "儲存中"
+  },
+  "filter": {
+    "clearAll": "清除全部條件",
+    "remove": "移除條件：{{name}}"
+  },
+  "table": {
+    "count": "顯示 {{shown}} 筆，共 {{total}} 筆",
+    "selectAll": "選取全部",
+    "selectRow": "選取這一筆"
+  },
+  "list": {
+    "sentenceSep": "。",
+    "sep": "、",
+    "noValue": "沒有資料"
+  },
+  "step": {
+    "current": "（目前步驟）",
+    "done": "（已完成）",
+    "error": "（需要修正）",
+    "todo": "（尚未開始）"
+  },
+  "presence": {
+    "editing": "{{names}} 正在編輯",
+    "viewing": "{{names}} 也在看這一頁"
+  },
+  "a11y": {
+    "pagination": "分頁",
+    "panes": "窗格",
+    "resize": "調整「{{name}}」寬度",
+    "toasts": "訊息"
+  },
+  "command": {
+    "placeholder": "輸入名稱或單號",
+    "title": "快速搜尋"
+  },
+  "notif": {
+    "all": "看全部通知",
+    "bellUnread": "通知，{{count}} 則未讀",
+    "emptyBody": "申請進度、門診提醒和醫療團隊的回覆會出現在這裡。",
+    "emptyTitle": "沒有通知",
+    "readAll": "全部標為已讀",
+    "title": "通知",
+    "unread": "未讀："
+  },
+  "photo": {
+    "credit": "攝影：",
+    "via": "（{{source}}）"
+  },
+  "doc": {
+    "backToText": "回到註 {{n}} 的內文",
+    "claim": "說法",
+    "contents": "目錄",
+    "evidence": "證據",
+    "footnote": "註 {{n}}",
+    "footnotes": "註與參考資料",
+    "limits": "限制",
+    "linkTo": "這一節的連結",
+    "meta": "文件資訊",
+    "no": "編號"
+  },
+  "emergency": {
+    "body": "如果現在有胸痛、呼吸困難、意識不清、半邊無力、嚴重出血，請不要等網站回覆，立刻打 119 或到最近的急診。",
+    "button": "緊急協助",
+    "call119": "救護車",
+    "call1925": "安心專線",
+    "crisisBody": "您不需要一個人撐著。安心專線 24 小時有人接聽；如果已經受傷或有立即危險，請打 119。",
+    "crisisTitle": "請先和人說說話",
+    "label": "緊急協助",
+    "sheetNote": "這個網站不會自動通知救護單位或診所。電話要由您或身邊的人撥出。",
+    "sheetTitle": "緊急協助",
+    "title": "需要立刻就醫"
+  },
+  "chat": {
+    "assistant": "診前助理（AI）",
+    "count": "{{count}}／{{max}} 字",
+    "draft": {
+      "offline": "草稿在這台裝置",
+      "saved": "草稿已儲存",
+      "saving": "儲存草稿中"
+    },
+    "failed": "沒有送出。",
+    "interrupted": "這則回覆沒有完成。",
+    "jump": "看最新訊息",
+    "offline": "目前離線，可以先寫",
+    "openingLabel": "開始前的說明",
+    "queued": "恢復連線後送出",
+    "queuedCount": "{{count}} 則等待送出",
+    "refusalLabel": "這件事要由醫療人員處理",
+    "send": "送出",
+    "sendLater": "排入待送",
+    "sending": "傳送中",
+    "stop": "停止回覆",
+    "thinking": "正在整理您的回答",
+    "you": "您說："
+  },
+  "merge": {
+    "allMine": "全部用我的",
+    "allTheirs": "全部用對方的",
+    "blank": "（空白）",
+    "body": "您編輯時，這份資料在別處更新過。請逐項選擇要保留的內容，選完才會存檔。",
+    "later": "先不處理",
+    "left": "還有 {{count}} 項要選",
+    "mine": "您現在的內容",
+    "ready": "都選好了",
+    "save": "儲存選擇",
+    "title": "這份資料有兩個版本"
+  },
+  "measure": {
+    "diastolic": "舒張壓",
+    "empty": "還沒有紀錄。",
+    "kind": {
+      "bp": "血壓",
+      "glucose": "血糖",
+      "lab": "檢驗",
+      "pulse": "脈搏",
+      "weight": "體重"
+    },
+    "latest": "最近一次 {{date}}",
+    "systolic": "收縮壓",
+    "unit": {
+      "bp": "mmHg",
+      "glucose": "mg/dL",
+      "lab": "檢驗值",
+      "pulse": "次／分",
+      "weight": "公斤"
+    },
+    "when": "時間"
+  },
+  "refill": {
+    "cellNext": "下一次",
+    "cellOpen": "可領藥",
+    "dIssued": "開立日",
+    "dSupply": "藥吃到",
+    "expired": "這張慢箋過期了",
+    "finished": "這張慢箋領完了",
+    "inDays": "還有 {{count}} 天可領藥",
+    "late": "領藥期間過了",
+    "lateBody": "原本要在 {{date}} 前領。請聯絡診所確認接下來怎麼做。",
+    "noWindow": "沒有下一次領藥",
+    "openNow": "現在可以領藥",
+    "openUntil": "第 {{n}} 次領藥到 {{date}} 為止，還有 {{count}} 天",
+    "spokenFill": "第 {{n}} 次 {{date}} 在{{pharmacy}}領",
+    "spokenFills": "已領 {{done}} 次，共 {{total}} 次",
+    "stamp": "已領",
+    "supplyTo": "手上的藥吃到 {{date}}",
+    "today": "今天 {{date}}",
+    "validUntil": "有效到 {{date}}",
+    "windowIs": "第 {{n}} 次領藥期間 {{range}}",
+    "lValid": "有效期到",
+    "lWindow": "領藥期間"
+  },
+  "status": {
+    "account": {
+      "active": "使用中",
+      "disabled": "已停用"
+    },
+    "appointment": {
+      "booked": "已預約",
+      "cancelled": "已取消",
+      "checked_in": "已報到",
+      "completed": "已看診"
+    },
+    "care": {
+      "active": "追蹤中",
+      "inactive": "未追蹤",
+      "new": "新病人",
+      "watch": "需留意"
+    },
+    "note": {
+      "draft": "草稿",
+      "signed": "已簽署"
+    },
+    "previsit": {
+      "active": "填寫中",
+      "none": "未開始",
+      "red_flag": "紅旗",
+      "reviewed": "已審閱",
+      "submitted": "待審閱"
+    },
+    "run": {
+      "completed": "完成",
+      "failed": "失敗",
+      "interrupted": "中斷",
+      "running": "執行中",
+      "skipped": "未呼叫模型"
+    },
+    "source": {
+      "clinic": "診所紀錄",
+      "patient": "自述",
+      "self_reported": "自述"
+    },
+    "ticket": {
+      "open": "待處理",
+      "resolved": "已處理"
+    }
+  },
+  "review": {
+    "editedBy": "{{name}} 修改 {{time}}",
+    "original": "看 AI 原文",
+    "originalNote": "AI 整理的原文",
+    "restore": "改回原文",
+    "editLine": "修改這一句",
+    "jump": "看 {{time}} 的原話",
+    "signed": "{{name}} 於 {{time}} 簽署，內容已鎖定。"
+  }
+}

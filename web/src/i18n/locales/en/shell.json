@@ -1,0 +1,277 @@
+{
+  "title": "{{page}} | PreVisit Desk",
+  "skip": "Skip to main content",
+  "offline": "You are offline. Keep writing; it sends when the connection is back.",
+  "brand": {
+    "name": "PreVisit Desk",
+    "sub": "診前助理"
+  },
+  "ws": {
+    "public": "Public site",
+    "patient": "Patient",
+    "clinic": "Clinic",
+    "pharmacy": "Pharmacy",
+    "admin": "Administration"
+  },
+  "role": {
+    "patient": "Patient",
+    "guest": "Demo patient on trial",
+    "physician": "Physician",
+    "pharmacist": "Pharmacist",
+    "coordinator": "Care coordinator",
+    "admin": "Administrator"
+  },
+  "nav": {
+    "main": "Main menu",
+    "open": "Open menu",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "count_one": "{{count}} item",
+    "count_other": "{{count}} items",
+    "unread": "Unread",
+    "path": "You are here",
+    "urgent": "{{count}} urgent"
+  },
+  "menu": {
+    "account": "Account menu: {{name}}",
+    "display": "Language, theme and text size",
+    "language": "Language",
+    "zh": "繁體中文",
+    "en": "English",
+    "theme": "Theme",
+    "theme_system": "Same as system",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "text": "Text size",
+    "text_100": "Standard",
+    "text_112": "Large",
+    "text_125": "Extra large",
+    "sessions": "Account and devices",
+    "public": "Public site",
+    "signOut": "Sign out",
+    "leaveGuest": "End the trial",
+    "switchWorkspace": "Switch workspace",
+    "accountShort": "Account menu",
+    "density": "Row density",
+    "density_compact": "Compact",
+    "density_comfortable": "Comfortable"
+  },
+  "command": {
+    "open": "Search",
+    "go": "Go to",
+    "do": "Actions",
+    "light": "Switch to light",
+    "dark": "Switch to dark",
+    "search_clinic": "Search patients, requests or pages",
+    "search_pharmacy": "Search numbers, patients or drugs",
+    "search_admin": "Search accounts or pages"
+  },
+  "public": {
+    "login": "Sign in",
+    "try": "Try with a demo patient",
+    "toWorkspace": "Go to my workspace",
+    "nav": {
+      "service": "How it works",
+      "trust": "Trust centre",
+      "handbook": "Handbook"
+    }
+  },
+  "patient": {
+    "home": "Home",
+    "visits": "Pre-visit interviews",
+    "medications": "Medicines and refills",
+    "appointments": "Appointments",
+    "messages": "Messages",
+    "mine": "My information",
+    "profile": "Health profile",
+    "privacy": "Privacy and data",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "start": "Start an interview",
+    "guest": "Trying with demo data. Do not enter real medical or personal data.",
+    "claim": "Set up an account to keep it",
+    "tab": {
+      "home": "Home",
+      "visits": "Interview",
+      "medications": "Medicines",
+      "appointments": "Visits",
+      "more": "More"
+    }
+  },
+  "clinic": {
+    "today": "Today",
+    "overview": "Overview",
+    "worklist": "Worklist",
+    "rx": "Rx review",
+    "tickets": "Handovers",
+    "schedule": "Schedule",
+    "records": "Patients and rules",
+    "patients": "Patients",
+    "oversight": "Oversight",
+    "rules": "Rules"
+  },
+  "pharmacy": {
+    "queue": "Dispensing queue",
+    "history": "History",
+    "formulary": "Formulary",
+    "rules": "Rules",
+    "board": "Dispensing stages",
+    "stage": {
+      "check": "To check",
+      "prepare": "Preparing",
+      "ready": "Ready",
+      "returned": "Returned",
+      "done": "Collected today"
+    }
+  },
+  "admin": {
+    "overview": "Overview",
+    "people": "People",
+    "accounts": "Accounts",
+    "permissions": "Permissions",
+    "ai_group": "AI and oversight",
+    "ai": "AI settings",
+    "oversight": "Oversight",
+    "runs": "Runs",
+    "eval": "Evaluation",
+    "rules": "Rules",
+    "records": "Records and data",
+    "audit": "Audit log",
+    "data": "Data retention",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "detail": "Detail",
+    "system": "System status"
+  },
+  "trust": {
+    "overview": "Overview",
+    "intended-use": "Intended use",
+    "how-it-works": "How the AI works",
+    "clinical-safety": "Clinical safety",
+    "oversight": "Human oversight",
+    "renewal-safety": "Renewal safety",
+    "privacy": "Privacy and data",
+    "security": "Security",
+    "evidence": "Evaluation and evidence",
+    "incidents": "Incidents and corrections",
+    "regulation": "Regulation",
+    "references": "Terms and references",
+    "changelog": "Changes"
+  },
+  "footer": {
+    "service": "Service",
+    "trust": "Trust centre",
+    "help": "Help",
+    "emergency": "In an emergency",
+    "credits": "Photo credits",
+    "intendedUse": "PreVisit Desk organises what patients say and their medicine records before a visit, for physicians and pharmacists to judge. It does not diagnose, prescribe or set doses, and it does not replace a visit.",
+    "demo": "This is a demonstration. All people and data are fictional. Do not enter real medical or personal data.",
+    "docVersion": "Document version {{version}}",
+    "docDate": "Updated {{date}}",
+    "notDevice": "Not a medical device"
+  },
+  "guard": {
+    "unreachableTitle": "Cannot reach the server",
+    "unreachableBody": "Check your connection. If it works, the service may be updating; try again in a few minutes.",
+    "retry": "Try again",
+    "forbiddenTitle": "This account cannot use this workspace",
+    "forbiddenBody": "You are signed in as {{name}} ({{role}}). Sign in with another account to use a different workspace.",
+    "goHome": "Go to my home page"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The link may have changed, or the record was deleted.",
+    "home": "Go to the public site"
+  },
+  "crash": {
+    "title": "Something went wrong on this page",
+    "body": "What you filled in is kept as a draft. Reload to continue.",
+    "staleTitle": "The site was updated",
+    "staleBody": "This tab is an older version. Reload to continue; drafts are kept.",
+    "reload": "Reload"
+  },
+  "placeholder": {
+    "title": "This page is being built",
+    "body": "The engineer for this workspace takes over the layout and the data."
+  },
+  "page": {
+    "public": {
+      "home": "Home",
+      "service": "How the service works",
+      "clinicians": "For doctors and pharmacists",
+      "trustOverview": "Trust centre",
+      "trustSection": "Trust centre",
+      "handbook": "Handbook",
+      "handbookArticle": "Handbook",
+      "emergency": "In an emergency",
+      "credits": "Photo credits",
+      "login": "Sign in",
+      "register": "Create a patient account",
+      "try": "Try with a demo patient"
+    },
+    "patient": {
+      "home": "Home",
+      "visits": "Pre-visit interviews",
+      "visitNew": "Start an interview",
+      "visit": "Pre-visit interview",
+      "visitSummary": "Interview summary",
+      "medications": "Medicines and refills",
+      "rxList": "My requests",
+      "rxNew": "New request",
+      "rxDetail": "Request status",
+      "rxWizard": "Fill in the request",
+      "appointments": "Appointments",
+      "appointmentBook": "Book a visit",
+      "messages": "Messages",
+      "messageThread": "Messages",
+      "profile": "Health profile",
+      "measurements": "Measurements",
+      "privacy": "Privacy and data",
+      "settings": "Settings",
+      "notifications": "Notifications"
+    },
+    "clinic": {
+      "overview": "Today",
+      "worklist": "Worklist",
+      "visitReview": "Review desk",
+      "rxQueue": "Prescription review",
+      "rxReview": "Prescription review",
+      "tickets": "Handovers",
+      "ticketThread": "Handovers",
+      "patients": "Patients",
+      "patient": "Patient",
+      "schedule": "Schedule",
+      "oversight": "Oversight",
+      "rules": "Rules",
+      "settings": "Settings",
+      "notifications": "Notifications"
+    },
+    "pharmacy": {
+      "queue": "Dispensing queue",
+      "rxDispense": "Check and dispense",
+      "patient": "Patient medicines",
+      "history": "History",
+      "formulary": "Formulary",
+      "rules": "Rules",
+      "settings": "Settings",
+      "notifications": "Notifications"
+    },
+    "admin": {
+      "overview": "Overview",
+      "accounts": "Accounts",
+      "account": "Account",
+      "permissions": "Permissions",
+      "aiSettings": "AI settings",
+      "oversight": "Oversight",
+      "runs": "Runs",
+      "run": "Run",
+      "audit": "Audit log",
+      "rules": "Rules",
+      "eval": "Evaluation",
+      "data": "Data retention and demo data",
+      "settings": "Settings",
+      "notifications": "Notifications"
+    },
+    "notFound": "Page not found"
+  }
+}

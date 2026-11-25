@@ -1,0 +1,794 @@
+/* Shells. Same parts, four different frames:
+   public   one printed sheet, header closed by a double rule, footer on solid form ink
+   patient  white rail with the conversation list, bottom tabs on phones
+   clinic   solid ink rail, page edge to edge
+   pharmacy dispensing board across the top, narrow rail
+   admin    text index on the left, path and system line on top */
+
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  left: 1rem;
+  top: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-radius: var(--r-control);
+  background: var(--fg);
+  color: var(--surface);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: none;
+}
+.shell {
+  background: var(--bg);
+  color: var(--fg);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 2.75rem;
+  color: inherit;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1.125rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  border-radius: var(--r-control);
+}
+.brand svg {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  color: var(--ink);
+}
+.brand small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--fg-2);
+}
+
+/* ===== Public ===== */
+.site {
+  --header-h: 4.75rem;
+  --gutter: 1.25rem;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+}
+@media (min-width: 48rem) {
+  .site {
+    --gutter: 2.5rem;
+  }
+}
+.site-wrap {
+  width: 100%;
+  max-width: calc(var(--page) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: calc(var(--gutter) + var(--safe-l)) calc(var(--gutter) + var(--safe-r));
+}
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--surface);
+  padding-top: var(--safe-t);
+}
+/* Prescription letterhead: a heavy rule and a hairline. */
+.site-header::after {
+  content: "";
+  display: block;
+  height: 5px;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+.site-header-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  min-height: calc(var(--header-h) - 5px);
+}
+.site-nav {
+  display: flex;
+  gap: 0.25rem 1.5rem;
+  margin-inline-start: 1rem;
+}
+.site-nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--fg);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.site-nav a[aria-current="page"] {
+  color: var(--ink-text);
+  font-weight: 700;
+}
+@media (hover: hover) and (pointer: fine) {
+  .site-nav a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.35em;
+    text-decoration-thickness: 2px;
+  }
+}
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-inline-start: auto;
+}
+@media (max-width: 68rem) {
+  .site-nav,
+  .site-header-actions > [data-wide] {
+    display: none;
+  }
+}
+@media (min-width: 68.01rem) {
+  .site-header-actions > [data-narrow] {
+    display: none;
+  }
+}
+@media (max-width: 26rem) {
+  .site-header .brand small {
+    display: none;
+  }
+  .site-header-row {
+    gap: 0.5rem;
+  }
+}
+.site-main {
+  flex: 1;
+}
+.site-page {
+  padding-block: 3rem 5rem;
+}
+.site-footer {
+  background: var(--rail);
+  color: var(--rail-fg);
+  padding-block: 3.5rem calc(2rem + var(--safe-b));
+}
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--rail-line);
+  text-underline-offset: 0.25em;
+}
+@media (hover: hover) and (pointer: fine) {
+  .site-footer a:hover {
+    text-decoration-color: currentColor;
+  }
+}
+.site-footer a:focus-visible,
+.rail :focus-visible {
+  outline-color: var(--rail-fg);
+}
+.site-footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+  gap: 2.5rem 3rem;
+}
+@media (max-width: 60rem) {
+  .site-footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .site-footer-grid > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+.site-footer h2 {
+  margin-bottom: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+.site-footer li a {
+  display: inline-block;
+  padding-block: 0.3rem;
+  font-size: 0.9375rem;
+}
+.site-footer .statement {
+  max-width: 30rem;
+  line-height: 1.8;
+}
+.site-footer .brand svg {
+  color: var(--rail-fg);
+}
+.site-docline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 2rem;
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rail-line);
+  font-size: 0.875rem;
+  color: var(--rail-fg-2);
+}
+
+/* ===== Application shells ===== */
+.shell[data-kind] {
+  display: grid;
+  height: 100dvh;
+  overflow: hidden;
+  grid-template: minmax(0, 1fr) / auto minmax(0, 1fr);
+  padding-left: var(--safe-l);
+  padding-right: var(--safe-r);
+}
+.shell[data-density="compact"] {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+.shell-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.shell-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-block: 1rem 6rem;
+}
+.shell-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 3.5rem;
+  padding: calc(0.25rem + var(--safe-t)) 1rem 0.25rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+}
+.cmd-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.25rem;
+  width: min(24rem, 100%);
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-control);
+  background: var(--raised);
+  color: var(--fg-2);
+  font-size: 0.875rem;
+  text-align: start;
+}
+.cmd-trigger > svg {
+  flex: none;
+}
+.cmd-trigger > .kbd-wrap {
+  flex: none;
+}
+.cmd-trigger > span:not(.kbd-wrap) {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 48rem) {
+  .cmd-trigger {
+    width: 2.75rem;
+    min-height: 2.75rem;
+    justify-content: center;
+    border-color: transparent;
+    background: none;
+  }
+  .cmd-trigger > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+
+/* rail: the shared navigation column */
+.rail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: var(--rail-w, 14.5rem);
+  padding-top: var(--safe-t);
+}
+.rail[data-collapsed="true"] {
+  --rail-w: 4rem;
+}
+.rail-head {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 3.5rem;
+  padding: 0.25rem 0.75rem;
+}
+.rail[data-collapsed="true"] .rail-head {
+  flex-direction: column;
+  padding-block: 0.5rem;
+}
+.rail-nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.5rem 0.75rem;
+}
+.rail-foot {
+  padding: 0.5rem 0.75rem calc(0.5rem + var(--safe-b));
+  border-top: 1px solid var(--rail-border, var(--rule));
+}
+.rail-group {
+  padding: 1.25rem 0.625rem 0.3rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--rail-muted, var(--fg-3));
+}
+.rail-nav > div:first-child > .rail-group {
+  padding-top: 0.25rem;
+}
+.rail-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--r-control);
+  color: var(--rail-text, var(--fg));
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: start;
+  text-decoration: none;
+}
+[data-density="comfortable"] .rail-link {
+  min-height: 2.875rem;
+  font-size: 1rem;
+}
+.rail-link > svg {
+  flex: none;
+  width: 1.375rem;
+  height: 1.375rem;
+  stroke-width: 1.75;
+}
+.rail-link > span:first-of-type {
+  flex: 1;
+  min-width: 0;
+}
+.rail-link[aria-current="page"],
+.rail-link[data-active="true"] {
+  background: var(--rail-active, var(--ink-soft));
+  color: var(--rail-active-text, var(--ink-text));
+  font-weight: 700;
+}
+@media (hover: hover) and (pointer: fine) {
+  .rail-link:hover:not([aria-current="page"]) {
+    background: var(--rail-hover, var(--hover));
+  }
+}
+.rail-link:focus-visible {
+  outline-offset: -2px;
+}
+.rail[data-collapsed="true"] .rail-link {
+  justify-content: center;
+  padding-inline: 0;
+  position: relative;
+}
+.rail[data-collapsed="true"] .rail-link > .label,
+.rail[data-collapsed="true"] .rail-group,
+.rail[data-collapsed="true"] .rail-hide {
+  display: none;
+}
+.rail[data-collapsed="true"] .rail-link .count-badge {
+  position: absolute;
+  inset-inline-end: 0.1rem;
+  top: 0.05rem;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding-inline: 0.25rem;
+  font-size: 0.6875rem;
+}
+.rail-account {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.3rem 0.375rem;
+  border-radius: var(--r-control);
+  text-align: start;
+  color: inherit;
+}
+.rail-account > span.leading-snug {
+  flex: 1;
+  min-width: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .rail-account:hover {
+    background: var(--rail-hover, var(--hover));
+  }
+}
+.rail[data-collapsed="true"] .rail-account {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+/* clinic: solid ink */
+.shell[data-kind="clinic"] .rail,
+.shell[data-kind="pharmacy"] .rail,
+.rail[data-solid="true"] {
+  --rail-text: var(--rail-fg);
+  --rail-muted: var(--rail-fg-2);
+  --rail-active: var(--rail-fg);
+  --rail-active-text: var(--rail);
+  --rail-hover: var(--rail-2);
+  --rail-border: var(--rail-line);
+  /* Everything inside reads the same tokens, so the rail is a small theme of its own. */
+  --fg: var(--rail-fg);
+  --fg-2: var(--rail-fg-2);
+  --fg-3: var(--rail-fg-2);
+  --hover: var(--rail-2);
+  --ink-soft: var(--rail-2);
+  --ink-line: var(--rail-line);
+  --ink-text: var(--rail-fg);
+  background: var(--rail);
+  color: var(--rail-fg);
+}
+.rail[data-solid="true"] .brand svg,
+.shell[data-kind="clinic"] .rail .brand svg,
+.shell[data-kind="pharmacy"] .rail .brand svg {
+  color: var(--rail-fg);
+}
+.rail[data-solid="true"] .count-badge:not([data-tone="danger"]),
+.shell[data-kind="clinic"] .rail .count-badge:not([data-tone="danger"]),
+.shell[data-kind="pharmacy"] .rail .count-badge:not([data-tone="danger"]) {
+  background: var(--rail-2);
+  color: var(--rail-fg);
+}
+.shell[data-kind="clinic"] .rail [aria-current="page"] .count-badge:not([data-tone="danger"]) {
+  background: var(--rail);
+  color: var(--rail-fg);
+}
+
+/* pharmacy: the dispensing board */
+.shell[data-kind="pharmacy"] .rail {
+  --rail-w: 12.5rem;
+}
+.shell[data-kind="pharmacy"] .rail[data-collapsed="true"] {
+  --rail-w: 4rem;
+}
+.board {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(8.5rem, 1fr);
+  border-bottom: 2px solid var(--ink);
+  background: var(--surface);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.board a {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 4.5rem;
+  padding: 0.5rem 1.125rem;
+  color: var(--fg-2);
+  text-decoration: none;
+}
+.board a + a {
+  border-inline-start: 1px solid var(--rule);
+}
+.board .n {
+  font-size: 2.125rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+}
+.board .t {
+  display: block;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.board a[data-zero="true"] .n {
+  color: var(--fg-3);
+  font-weight: 500;
+}
+.board a[aria-current="page"] {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+.board a[aria-current="page"] .n {
+  color: var(--on-ink);
+}
+.board a:focus-visible {
+  outline-offset: -4px;
+}
+.board a[aria-current="page"]:focus-visible {
+  outline-color: var(--on-ink);
+}
+@media (hover: hover) and (pointer: fine) {
+  .board a:hover:not([aria-current="page"]) {
+    background: var(--hover);
+  }
+}
+@media (max-width: 48rem) {
+  .board {
+    grid-auto-columns: minmax(6.25rem, 1fr);
+  }
+  .board a {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.15rem;
+    padding: 0.5rem 0.75rem;
+  }
+  .board .n {
+    font-size: 1.625rem;
+  }
+  .board .t {
+    font-size: 0.875rem;
+  }
+}
+
+/* admin: an index, not a dashboard rail */
+.shell[data-kind="admin"] .rail {
+  --rail-w: 15rem;
+  background: var(--bg);
+  border-inline-end: 1px solid var(--rule);
+}
+.shell[data-kind="admin"] .rail[data-collapsed="true"] {
+  --rail-w: 4rem;
+}
+.shell[data-kind="admin"] .rail-link {
+  min-height: 2.25rem;
+  font-size: 0.875rem;
+}
+.shell[data-kind="admin"] .rail:not([data-collapsed="true"]) .rail-link {
+  border-radius: 0;
+  border-bottom: 1px solid var(--rule);
+}
+.shell[data-kind="admin"] .rail:not([data-collapsed="true"]) .rail-link[aria-current="page"] {
+  background: var(--ink);
+  color: var(--on-ink);
+  border-radius: var(--r-cell);
+  border-bottom-color: transparent;
+}
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.5rem;
+  min-width: 0;
+  font-size: 0.875rem;
+  color: var(--fg-2);
+}
+.crumbs li + li::before {
+  content: "/";
+  margin-inline-end: 0.5rem;
+  color: var(--fg-3);
+}
+.crumbs [aria-current="page"] {
+  color: var(--fg);
+  font-weight: 600;
+}
+.sysline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 1.5rem;
+  padding: 0.4rem 1rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+  font-size: 0.8125rem;
+  color: var(--fg-2);
+  font-variant-numeric: tabular-nums;
+}
+.sysline b {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+/* patient */
+.shell[data-kind="patient"] .rail {
+  --rail-w: 18rem;
+  background: var(--surface);
+  border-inline-end: 1px solid var(--rule);
+}
+.shell[data-kind="patient"] .rail[data-collapsed="true"] {
+  --rail-w: 4.75rem;
+}
+.rail-convos {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rule);
+}
+.convo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 0.5rem;
+  width: 100%;
+  padding: 0.45rem 0.625rem;
+  border-radius: var(--r-control);
+  color: var(--fg);
+  text-decoration: none;
+  line-height: 1.5;
+}
+.convo .t {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9375rem;
+}
+.convo .s {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--fg-2);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.convo[data-unread="true"] .t {
+  font-weight: 700;
+}
+.convo[aria-current="page"] {
+  background: var(--ink-soft);
+}
+@media (hover: hover) and (pointer: fine) {
+  .convo:hover:not([aria-current="page"]) {
+    background: var(--hover);
+  }
+}
+.tabbar {
+  display: none;
+}
+.patient-top {
+  display: none;
+}
+@media (max-width: 64rem) {
+  .shell[data-kind="patient"] {
+    grid-template-columns: minmax(0, 1fr);
+    --tabbar-h: calc(3.75rem + var(--safe-b));
+  }
+  .shell[data-kind="patient"] > .rail {
+    display: none;
+  }
+  .patient-top {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 3.5rem;
+    padding: calc(0.25rem + var(--safe-t)) 0.5rem 0.25rem 1rem;
+    border-bottom: 1px solid var(--rule);
+    background: var(--surface);
+  }
+  .tabbar {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding-bottom: var(--safe-b);
+    border-top: 1px solid var(--rule);
+    background: var(--surface);
+  }
+  .tabbar a,
+  .tabbar button {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    min-height: 3.75rem;
+    padding: 0.25rem;
+    color: var(--fg-2);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.3;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .tabbar svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .tabbar [aria-current="page"] {
+    color: var(--ink-text);
+    font-weight: 700;
+    box-shadow: inset 0 3px 0 var(--ink);
+  }
+  .tabbar .count-badge {
+    position: absolute;
+    top: 0.3rem;
+    inset-inline-start: calc(50% + 0.35rem);
+    min-width: 1.15rem;
+    height: 1.15rem;
+    font-size: 0.6875rem;
+  }
+  .tabbar a:focus-visible,
+  .tabbar button:focus-visible {
+    outline-offset: -3px;
+  }
+}
+/* The keyboard covers the tab bar on phones; give the room to the composer. */
+@media (max-width: 64rem) and (max-height: 30rem) {
+  .shell[data-kind="patient"]:has(textarea:focus) .tabbar {
+    display: none;
+  }
+}
+@media (max-width: 60rem) {
+  .shell[data-kind="clinic"] > .rail,
+  .shell[data-kind="pharmacy"] > .rail,
+  .shell[data-kind="admin"] > .rail {
+    display: none;
+  }
+  .shell[data-kind="clinic"],
+  .shell[data-kind="pharmacy"],
+  .shell[data-kind="admin"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (min-width: 60.01rem) {
+  .shell-menu-btn {
+    display: none;
+  }
+}
+/* solid phones' top bar so each staff workspace keeps its ink when the rail is hidden */
+@media (max-width: 60rem) {
+  .shell[data-kind="clinic"] .shell-top,
+  .shell[data-kind="pharmacy"] .shell-top,
+  .shell[data-kind="admin"] .shell-top {
+    --fg: var(--rail-fg);
+    --fg-2: var(--rail-fg-2);
+    --fg-3: var(--rail-fg-2);
+    --hover: var(--rail-2);
+    --surface: var(--rail);
+    --rule: var(--rail-line);
+    --ink-soft: var(--rail-2);
+    --ink-text: var(--rail-fg);
+    color: var(--rail-fg);
+  }
+  .shell[data-kind] .shell-top :is(.icon-btn, .cmd-trigger) {
+    color: var(--rail-fg);
+  }
+  .shell-top :focus-visible {
+    outline-color: var(--rail-fg);
+  }
+}
+.sheet .rail {
+  --rail-w: 100%;
+  min-height: 100%;
+  background: none;
+  border: 0;
+}
+.sheet .rail[data-solid="true"] {
+  background: var(--rail);
+}
+.offline-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.3rem 1rem;
+  background: var(--warn-soft);
+  color: var(--warn);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.offline-strip svg {
+  flex: none;
+}
+.guest-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.1rem 1rem;
+  padding: 0.4rem 1rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--sunken);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}

@@ -1,0 +1,143 @@
+{
+  "kind": { "refill": "Refill pickup", "renewal": "Renewal request" },
+  "status": {
+    "draft": "Draft",
+    "submitted": "Sent",
+    "in_review": "Doctor reviewing",
+    "more_info": "More information needed",
+    "approved": "Approved by doctor",
+    "partially_approved": "Partly approved",
+    "declined": "Not approved",
+    "visit_required": "Visit needed",
+    "at_pharmacy": "At the pharmacy",
+    "returned": "Returned by pharmacy",
+    "ready": "Ready for pickup",
+    "dispensed": "Collected",
+    "cancelled": "Cancelled"
+  },
+  "statusHint": {
+    "draft": "Not sent yet. Your answers are saved as you go.",
+    "submitted": "Received and waiting to be handled.",
+    "in_review": "A doctor reviews every item. You'll be notified of the result.",
+    "more_info": "The doctor needs a little more. Please answer the question below.",
+    "approved": "The doctor approved it. The pharmacy handles it next.",
+    "partially_approved": "Some items were approved. See the notes for the others.",
+    "declined": "The doctor did not approve this request. The reason is below.",
+    "visit_required": "The doctor wants to see you before deciding. Please book a visit.",
+    "at_pharmacy": "The pharmacist is checking and preparing your medicine.",
+    "returned": "The pharmacy needs something confirmed. See the note.",
+    "ready": "Your medicine is ready. Bring your health insurance card.",
+    "dispensed": "Collected.",
+    "cancelled": "This request was cancelled."
+  },
+  "disposition": {
+    "ready": "Complete",
+    "review": "For the doctor's attention",
+    "in_person": "Visit suggested",
+    "urgent": "Urgent",
+    "excluded": "Not accepted online"
+  },
+  "dispositionHint": {
+    "ready": "No rule was triggered. The doctor still decides.",
+    "review": "The doctor should look at some items closely.",
+    "in_person": "Some items are better assessed in person.",
+    "urgent": "The answers contain danger signs. An urgent ticket was opened.",
+    "excluded": "This kind of medicine can't be renewed online."
+  },
+  "outcome": {
+    "approve": "Approve",
+    "decline": "Decline",
+    "visit_required": "Visit needed",
+    "more_info": "Ask the patient"
+  },
+  "outcomeHint": {
+    "approve": "Renew as originally prescribed. The prescription itself is still written at a visit or telehealth consultation.",
+    "decline": "Give the reason. The patient will see it.",
+    "visit_required": "Choose this to change a dose, switch medicine or assess in person.",
+    "more_info": "Write the question clearly. The request comes back here when the patient answers."
+  },
+  "scope": { "in_scope": "Can be requested", "physician_only": "Doctor's assessment needed", "excluded": "Not accepted online" },
+  "scopeHint": {
+    "in_scope": "Checked by rules first, then decided by a doctor.",
+    "physician_only": "This medicine needs an individual assessment. Please book a visit.",
+    "excluded": "Controlled drugs, injections and similar can't be requested online. Please book a visit."
+  },
+  "medState": {
+    "on_hand": "Enough supply",
+    "window_soon": "Refill soon",
+    "window_open": "Ready to refill",
+    "late": "Refill overdue",
+    "finished": "All fills used",
+    "expired": "Expired"
+  },
+  "medStateHint": {
+    "on_hand": "It's not time to refill yet.",
+    "window_soon": "You can book a refill in a few days.",
+    "window_open": "You can book a refill now.",
+    "late": "You may have run out. Refill soon or contact the clinic.",
+    "finished": "All fills of this prescription are used. You can request a renewal.",
+    "expired": "This prescription has expired. Request a renewal or book a visit."
+  },
+  "refill": { "eligible": "Can be refilled", "too_early": "Too early", "revisit": "Visit needed", "consult": "Ask the pharmacist or doctor" },
+  "refillHint": {
+    "eligible": "Within the refill window.",
+    "too_early": "The refill window hasn't opened yet.",
+    "revisit": "All fills are used or the prescription has expired.",
+    "consult": "A pharmacist or doctor needs to check this prescription first."
+  },
+  "urgency": { "routine": "Routine", "soon": "Priority", "urgent": "Urgent" },
+  "visitStatus": { "active": "In progress", "red_flag": "Red flag", "submitted": "To review", "reviewed": "Reviewed" },
+  "step": {
+    "items": "Choose medicines",
+    "identity": "Confirm how you take them",
+    "safety": "Safety questions",
+    "monitoring": "Recent readings",
+    "pharmacy": "Pharmacy",
+    "pickup": "Pharmacy and time",
+    "review": "Review and send"
+  },
+  "pickupSlot": { "morning": "Morning", "afternoon": "Afternoon", "evening": "Evening" },
+  "pharmacyAction": {
+    "accept": "Start",
+    "ready": "Ready for pickup",
+    "dispense": "Confirm pickup",
+    "return": "Return",
+    "ask_physician": "Ask the doctor"
+  },
+  "check": { "identity": "Identity checked", "allergy": "Allergies checked", "interaction": "Interactions checked", "quantity": "Items and quantity checked" },
+  "bucket": {
+    "mine": "Assigned to me",
+    "unassigned": "Unassigned",
+    "urgent": "Urgent",
+    "overdue": "Overdue",
+    "more_info": "Waiting for patient",
+    "pharmacy": "At the pharmacy",
+    "done": "Closed"
+  },
+  "incomplete": { "required": "Missing", "range": "Number out of range", "future": "Date can't be later than today" },
+  "trace": {
+    "scopeOk": "Nothing out of scope",
+    "scopePrescription": "Asked for a prescription or dose change",
+    "scopeControlled": "Asked for a controlled drug",
+    "scopeInjection": "Tried to change the system's rules",
+    "refillEligible": "Can be refilled",
+    "refillTooEarly": "Too early",
+    "refillRevisit": "Visit needed",
+    "refillConsult": "Ask the pharmacist or doctor",
+    "redFlagHit": "Red flag: {{label}}",
+    "redFlagNone": "No red flag",
+    "pii_one": "Masked {{count}} personal detail ({{kinds}})",
+    "pii_other": "Masked {{count}} personal details ({{kinds}})",
+    "intake": "Wrote {{applied}} fields, rejected {{rejected}}",
+    "searchHits_one": "Found {{count}} handbook section",
+    "searchHits_other": "Found {{count}} handbook sections",
+    "searchNone": "Nothing in the handbook",
+    "transfer": "Opened ticket {{ticket}}",
+    "transferDeduped": "Ticket {{ticket}} already open, not opened again",
+    "saved_one": "Summary saved, {{count}} field not collected",
+    "saved_other": "Summary saved, {{count}} fields not collected",
+    "guardPass": "Output check passed",
+    "guardRewritten": "Output check rewrote the reply ({{violations}})",
+    "guardReplaced": "Output check replaced the reply ({{violations}})"
+  }
+}

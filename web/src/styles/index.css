@@ -1,0 +1,157 @@
+/* Entry stylesheet. Tailwind utilities are generated from the tokens below and nothing else: the default
+   palette and type scale are removed, so `bg-blue-500` or `text-slate-600` simply do not exist. */
+@import "@fontsource-variable/noto-sans-tc/wght.css" layer(fonts);
+@import "tailwindcss";
+@import "./tokens.css" layer(theme);
+@import "./base.css" layer(base);
+@import "./components.css" layer(components);
+@import "./domain.css" layer(components);
+@import "./shells.css" layer(components);
+@import "./pages.css" layer(components);
+@import "./print.css" layer(utilities);
+
+@source "../../src";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant compact (&:where([data-density="compact"], [data-density="compact"] *));
+@custom-variant coarse (@media (pointer: coarse));
+
+@theme inline {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-sunken: var(--sunken);
+  --color-hover: var(--hover);
+  --color-overlay: var(--overlay);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-disabled: var(--fg-disabled);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-ink: var(--ink);
+  --color-ink-hover: var(--ink-hover);
+  --color-on-ink: var(--on-ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-line: var(--ink-line);
+  --color-ink-text: var(--ink-text);
+  --color-rail: var(--rail);
+  --color-rail-2: var(--rail-2);
+  --color-rail-fg: var(--rail-fg);
+  --color-rail-fg-2: var(--rail-fg-2);
+  --color-rail-line: var(--rail-line);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-ok-line: var(--ok-line);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-line: var(--info-line);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-line: var(--warn-line);
+  --color-hold: var(--hold);
+  --color-hold-soft: var(--hold-soft);
+  --color-hold-line: var(--hold-line);
+  --color-mute: var(--mute);
+  --color-mute-soft: var(--mute-soft);
+  --color-mute-line: var(--mute-line);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-line: var(--danger-line);
+  --color-danger-solid: var(--danger-solid);
+  --color-danger-solid-hover: var(--danger-solid-hover);
+  --color-on-danger: var(--on-danger);
+  --color-focus: var(--focus);
+
+  --font-*: initial;
+  --font-sans: var(--font-sans);
+  --font-read: var(--font-read);
+  --font-code: var(--font-code);
+
+  /* CJK needs looser leading than Latin at the same size, and far less tracking at display sizes. */
+  --text-*: initial;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.6;
+  --text-base: 1rem;
+  --text-base--line-height: 1.75;
+  --text-md: 1.125rem;
+  --text-md--line-height: 1.75;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.6;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 1.45;
+  --text-2xl: 1.875rem;
+  --text-2xl--line-height: 1.4;
+  --text-3xl: 2.375rem;
+  --text-3xl--line-height: 1.32;
+  --text-4xl: 3rem;
+  --text-4xl--line-height: 1.25;
+  --text-5xl: 3.75rem;
+  --text-5xl--line-height: 1.2;
+
+  --radius-*: initial;
+  --radius-cell: var(--r-cell);
+  --radius-control: var(--r-control);
+  --radius-panel: var(--r-panel);
+  --radius-sheet: var(--r-sheet);
+  --radius-full: 999px;
+
+  --shadow-*: initial;
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+  --shadow-3: var(--shadow-3);
+
+  --ease-out: var(--ease-out);
+  --ease-in-out: var(--ease-in-out);
+  --ease-drawer: var(--ease-drawer);
+
+  --container-measure: var(--measure);
+  --container-page: var(--page);
+
+  --spacing-ctl: var(--ctl-h);
+  --spacing-ctl-sm: var(--ctl-h-sm);
+  --spacing-ctl-lg: var(--ctl-h-lg);
+  --spacing-ctl-px: var(--ctl-px);
+  --spacing-row: var(--row-h);
+  --spacing-cell-x: var(--cell-x);
+  --spacing-cell-y: var(--cell-y);
+  --spacing-pane: var(--pane);
+  --spacing-stack: var(--stack);
+}
+
+@utility num {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+@utility text-ctl {
+  font-size: var(--ctl-fs);
+  line-height: 1.4;
+}
+/* Sizes that follow the density of the shell (or of any element with data-density). */
+@utility text-body {
+  font-size: var(--body-fs);
+  line-height: 1.7;
+}
+@utility text-note {
+  font-size: var(--note-fs);
+  line-height: 1.6;
+}
+@utility text-title {
+  font-size: var(--title-fs);
+  line-height: 1.5;
+  font-weight: 700;
+}
+@utility scroll-y {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+@utility wrap-any {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}

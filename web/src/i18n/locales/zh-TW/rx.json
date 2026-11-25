@@ -1,0 +1,140 @@
+{
+  "kind": { "refill": "領藥預約", "renewal": "續開申請" },
+  "status": {
+    "draft": "草稿",
+    "submitted": "已送出",
+    "in_review": "醫師審核中",
+    "more_info": "需要補充",
+    "approved": "醫師同意",
+    "partially_approved": "部分同意",
+    "declined": "未同意",
+    "visit_required": "需要回診",
+    "at_pharmacy": "藥局處理中",
+    "returned": "藥局退回",
+    "ready": "可以領藥",
+    "dispensed": "已領藥",
+    "cancelled": "已取消"
+  },
+  "statusHint": {
+    "draft": "還沒送出，填到一半也會自動儲存。",
+    "submitted": "已收到，等待處理。",
+    "in_review": "醫師會逐項審核，有結果會通知您。",
+    "more_info": "醫師需要多一點資訊，請回覆下面的問題。",
+    "approved": "醫師已同意，接著由藥局處理。",
+    "partially_approved": "有些項目醫師已同意，其他項目請看說明。",
+    "declined": "醫師沒有同意這次申請，原因寫在下面。",
+    "visit_required": "醫師希望先看診再決定，請預約門診。",
+    "at_pharmacy": "藥師正在核對和備藥。",
+    "returned": "藥局有地方要確認，請看說明。",
+    "ready": "藥已備好，請帶健保卡到藥局領取。",
+    "dispensed": "已完成領藥。",
+    "cancelled": "這筆申請已取消。"
+  },
+  "disposition": {
+    "ready": "資料齊全",
+    "review": "醫師留意",
+    "in_person": "建議回診",
+    "urgent": "緊急",
+    "excluded": "不接受線上申請"
+  },
+  "dispositionHint": {
+    "ready": "檢核沒有觸發規則，仍由醫師決定。",
+    "review": "有項目需要醫師特別看過。",
+    "in_person": "有項目建議當面評估。",
+    "urgent": "回答中有危急徵象，已開緊急單。",
+    "excluded": "這類藥不能線上申請續開。"
+  },
+  "outcome": {
+    "approve": "同意續開",
+    "decline": "不同意",
+    "visit_required": "需要回診",
+    "more_info": "請病人補充"
+  },
+  "outcomeHint": {
+    "approve": "照原處方續開。正式處方仍在看診或通訊診察時開立。",
+    "decline": "請寫明原因，病人會看到。",
+    "visit_required": "需要改劑量、換藥或當面評估時選這個。",
+    "more_info": "把要問的問題寫清楚，病人回覆後會回到審核。"
+  },
+  "scope": { "in_scope": "可以申請", "physician_only": "需醫師個別評估", "excluded": "不接受線上申請" },
+  "scopeHint": {
+    "in_scope": "先由程式檢核，再交醫師決定。",
+    "physician_only": "這個藥要醫師個別評估，請預約門診。",
+    "excluded": "管制藥或針劑等不能線上申請，請回診。"
+  },
+  "medState": {
+    "on_hand": "藥量足夠",
+    "window_soon": "快可以領藥",
+    "window_open": "可以領藥",
+    "late": "已過領藥日",
+    "finished": "已領完",
+    "expired": "已過期"
+  },
+  "medStateHint": {
+    "on_hand": "還不到領藥的時間。",
+    "window_soon": "再幾天就可以預約領藥。",
+    "window_open": "現在可以預約領藥。",
+    "late": "藥可能已經吃完，請盡快領藥或聯絡診所。",
+    "finished": "這張慢箋的次數都領完了，可以申請續開。",
+    "expired": "這張慢箋已過有效期限，可以申請續開或回診。"
+  },
+  "refill": { "eligible": "可以領藥", "too_early": "還不能領", "revisit": "需要回診", "consult": "請洽藥師或醫師" },
+  "refillHint": {
+    "eligible": "在領藥期間內。",
+    "too_early": "還沒進入領藥期間。",
+    "revisit": "次數已領完或慢箋過期。",
+    "consult": "這張慢箋需要先由藥師或醫師確認。"
+  },
+  "urgency": { "routine": "一般", "soon": "優先", "urgent": "緊急" },
+  "visitStatus": { "active": "進行中", "red_flag": "紅旗", "submitted": "待審閱", "reviewed": "已審閱" },
+  "step": {
+    "items": "選擇藥品",
+    "identity": "確認用藥",
+    "safety": "安全問題",
+    "monitoring": "近期數據",
+    "pharmacy": "藥局",
+    "pickup": "藥局與時間",
+    "review": "檢視並送出"
+  },
+  "pickupSlot": { "morning": "上午", "afternoon": "下午", "evening": "晚上" },
+  "pharmacyAction": {
+    "accept": "開始處理",
+    "ready": "備藥完成",
+    "dispense": "確認領藥",
+    "return": "退回",
+    "ask_physician": "請醫師確認"
+  },
+  "check": { "identity": "核對身分", "allergy": "核對過敏史", "interaction": "核對交互作用", "quantity": "核對品項與數量" },
+  "bucket": {
+    "mine": "指派給我",
+    "unassigned": "未指派",
+    "urgent": "緊急",
+    "overdue": "逾時",
+    "more_info": "等病人補充",
+    "pharmacy": "在藥局",
+    "done": "已結束"
+  },
+  "incomplete": { "required": "還沒填", "range": "數字超出範圍", "future": "日期不能晚於今天" },
+  "trace": {
+    "scopeOk": "沒有越界內容",
+    "scopePrescription": "要求開藥或調整劑量",
+    "scopeControlled": "要求管制藥",
+    "scopeInjection": "試圖改變系統規則",
+    "refillEligible": "可以領藥",
+    "refillTooEarly": "還不能領",
+    "refillRevisit": "需要回診",
+    "refillConsult": "請洽藥師或醫師",
+    "redFlagHit": "命中紅旗：{{label}}",
+    "redFlagNone": "沒有紅旗",
+    "pii": "遮蔽 {{count}} 處個資（{{kinds}}）",
+    "intake": "寫入 {{applied}} 個欄位，退回 {{rejected}} 個",
+    "searchHits": "找到 {{count}} 節衛教內容",
+    "searchNone": "手冊裡沒有相關內容",
+    "transfer": "已開轉交單 {{ticket}}",
+    "transferDeduped": "已有轉交單 {{ticket}}，沒有重複開立",
+    "saved": "已儲存摘要，{{count}} 個欄位未取得",
+    "guardPass": "輸出檢查通過",
+    "guardRewritten": "輸出檢查改寫了回覆（{{violations}}）",
+    "guardReplaced": "輸出檢查換掉了回覆（{{violations}}）"
+  }
+}

@@ -1,0 +1,348 @@
+/* Hallmark · genre: editorial + app screens · direction: custom, 藥袋／處方箋 (by request) · surface: tinted paper · accent: form ink, under 5% outside rails
+ * pre-emit critique: P4 H4 E4 S5 R4 V4 · weakest: E, dense panes drift off the rule grid; rows and cells now share --row-h and --rule
+ *
+ * PreVisit Desk v2 design tokens: the only place colours, fonts and sizes are defined.
+ *
+ * Two inks, as on a printed prescription. The FORM INK prints structure: labels, rules, actions. The
+ * WRITING INK (near black) fills in the values. Each workspace is one copy (聯) of the same form, so only the
+ * form ink and the shell change: public and patient green, clinic blue, pharmacy amber-bottle brown, admin
+ * graphite. Red is reserved for emergencies. Run `node scripts/contrast.mjs` after any change.
+ *
+ * data-theme is always set on <html> ("light" or "dark"; "system" is resolved by the script in index.html).
+ * data-ws, data-density are set by the shells; data-text ("112", "125") by the account preference. */
+
+:root {
+  color-scheme: light;
+
+  /* paper */
+  --bg: #f2f5f2;
+  --surface: #fdfefd;
+  --raised: #fefffe;
+  --sunken: #e8ede9;
+  --hover: #ecf1ed;
+  --overlay: rgb(16 28 21 / 0.46);
+
+  /* writing ink */
+  --fg: #14201a;
+  --fg-2: #435047;
+  --fg-3: #55625a;
+  --fg-disabled: #6b776f;
+
+  /* rules: --rule separates, --rule-strong bounds a control (3:1), --ink-line is the printed form line */
+  --rule: #d3dbd5;
+  --rule-strong: #768279;
+
+  /* status. Never colour alone: StatusTag and Banner always carry an icon and words. */
+  --ok: #17663a;
+  --ok-soft: #e1f0e4;
+  --ok-line: #8fc0a0;
+  --info: #1d4c82;
+  --info-soft: #e4edf7;
+  --info-line: #9bb9da;
+  --warn: #6b4e00;
+  --warn-soft: #ffeeb0;
+  --warn-line: #cf9f0c;
+  --hold: #67386f;
+  --hold-soft: #f2e8f4;
+  --hold-line: #c3a3c9;
+  --mute: #435047;
+  --mute-soft: #e6ebe7;
+  --mute-line: #a9b4ac;
+
+  /* emergencies only */
+  --danger: #a3121a;
+  --danger-soft: #fdeceb;
+  --danger-line: #d98a87;
+  --danger-solid: #b8141d;
+  --danger-solid-hover: #960f17;
+  --on-danger: #fffefe;
+
+  --focus: #1257c4;
+  --selection: #cfe5d6;
+
+  /* elevation: paper on a desk. Offset and blur, no halo. */
+  --shadow-1: 0 1px 2px rgb(16 32 22 / 0.07);
+  --shadow-2: 0 4px 14px -4px rgb(16 32 22 / 0.16), 0 1px 3px rgb(16 32 22 / 0.08);
+  --shadow-3: 0 18px 48px -14px rgb(16 32 22 / 0.3), 0 3px 10px rgb(16 32 22 / 0.1);
+
+  /* type: 黑體 works, 明體 reads. The serif face is loaded by the public shell only. */
+  --font-sans: "Noto Sans TC Variable", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei UI", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-read: "Noto Serif TC Variable", "Noto Serif TC", "Songti TC", "PMingLiU", Georgia, serif;
+  --font-code: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+
+  /* shape: a form is cut square. Cells and tags 2, controls 4, panels 6, speech and sheets 10. */
+  --r-cell: 2px;
+  --r-control: 4px;
+  --r-panel: 6px;
+  --r-sheet: 10px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --t-press: 120ms;
+  --t-pop: 170ms;
+  --t-sheet: 280ms;
+
+  --text-scale: 1;
+  --measure: 38rem; /* prose column: 36 to 38 CJK characters */
+  --page: 77rem; /* public container */
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+}
+
+[data-text="112"] {
+  --text-scale: 1.125;
+}
+[data-text="125"] {
+  --text-scale: 1.25;
+}
+
+/* ---- form ink per workspace, light ---- */
+:root,
+[data-ws="public"],
+[data-ws="patient"] {
+  --ink: #0a6141;
+  --ink-hover: #074b32;
+  --on-ink: #fbfffc;
+  --ink-soft: #e0efe5;
+  --ink-line: #93bfa5;
+  --ink-text: #0a5b3d;
+  --rail: #0b4a33;
+  --rail-2: #0e583d;
+  --rail-fg: #f1f8f3;
+  --rail-fg-2: #b9d6c6;
+  --rail-line: #2c6a51;
+}
+[data-ws="clinic"] {
+  --bg: #f1f4f7;
+  --sunken: #e6ebf0;
+  --hover: #ebf0f5;
+  --rule: #d1d8e0;
+  --rule-strong: #737e8b;
+  --ink: #1b4a82;
+  --ink-hover: #133962;
+  --on-ink: #fcfdff;
+  --ink-soft: #e2ecf7;
+  --ink-line: #97b5d6;
+  --ink-text: #1b4a82;
+  --rail: #12304f;
+  --rail-2: #1b4268;
+  --rail-fg: #f0f5fb;
+  --rail-fg-2: #b4c9df;
+  --rail-line: #2f5379;
+  --selection: #cfdff1;
+}
+[data-ws="pharmacy"] {
+  --bg: #f3f3f2;
+  --sunken: #e9e9e7;
+  --hover: #eeeeec;
+  --rule: #d8d8d4;
+  --rule-strong: #7c7c76;
+  --ink: #6b4313;
+  --ink-hover: #50310c;
+  --on-ink: #fffefc;
+  --ink-soft: #f0e8dc;
+  --ink-line: #c8ad88;
+  --ink-text: #6b4313;
+  --rail: #3d2a14;
+  --rail-2: #523a1e;
+  --rail-fg: #f8f4ee;
+  --rail-fg-2: #d9c8b2;
+  --rail-line: #654b2c;
+  --selection: #ecdcc4;
+}
+[data-ws="admin"] {
+  --bg: #f2f4f5;
+  --sunken: #e7e9eb;
+  --hover: #eceef0;
+  --rule: #d4d8db;
+  --rule-strong: #757d84;
+  --ink: #2f3b45;
+  --ink-hover: #1f2930;
+  --on-ink: #fcfdfe;
+  --ink-soft: #e4e9ed;
+  --ink-line: #a6b1ba;
+  --ink-text: #2f3b45;
+  --rail: #262f37;
+  --rail-2: #36424c;
+  --rail-fg: #f2f5f7;
+  --rail-fg-2: #bec8d0;
+  --rail-line: #47545f;
+  --selection: #d7dee4;
+}
+
+/* ---- dark ---- */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1411;
+  --surface: #161c18;
+  --raised: #1d2520;
+  --sunken: #0b0f0d;
+  --hover: #1f2822;
+  --overlay: rgb(3 6 4 / 0.66);
+  --fg: #e8eeea;
+  --fg-2: #b3beb7;
+  --fg-3: #96a29a;
+  --fg-disabled: #7d8981;
+  --rule: #2b352f;
+  --rule-strong: #718078;
+  --ok: #83cf9d;
+  --ok-soft: #15301f;
+  --ok-line: #37704d;
+  --info: #97bfec;
+  --info-soft: #172a41;
+  --info-line: #3b628e;
+  --warn: #f2ce62;
+  --warn-soft: #372c08;
+  --warn-line: #8a6d12;
+  --hold: #d8aee0;
+  --hold-soft: #33213a;
+  --hold-line: #774f82;
+  --mute: #b3beb7;
+  --mute-soft: #232b26;
+  --mute-line: #4f5b54;
+  --danger: #ff9e97;
+  --danger-soft: #3c1614;
+  --danger-line: #93403c;
+  --danger-solid: #cb2c2d;
+  --danger-solid-hover: #ad2022;
+  --on-danger: #fffefe;
+  --focus: #8bb8ff;
+  --selection: #214b36;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-2: 0 6px 18px -4px rgb(0 0 0 / 0.6), 0 1px 3px rgb(0 0 0 / 0.4);
+  --shadow-3: 0 20px 52px -12px rgb(0 0 0 / 0.75), 0 3px 10px rgb(0 0 0 / 0.5);
+}
+[data-theme="dark"],
+[data-theme="dark"] [data-ws="public"],
+[data-theme="dark"] [data-ws="patient"] {
+  --ink: #72c79d;
+  --ink-hover: #8fd7b2;
+  --on-ink: #052417;
+  --ink-soft: #163325;
+  --ink-line: #33684e;
+  --ink-text: #86d3ac;
+  --rail: #0c2a1e;
+  --rail-2: #15402e;
+  --rail-fg: #e9f3ed;
+  --rail-fg-2: #a5c4b3;
+  --rail-line: #275743;
+}
+[data-theme="dark"] [data-ws="clinic"] {
+  --bg: #0f1216;
+  --surface: #161a20;
+  --raised: #1d222a;
+  --sunken: #0b0d11;
+  --hover: #1f252e;
+  --rule: #2a313a;
+  --rule-strong: #6f7b89;
+  --ink: #8db8ea;
+  --ink-hover: #a9cbf2;
+  --on-ink: #06203c;
+  --ink-soft: #182b43;
+  --ink-line: #35597f;
+  --ink-text: #9cc3ef;
+  --rail: #0d1e30;
+  --rail-2: #173150;
+  --rail-fg: #e8eff7;
+  --rail-fg-2: #a2b9d1;
+  --rail-line: #2a4866;
+  --selection: #24456b;
+}
+[data-theme="dark"] [data-ws="pharmacy"] {
+  --bg: #131210;
+  --surface: #1b1a17;
+  --raised: #23211e;
+  --sunken: #0e0d0b;
+  --hover: #26241f;
+  --rule: #34312c;
+  --rule-strong: #7f7a71;
+  --ink: #dbac76;
+  --ink-hover: #e7c298;
+  --on-ink: #2b1905;
+  --ink-soft: #35281a;
+  --ink-line: #6f5537;
+  --ink-text: #e2b988;
+  --rail: #23190d;
+  --rail-2: #3a2a17;
+  --rail-fg: #f5efe7;
+  --rail-fg-2: #c9b69d;
+  --rail-line: #54402a;
+  --selection: #57401f;
+}
+[data-theme="dark"] [data-ws="admin"] {
+  --bg: #101214;
+  --surface: #181b1e;
+  --raised: #202428;
+  --sunken: #0c0e0f;
+  --hover: #23282c;
+  --rule: #2e3439;
+  --rule-strong: #747e86;
+  --ink: #b5c2cc;
+  --ink-hover: #ccd6dd;
+  --on-ink: #14191d;
+  --ink-soft: #262d33;
+  --ink-line: #566370;
+  --ink-text: #c0ccd5;
+  --rail: #14191d;
+  --rail-2: #262e35;
+  --rail-fg: #eef2f4;
+  --rail-fg-2: #aab6bf;
+  --rail-line: #3a454e;
+  --selection: #37434d;
+}
+
+/* ---- density: comfortable (public, patient), compact (clinic, pharmacy, admin) ---- */
+:root,
+[data-density="comfortable"] {
+  --ctl-h: 3rem;
+  --ctl-h-sm: 2.5rem;
+  --ctl-h-lg: 3.5rem;
+  --ctl-px: 1.125rem;
+  --ctl-fs: 1rem;
+  --row-h: 3.5rem;
+  --cell-x: 1rem;
+  --cell-y: 0.75rem;
+  --pane: 1.5rem;
+  --stack: 1.25rem;
+  --body-fs: 1.0625rem; /* text-body */
+  --note-fs: 0.9375rem; /* text-note: hints, secondary lines */
+  --title-fs: 1.25rem; /* text-title: section and pane titles */
+}
+[data-density="compact"] {
+  --ctl-h: 2.25rem;
+  --ctl-h-sm: 1.875rem;
+  --ctl-h-lg: 2.75rem;
+  --ctl-px: 0.8125rem;
+  --ctl-fs: 0.875rem;
+  --row-h: 2.625rem;
+  --cell-x: 0.75rem;
+  --cell-y: 0.4375rem;
+  --pane: 1rem;
+  --stack: 0.875rem;
+  --body-fs: 0.9375rem;
+  --note-fs: 0.8125rem;
+  --title-fs: 1rem;
+}
+@media (pointer: coarse) {
+  :root,
+  [data-density="comfortable"] {
+    --ctl-h-sm: 2.75rem;
+  }
+  [data-density="compact"] {
+    --ctl-h: 2.75rem;
+    --ctl-h-sm: 2.75rem;
+    --ctl-h-lg: 3rem;
+    --row-h: 3rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-press: 1ms;
+    --t-pop: 1ms;
+    --t-sheet: 1ms;
+  }
+}

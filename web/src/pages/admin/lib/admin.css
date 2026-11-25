@@ -1,0 +1,233 @@
+/* Admin only: day charts, count tables, the permission matrix, the save bar, the one-time password. */
+
+.chart-plot {
+  display: grid;
+  grid-template: 8.5rem 1.5rem / 3.25rem minmax(0, 1fr);
+  margin-top: 0.5rem;
+  border-radius: var(--r-cell);
+  touch-action: pan-y;
+}
+.chart-axis {
+  position: relative;
+  font-size: 0.875rem;
+  line-height: 1;
+  color: var(--fg-2);
+}
+.chart-axis > span {
+  position: absolute;
+  right: 0.5rem;
+  transform: translateY(50%);
+  white-space: nowrap;
+}
+.chart-area {
+  position: relative;
+}
+.chart-line {
+  position: absolute;
+  inset-inline: 0;
+  height: 1px;
+  background: var(--rule);
+}
+.chart-line[data-zero="true"] {
+  background: var(--rule-strong);
+}
+.chart-bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+.chart-bars > span {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.chart-bars > span > i {
+  width: min(70%, 1.5rem);
+  min-width: 2px;
+  background: var(--ink);
+  border-radius: 2px 2px 0 0;
+}
+.chart-bars > span > i:not([data-zero="true"]) {
+  min-height: 2px;
+}
+.chart-bars > span[data-active="true"] {
+  background: var(--ink-soft);
+}
+.chart-x {
+  position: relative;
+  grid-column: 2;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: var(--fg-2);
+}
+.chart-x > span {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.chart-x > span[data-edge="start"] {
+  transform: none;
+  left: 0 !important;
+}
+.chart-x > span[data-edge="end"] {
+  transform: none;
+  left: auto !important;
+  right: 0;
+}
+
+.count-bars {
+  width: 100%;
+  border-collapse: collapse;
+}
+.count-bars thead th {
+  padding: 0 0 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--fg-2);
+  text-align: start;
+}
+.count-bars tbody th {
+  width: 45%;
+  padding: 0.375rem 1rem 0.375rem 0;
+  font-weight: 400;
+  text-align: start;
+  overflow-wrap: anywhere;
+  border-top: 1px solid var(--rule);
+}
+.count-bars td {
+  padding-block: 0.375rem;
+  border-top: 1px solid var(--rule);
+  white-space: nowrap;
+}
+.count-bars td > span {
+  display: inline-block;
+  min-width: 2.5rem;
+  padding-inline-end: 0.5rem;
+  font-weight: 600;
+  text-align: end;
+}
+.count-bars td > i,
+.share-bar > i {
+  display: inline-block;
+  height: 0.75rem;
+  vertical-align: middle;
+  background: var(--ink);
+  border-radius: 0 2px 2px 0;
+}
+.count-bars td > i {
+  max-width: calc(100% - 3.25rem);
+}
+.count-bars td > i:not([data-zero="true"]),
+.share-bar > i:not([data-zero="true"]) {
+  min-width: 2px;
+}
+.share-bar {
+  display: block;
+  width: 100%;
+  height: 0.75rem;
+  line-height: 0;
+  background: var(--sunken);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-cell);
+  overflow: hidden;
+}
+.share-bar > i {
+  height: 100%;
+  border-radius: 0;
+}
+
+/* Permission matrix: the first column and the header stay while the rest scrolls. */
+.matrix-wrap {
+  overflow: auto;
+  max-height: min(70dvh, 52rem);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+}
+.matrix {
+  width: 100%;
+  min-width: 46rem;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.matrix th,
+.matrix td {
+  padding: var(--cell-y) var(--cell-x);
+  border-bottom: 1px solid var(--rule);
+  text-align: center;
+  vertical-align: middle;
+}
+.matrix thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--ink-soft);
+  color: var(--ink-text);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.matrix th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 24rem;
+  background: var(--surface);
+  text-align: start;
+  font-weight: 400;
+}
+.matrix thead th:first-child {
+  z-index: 3;
+  background: var(--ink-soft);
+}
+.matrix .group th {
+  background: var(--sunken);
+  font-weight: 700;
+}
+.matrix svg {
+  display: inline-block;
+}
+
+.save-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: 1.5rem;
+  padding: 0.75rem var(--pane);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-panel);
+  background: var(--raised);
+  box-shadow: var(--shadow-2);
+}
+
+.one-time {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-control);
+  background: var(--raised);
+}
+.one-time code {
+  font-family: var(--font-code);
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+@media (forced-colors: active) {
+  .chart-bars > span > i,
+  .count-bars td > i,
+  .share-bar > i {
+    background: CanvasText;
+    forced-color-adjust: none;
+  }
+}

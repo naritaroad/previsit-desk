@@ -1,0 +1,71 @@
+{
+  "offline": "You're offline. What you typed is kept; try again when you're back online.",
+  "badResponse": "The server's answer was incomplete. Try again.",
+  "rateLimited": "Too many requests. Try again in {{seconds}} seconds.",
+  "notFound": "Not found. It may have been deleted or passed its retention period.",
+  "visitClosed": "This previsit has been sent and can't be changed.",
+  "busy": "Still working on your last action. Please wait a moment.",
+  "stale": "This was just updated. The latest version is loaded; check it and send again.",
+  "unauthorized": "Your session has ended. Sign in again.",
+  "forbidden": "This account doesn't have permission.",
+  "invalidCredentials": "Wrong username or password.",
+  "tooLarge": "That's too long. Shorten it and send again.",
+  "invalidFields": "Some fields need fixing.",
+  "invalidRequest": "Something in the request isn't valid. Check it and try again.",
+  "invalidState": "That isn't possible in the current state. Refresh and look again.",
+  "internal": "Something went wrong on our side. Try again later.",
+  "run": {
+    "budget": "Today's AI limit is used up. Red-flag checks and the refill check still work, and you can send your answers as they are.",
+    "timeout": "The AI took too long to answer. Try again.",
+    "interrupted": "Your last message wasn't finished. Try again.",
+    "model": "The AI can't answer right now. Try again.",
+    "unknown": "This answer wasn't finished. Try again."
+  },
+  "field": {
+    "required": "Required.",
+    "tooLong": "Too long.",
+    "number": "Enter a number.",
+    "range": "That number is out of range. Please check it.",
+    "date": "Write the date as YYYY-MM-DD.",
+    "future": "Can't be later than today.",
+    "usernameShort": "At least 3 characters.",
+    "usernameLong": "At most 32 characters.",
+    "usernameChars": "Use letters, digits and . _ - only, starting with a letter or digit.",
+    "passwordShort": "At least 8 characters.",
+    "passwordLong": "At most 128 characters.",
+    "passwordMismatch": "The two passwords don't match.",
+    "passwordSame": "The new password must be different from the current one.",
+    "bpOrder": "Diastolic must be lower than systolic.",
+    "perFillExceedsTotal": "Days per fill can't exceed the total days.",
+    "beforePrescription": "The last fill can't be earlier than the prescription date.",
+    "messageLong": "Too long. Please shorten it."
+  },
+  "draft": {
+    "saving": "Saving",
+    "saved": "Saved",
+    "savedAt": "Saved at {{time}}",
+    "offline": "Offline, kept on this device",
+    "conflict": "Another device has newer text"
+  },
+  "outbox": {
+    "queued": "Waiting to send",
+    "sending": "Sending",
+    "sent": "Sent",
+    "failed": "Not sent"
+  },
+  "connection": {
+    "connecting": "Connecting",
+    "retrying": "Connection lost, reconnecting",
+    "offline": "Offline",
+    "paused": "Updates paused",
+    "closed": "Updates stopped"
+  },
+  "leave": {
+    "unsaved": "You have unsaved changes that may be lost if you leave.",
+    "unsent": "A message hasn't been sent. It stays on this device and is sent the next time you open it."
+  },
+  "session": {
+    "expired": "Your session has ended. Sign in again; unsent work is still here.",
+    "unreachable": "Can't reach the server. Check your connection and try again."
+  }
+}

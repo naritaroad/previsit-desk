@@ -1,0 +1,619 @@
+{
+  "seo": {
+    "siteName": "PreVisit Desk",
+    "home": {
+      "title": "PreVisit Desk: your history before the visit, refills and renewals",
+      "desc": "Answer questions in writing before a visit; the doctor gets a summary that links back to your words. Refill dates are worked out by code, and a doctor decides every renewal. A demonstration with fictional people and data."
+    },
+    "service": {
+      "title": "How it works | PreVisit Desk",
+      "desc": "Five situations: the night before a visit, a refill, a finished prescription, chest pain, and asking for a person. Who handles each step, and where the system stops."
+    },
+    "clinicians": {
+      "title": "For doctors and pharmacists | PreVisit Desk",
+      "desc": "Worklist, review desk, renewal review and dispensing checks: what reaches you, which fields the system leaves blank, and the current oversight phase."
+    },
+    "trust": {
+      "title": "Trust centre | PreVisit Desk",
+      "desc": "Twelve documents with versions and an owner: intended use, how it works, clinical safety and hazard log, human oversight, privacy, security, evaluation and regulation."
+    },
+    "handbook": {
+      "title": "Health handbook | PreVisit Desk",
+      "desc": "Preparing for a visit, warning signs, when to see a doctor, medicine safety. Every section names its source and the date it was checked."
+    },
+    "emergency": {
+      "title": "In an emergency | PreVisit Desk",
+      "desc": "In Taiwan, call 119 for chest pain, trouble breathing, signs of stroke, heavy bleeding or unconsciousness. If you might hurt yourself, call 1925."
+    },
+    "credits": { "title": "Photos and licences | PreVisit Desk", "desc": "The photographer, source and licence of every photograph on the site, and the typefaces and icons used." },
+    "login": { "title": "Sign in | PreVisit Desk", "desc": "Patients, doctors, pharmacists, care coordinators and administrators sign in here and land in their own workspace." },
+    "register": { "title": "Create a patient account | PreVisit Desk", "desc": "Register with a username and a nickname; no real name or email. Adults only. Do not enter real medical records." },
+    "try": { "title": "Try it as a demo patient | PreVisit Desk", "desc": "Pick a fictional patient and try the previsit interview, a refill or a renewal without registering. The data belongs to this browser and is deleted when it expires." },
+    "notFound": { "title": "Page not found | PreVisit Desk", "desc": "The link may have changed." }
+  },
+  "cta": {
+    "try": "Try it as a demo patient",
+    "login": "Sign in",
+    "service": "See how it works",
+    "clinicians": "For doctors and pharmacists",
+    "trust": "Go to the trust centre",
+    "emergency": "In an emergency"
+  },
+  "fiction": "A demonstration. Every person and record is fictional. Do not enter real medical records or personal data.",
+  "photo": {
+    "medicine_table": "A week of medicine, sorted by day.",
+    "consultation": "Two people over the same form.",
+    "city_taiwan": "A street in Tainan before the signs light up.",
+    "waiting": "Three chairs in a waiting area.",
+    "doctor_desk": "Hands at a keyboard, a stethoscope beside them.",
+    "pharmacy": "Old wooden drawers, each with a number. Photographed in Asakusa, Tokyo; not a pharmacy.",
+    "clinic_corridor": "A corridor before the visit.",
+    "bp_home": "Blood pressure at home.",
+    "notes_hand": "Written down first, so less gets forgotten.",
+    "nature_calm": "A plant on a window sill.",
+    "hero": "Afternoon; the blinds cast their shadow on the carpet."
+  },
+  "home": {
+    "title": "Say all of it before the visit.",
+    "lede": "Answer at home, at your own pace. What you say becomes one record the doctor can read before you walk in. You can also see when a refill opens and who a renewal is waiting for.",
+    "heroLink": "What it does not do",
+    "photoNote": "The people in the photographs have no connection with this service.",
+    "strip": {
+      "title": "One prescription, three refills. Which day?",
+      "body": "This is losartan for Hsiu-Chin Lin, a fictional patient. Drag the black date line to see whether she can collect on that day. If she can, stamp it and the next date is worked out again.",
+      "rule": "The dates come from code, not from AI. The rule is:",
+      "ruleFallback": "The second and third fill open a few days before the previous supply runs out; the trust centre has the details.",
+      "ruleSource": "Source of the rule",
+      "pharmacy": "Anhe Demo Pharmacy",
+      "slider": "Suppose today is",
+      "valueText": "{{date}}, {{state}}",
+      "today": "Back to today",
+      "fill": "Collect fill {{n}} on {{date}}",
+      "reset": "Start over",
+      "prev": "Previous day",
+      "next": "Next day",
+      "state": {
+        "too_early": "Too early. Fill {{n}} opens on {{date}}.",
+        "open": "Fill {{n}} can be collected.",
+        "gap": "Fill {{n}} can be collected, but the medicine ran out {{days}} days ago.",
+        "finished": "All three fills are used. To keep taking it, ask for a renewal.",
+        "expired": "The prescription has lapsed. See the doctor."
+      }
+    },
+    "excerpt": {
+      "title": "How a few sentences become the doctor’s record",
+      "body": "On the left, a fictional patient’s answers; on the right, the fields the doctor sees. Pick a field to find the sentence behind it. What was not asked says so. Assessment and plan stay blank; only the doctor fills them in.",
+      "chatLabel": "Excerpt of a previsit interview",
+      "sheetTitle": "Previsit summary",
+      "sheetNote": "excerpt",
+      "ai": "PreVisit assistant (AI)",
+      "patient": "Patient",
+      "from": "Show the sentence behind this field: {{label}}",
+      "turns": [
+        { "who": "ai", "parts": [{ "t": "To start: what is bothering you today?" }] },
+        {
+          "who": "patient",
+          "parts": [{ "t": "I am here for " }, { "t": "my regular follow-up, and I feel a little dizzy on getting up", "m": 1 }, { "t": ", for " }, { "t": "about two weeks", "m": 2 }, { "t": "." }]
+        },
+        { "who": "ai", "parts": [{ "t": "Two weeks of dizziness on getting up. Does it pass quickly, or does it stay?" }] },
+        {
+          "who": "patient",
+          "parts": [{ "t": "It goes away after I sit for a moment", "m": 3 }, { "t": ". " }, { "t": "No falls, no nausea", "m": 4 }, { "t": ". " }, { "t": "About 2 out of 10", "m": 5 }]
+        },
+        { "who": "ai", "parts": [{ "t": "Your record lists high blood pressure, diabetes and high cholesterol, and a penicillin allergy. Is that still right?" }] },
+        { "who": "patient", "parts": [{ "t": "Yes, the same", "m": 6 }, { "t": ", and " }, { "t": "I take the medicines as usual", "m": 7 }] }
+      ],
+      "fields": [
+        { "label": "Reason for visit", "value": "Follow-up, dizzy on getting up", "m": 1 },
+        { "label": "Onset", "value": "About two weeks ago", "m": 2 },
+        { "label": "Course", "value": "Only on getting up, passes after sitting", "m": 3 },
+        { "label": "Along with it", "value": "No falls, no nausea", "m": 4 },
+        { "label": "Severity", "value": "2 (0 to 10)", "m": 5 },
+        { "label": "History, allergies", "value": "High blood pressure, type 2 diabetes, high cholesterol; penicillin allergy", "m": 6 },
+        { "label": "Medicines", "value": "Losartan, metformin, atorvastatin", "m": 7 },
+        { "label": "Not asked yet", "value": "What makes it worse, what makes it better", "m": 0, "missing": true },
+        { "label": "Assessment (A)", "value": "For the doctor", "m": 0, "blank": true },
+        { "label": "Plan (P)", "value": "For the doctor", "m": 0, "blank": true }
+      ]
+    },
+    "renewal": {
+      "title": "Who a renewal request passes through",
+      "body": "A renewal request is not a prescription. It asks a doctor to look at a prepared record. Change the situation and see how the path changes, and who decides at each step.",
+      "label": "Situation",
+      "who": "Handled by",
+      "note": "In this demonstration an approved request goes to a demo pharmacy. A real prescription is written by a doctor in a visit or a telemedicine consultation.",
+      "link": "Renewals and refills: the full document",
+      "skipped": "Does not get this far",
+      "scenarios": [
+        {
+          "id": "ready",
+          "label": "Everything stable",
+          "stops": [
+            { "ws": "patient", "who": "Patient", "what": "Picks the medicine, confirms how it is taken, answers the safety questions, adds recent blood pressure and glucose, reads the consent and sends it." },
+            { "ws": "program", "who": "Rule engine", "what": "No rule fires, so the request joins the ordinary queue. The code ends here; it has no way to approve." },
+            { "ws": "clinic", "who": "Doctor", "what": "Reads the answers and readings and decides for each medicine: renew as prescribed, decline, ask for a visit, or ask for more." },
+            { "ws": "pharmacy", "who": "Pharmacist", "what": "Checks identity, allergies, interactions and quantity. All four must pass before it can be marked collected; otherwise it goes back or a question goes to the doctor." },
+            { "ws": "patient", "who": "Patient", "what": "Sees at every point where the request is and who it is waiting for, then collects the medicine." }
+          ]
+        },
+        {
+          "id": "review",
+          "label": "Blood test missing",
+          "stops": [
+            { "ws": "patient", "who": "Patient", "what": "Answers “not sure” to the date of the last blood test, answers the rest, and sends it." },
+            { "ws": "program", "who": "Rule engine", "what": "Marks it for the doctor’s attention and lists the missing item with the rule it comes from." },
+            { "ws": "clinic", "who": "Doctor", "what": "Asks for the date. The request goes back to the patient with every earlier answer still there." },
+            { "ws": "patient", "who": "Patient", "what": "Adds the date and sends it again. The request returns to review." },
+            { "ws": "clinic", "who": "Doctor", "what": "Decides with the new information. A different dose or drug needs a visit; it cannot be changed in the system." }
+          ]
+        },
+        {
+          "id": "urgent",
+          "label": "Chest pain now",
+          "stops": [
+            { "ws": "patient", "who": "Patient", "what": "Answers in the safety questions that there is chest pain and breathlessness right now." },
+            { "ws": "program", "who": "Rule engine", "what": "Stops. The screen shows 119 and fixed instructions, and an urgent ticket is opened outside the ordinary queue." },
+            { "ws": "clinic", "who": "Doctor", "what": "The ticket sits at the top of the list. Nobody is on duty here, so please call 119 yourself." },
+            { "ws": "pharmacy", "who": "Pharmacist", "what": "Does not get this far.", "skip": true }
+          ]
+        },
+        {
+          "id": "excluded",
+          "label": "Sleeping pill",
+          "stops": [
+            { "ws": "patient", "who": "Patient", "what": "Picks a sleeping pill that is a controlled drug." },
+            { "ws": "program", "who": "Rule engine", "what": "Controlled drugs are not accepted online. The item cannot be sent, and the screen says why." },
+            { "ws": "clinic", "who": "Doctor", "what": "See the doctor in person.", "offline": true },
+            { "ws": "pharmacy", "who": "Pharmacist", "what": "Does not get this far.", "skip": true }
+          ]
+        }
+      ]
+    },
+    "who": {
+      "title": "Three people, three workspaces",
+      "patient": {
+        "title": "For patients",
+        "body": "You answer at home instead of fitting everything into the visit, and you can edit any field before sending. The AI starts from the history, medicines and allergies in your record and asks whether they are still right, rather than starting over.",
+        "body2": "Refill dates, where a request is, and who has looked at your data are in one place. If you want a person, “ask the doctor to contact me” is in every conversation.",
+        "cta": "Try it as a demo patient"
+      },
+      "physician": {
+        "title": "For doctors",
+        "body": "Before the patient walks in you see the history in order and the patient’s own readings, and every line opens the words it came from. Fields that were not asked are listed so you can ask them.",
+        "body2": "Assessment, plan and the note to the patient are yours; nothing is filled in for you. Every renewal is reviewed one by one. Dose and drug cannot be changed here; if they need to change, ask for a visit.",
+        "cta": "See the review desk"
+      },
+      "pharmacist": {
+        "title": "For pharmacists",
+        "body": "Refills and renewals approved by a doctor come into one queue, each marked with its origin. You see medicines, allergies and the request itself, not the interview.",
+        "body2": "Identity, allergies, interactions and quantity must all be ticked before anything can be marked collected. If in doubt, send it back with a reason or ask the doctor.",
+        "cta": "See the dispensing checks"
+      }
+    },
+    "limits": {
+      "title": "What it does not do",
+      "items": [
+        { "t": "It does not diagnose or name an illness.", "d": "Ask “is it pneumonia?” and it is noted as a question for your doctor." },
+        { "t": "It does not prescribe, give doses, or suggest stopping or changing a medicine.", "d": "Please ask your doctor or pharmacist." },
+        { "t": "It approves nothing by itself.", "d": "There is no such function in the code and no such button on the screen." },
+        { "t": "It does not replace 119.", "d": "Nobody is watching around the clock." },
+        { "t": "It is not for real data.", "d": "Text sent to the model uses a free tier, and the provider’s terms say it may be used to improve products." },
+        { "t": "It is not connected to the National Health Insurance records or to any hospital.", "d": "It knows what the patient typed and the demo data, and nothing else." }
+      ],
+      "link": "Intended use, in full"
+    },
+    "trust": {
+      "title": "Numbers you can check",
+      "body": "The server answers with these when you open the page. Each row says where to check it and what it does not show.",
+      "readAt": "Read at {{time}}",
+      "loading": "Reading",
+      "unavailable": "Not available now",
+      "failed": "The server cannot be reached, so the numbers are left out. The documents can still be read.",
+      "caption": "Current numbers, sources and limits",
+      "rows": {
+        "eval": {
+          "claim": "Latest evaluation: {{passed}} of {{total}} cases passed, {{date}}, model {{model}}.",
+          "evidence": "Evaluation and evidence",
+          "limits": "The author wrote the cases and no real patients took part. A full pass only means these cases did not go wrong."
+        },
+        "redFlags": {
+          "claim": "{{n}} red-flag rules; every message is checked before the model sees it.",
+          "evidence": "Clinical safety",
+          "limits": "They only know the wordings written into them. Typos, Taiwanese, or a symptom split over two messages are missed."
+        },
+        "formulary": {
+          "claim": "Medicines: {{a}} can be requested online, {{b}} need a doctor’s own assessment, {{c}} are not accepted.",
+          "evidence": "Renewals and refills",
+          "limits": "The author wrote the list. No doctor or pharmacist has approved it."
+        },
+        "oversight": {
+          "claim": "Oversight phase {{phase}}: a doctor reviews every renewal request.",
+          "evidence": "Human oversight",
+          "limits": "The doctors in the demonstration are demo accounts. Nobody is on duty."
+        },
+        "retention": {
+          "claim": "Interviews are deleted after {{n}} days without activity.",
+          "evidence": "Privacy and data",
+          "limits": "Backups, and text already sent to the model provider, cannot be deleted this way."
+        }
+      }
+    },
+    "emergency": {
+      "title": "If you feel unwell right now, do not use this site",
+      "body": "Chest pain, trouble breathing, weakness on one side, heavy bleeding, cannot be woken: call 119 in Taiwan. If you might hurt yourself, call 1925, answered day and night.",
+      "link": "What to do before and after the call"
+    }
+  },
+  "service": {
+    "title": "From the night before to the medicine in hand",
+    "lede": "The five situations below follow one fictional patient, Hsiu-Chin Lin. Each says what she does, what the system does, and where it stops and a person takes over.",
+    "toc": "Five situations",
+    "stopsAt": "Where the system stops",
+    "previsit": {
+      "when": "The night before",
+      "title": "Say it before the visit",
+      "p1": "Mrs Lin has an appointment in the morning. She opens the page; the AI asks one question at a time. Her record already lists high blood pressure, diabetes, high cholesterol and a penicillin allergy, so the AI only asks whether they are still right.",
+      "p2": "At the end it reads the summary back. It is saved only after she says it is right, and she can correct any field before sending. Next morning, every line on the doctor’s screen opens her own words.",
+      "stop": "She asks whether her blood pressure medicine is too strong. The AI does not answer; it notes a question for the doctor.",
+      "chat": [
+        { "who": "ai", "t": "Your record lists high blood pressure, diabetes and high cholesterol, and a penicillin allergy. Is that still right?" },
+        { "who": "patient", "t": "Yes, and I take the medicines as usual. Is the blood pressure one too strong?" },
+        { "who": "refusal", "t": "That is for your doctor to judge, so I cannot answer it. I have noted it as a question for your doctor; it will be in the summary." }
+      ]
+    },
+    "refill": {
+      "when": "A few days of medicine left",
+      "title": "The second fill: which day?",
+      "p1": "Each refillable prescription is drawn as three cells. A stamp is a fill already collected, the vertical line is today. Whether she can collect is worked out by code from the prescription dates, without AI.",
+      "p2": "When she can, she picks a pharmacy and a time. The pharmacist checks and prepares it and she collects it; every step shows on the request.",
+      "stop": "If a controlled drug is involved, symptoms changed, or she suspects a side effect, the code gives no date and sends her to a pharmacist or doctor."
+    },
+    "renewal": {
+      "when": "All three fills used",
+      "title": "Asking the doctor about a renewal",
+      "p1": "Another prescription is finished. She picks the medicine, confirms how she takes it, answers the safety questions, adds recent blood pressure and glucose, reads the consent and sends it. If she closes the page halfway, the answers are kept and she can go on from her phone.",
+      "p2": "The rule engine gives each medicine one of five results. They only change what the doctor sees first. Then the doctor decides, item by item.",
+      "stop": "The code does not approve. After the doctor agrees, the prescription itself is still written in a visit or a telemedicine consultation.",
+      "table": "The five results of the rule engine",
+      "head": ["Result", "When", "What happens next"],
+      "rows": [
+        ["Complete", "No rule fired", "Ordinary queue; a doctor decides"],
+        ["For the doctor’s attention", "One answer needs a look, or a reading is out of date", "Ordinary queue, with the reasons listed"],
+        ["Visit advised", "Pregnancy, a recent hospital stay, changed symptoms", "The doctor decides whether to ask for a visit"],
+        ["Urgent", "Dangerous symptoms right now", "119 on screen, urgent ticket"],
+        ["Not accepted online", "Controlled drugs, injections and others", "Cannot be sent; the reason is shown"]
+      ]
+    },
+    "redflag": {
+      "when": "She mentions chest pain",
+      "title": "Rules come before AI, and they stop everything",
+      "p1": "Every message goes through the red-flag rules before the AI. On a match the AI is not called at all: the screen shows fixed text and phone numbers, and an urgent ticket opens in the doctors’ workspace.",
+      "p2": "This step runs first in the middle of an interview, after sending, and while a person has taken over.",
+      "stop": "The system does not make the call. She, or someone with her, has to dial 119.",
+      "chat": [
+        { "who": "patient", "t": "Sudden strong chest pain, cold sweat" },
+        { "who": "redflag", "t": "What you describe may need care right away. Call 119 now, or ask someone near you to call." }
+      ]
+    },
+    "handover": {
+      "when": "She wants a person",
+      "title": "The person has a name, and the AI steps back",
+      "p1": "She presses “ask the doctor to contact me”. Once a care coordinator takes over, the AI stops replying and the person continues in the same conversation, with name and title on every message.",
+      "p2": "When it is settled they can close it or hand the conversation back to the AI.",
+      "stop": "Nobody is on duty here. If it is urgent, do not wait for a reply; make the call.",
+      "staffName": "Ya-Wen Hsu",
+      "staffTitle": "Care coordinator",
+      "chat": [
+        { "who": "patient", "t": "I stopped the medicine for a few days. How should I take it now?" },
+        { "who": "refusal", "t": "How to take it is for a doctor or pharmacist to say. I have told the care team." },
+        { "who": "notice", "t": "Ya-Wen Hsu, care coordinator, has taken over. The AI is paused." },
+        { "who": "staff", "t": "Hello Mrs Lin, this is Ya-Wen, the care coordinator. I am asking the doctor to look at your medicines. How many days do you have left?" }
+      ]
+    },
+    "end": { "title": "Walk through it yourself", "body": "Pick a demo patient; all five situations can be tried." }
+  },
+  "clinicians": {
+    "title": "For doctors, pharmacists and care coordinators",
+    "lede": "The system does one job: put what the patient said in order and bring it to the person who should read it. Judgement, signature and dispensing stay with you.",
+    "desk": {
+      "title": "Review desk",
+      "p1": "On the left, the patient’s record, medicines and earlier visits. In the middle, the subjective (S) the AI put in order and the patient’s own readings (O). On the right, your writing. Every line in the middle opens the original words and can be edited; an edited line keeps who changed it and what it said before.",
+      "p2": "Assessment (A), plan (P) and the note to the patient start empty. The system suggests nothing and offers no differential. Drafts save with versions; signing locks the note, and corrections go in as addenda. The patient sees your note only after you sign.",
+      "figure": "Excerpt of the review desk, fictional data",
+      "sTitle": "Subjective (S), ordered by AI from the interview",
+      "oTitle": "Objective (O), reported by the patient",
+      "apTitle": "Assessment and plan",
+      "author": "Dr Po-Yu Chen",
+      "a": "Assessment",
+      "p": "Plan",
+      "blank": "Written by the doctor",
+      "jumped": "In the patient’s words",
+      "pick": "Press a time to see what the patient actually wrote.",
+      "lines": [
+        { "at": "08:21", "t": "Dizzy on getting up in the morning for about two weeks.", "q": "I am here for my regular follow-up, and I have felt a little dizzy on getting up for about two weeks" },
+        { "at": "08:23", "t": "Only on getting up, passes after sitting; no falls, no nausea; severity 2.", "q": "It goes away after I sit for a moment. No falls, no nausea. About 2 out of 10" },
+        { "at": "08:24", "t": "History and allergies as recorded; takes medicines regularly.", "q": "Yes, the same, and I take the medicines as usual" }
+      ],
+      "missing": "What makes it worse: not asked yet",
+      "o": [
+        { "label": "Blood pressure, morning", "value": "133/79", "unit": "mmHg" },
+        { "label": "Glucose, fasting", "value": "129", "unit": "mg/dL" }
+      ]
+    },
+    "queue": {
+      "title": "What comes first",
+      "p1": "The worklist is ordered by urgency and due time, not by a model’s opinion. Urgent has one source: a red-flag rule, or a dangerous symptom answered in a renewal. The model cannot open an urgent ticket.",
+      "rows": [
+        ["Urgent", "A red flag, or a dangerous symptom right now in a renewal", "On top, with its own red count"],
+        ["Overdue", "Past the set handling time without a decision", "Marked; can be reassigned"],
+        ["Today’s clinic", "Appointment today, previsit sent", "By appointment time"],
+        ["To review", "Previsits and renewals that were sent", "By time sent"],
+        ["Waiting for patient", "More information was requested", "Returns to review when the patient replies"]
+      ],
+      "head": ["List", "How it gets there", "Order and marking"],
+      "caption": "How the worklist is sorted"
+    },
+    "renewal": {
+      "title": "Renewal review",
+      "p1": "Each request shows the engine’s result, which rules fired and where they come from, the patient’s answers and the trend of readings. Each medicine is decided on its own: renew, decline, visit required, or ask for more.",
+      "p2": "Dose and drug cannot be changed here. If they need to change, choose “visit required”. Agreement between your decisions and the engine is shown on the oversight page, by drug class."
+    },
+    "phase": {
+      "title": "Oversight phase",
+      "p1": "This is phase {{phase}}: a doctor reviews every renewal request. No button raises the phase, and no code approves automatically.",
+      "p2": "Phases two and three exist only as conditions: 250 doctor decisions per drug class, agreement above a threshold published beforehand, ethics review and the regulator’s consent, and an institution and a named doctor who carry responsibility. Given what this project is, none of them is met.",
+      "link": "Human oversight, in full"
+    },
+    "coordinator": {
+      "title": "Care coordinators",
+      "p1": "Can assign, contact patients, take over conversations, manage tags and follow-up, and write internal notes. Cannot sign a note or decide a renewal."
+    },
+    "pharmacy": {
+      "title": "Pharmacists",
+      "p1": "The queue holds two kinds of case: refills of an existing prescription, and renewals a doctor approved. Each is marked with its origin. You see medicines, allergies and the request; not the interview or the doctor’s note.",
+      "p2": "“Complete” works only when all four checks are ticked. If one is in doubt, send it back with a reason or ask the doctor. Try leaving one out.",
+      "figure": "Excerpt of the dispensing check, fictional data",
+      "sheet": "Dispensing sheet",
+      "no": "RX-20261125-0001",
+      "items": [
+        { "label": "Name", "value": "Hsiu-Chin Lin" },
+        { "label": "Medicine", "value": "Losartan" },
+        { "label": "Directions", "value": "50 mg, one tablet once a day after breakfast" },
+        { "label": "Fill", "value": "Fill 2 of the prescription, 28 days" }
+      ],
+      "checkTitle": "Four checks",
+      "checks": [
+        { "id": "identity", "label": "Identity", "hint": "Name matches the card" },
+        { "id": "allergy", "label": "Allergies", "hint": "Penicillin: unrelated to this medicine" },
+        { "id": "interaction", "label": "Interactions", "hint": "Against current medicines" },
+        { "id": "quantity", "label": "Quantity and days", "hint": "28 days" }
+      ],
+      "dispense": "Complete",
+      "left_one": "{{count}} check left",
+      "left_other": "{{count}} checks left",
+      "done": "All four are checked; it can be completed."
+    },
+    "log": {
+      "title": "Reading leaves a record",
+      "p1": "Every time you open a patient’s data, the time, your name and role, and what you viewed are written down. If that cannot be written, the data is not shown. The patient can see it on their privacy page."
+    },
+    "missing": {
+      "title": "What is not here",
+      "items": ["No connection to national medication records or a hospital system; medicines come from the patient and the demo data.", "No image or lab report upload, and no physical examination.", "No diagnostic or drug suggestions, and no interaction database.", "No protocol approved by a doctor or pharmacist. The rule file says so itself.", "No workload limit, and nothing that notices a review done too fast. This is listed as a known gap."]
+    },
+    "enter": {
+      "title": "See the real screens",
+      "p1": "The author gives out the passwords of the demo doctor, pharmacist, coordinator and administrator accounts. Without one, start with a demo patient."
+    },
+    "toc": { "desk": "Review desk", "queue": "What comes first", "renewal": "Renewal review", "phase": "Oversight phase", "coordinator": "Care coordinators", "pharmacy": "Pharmacists", "log": "Access records", "missing": "What is not here" }
+  },
+  "trust": {
+    "title": "Trust centre",
+    "lede": "Twelve documents on how this system works, where it can go wrong, and who is responsible when it does. What has not been done is written down too.",
+    "setMeta": { "version": "Document version", "effective": "Effective", "next": "Next review", "count": "Documents", "countValue": "{{count}}" },
+    "reviewNote": "No external clinical review has taken place. No doctor, pharmacist or organisation endorses these documents.",
+    "listTitle": "All documents",
+    "startTitle": "Start with the weak points",
+    "start": [
+      { "to": "/trust/clinical-safety#s3", "t": "Sentences known to be missed", "d": "Wordings the red-flag rules do not recognise." },
+      { "to": "/trust/clinical-safety#s6", "t": "Hazard log", "d": "Possible harms, controls and residual risk, one by one." },
+      { "to": "/trust/security#s8", "t": "Known security gaps", "d": "What has not been closed yet." },
+      { "to": "/trust/evaluation#s3", "t": "What the numbers cannot show", "d": "Why a full pass is not the same as safe." }
+    ],
+    "factsTitle": "Numbers right now",
+    "search": {
+      "label": "Search all documents",
+      "placeholder": "Search all documents, e.g. red flag, retention, C-12",
+      "results": "{{count}} sections mention “{{q}}”",
+      "none": "No document mentions “{{q}}”",
+      "noneBody": "Try another wording, or use the list of documents below.",
+      "loading": "Reading the documents",
+      "more": "Show {{count}} more"
+    },
+    "doc": {
+      "breadcrumb": "Trust centre",
+      "version": "Version",
+      "effective": "Effective",
+      "owner": "Owner",
+      "reviewer": "Reviewed by",
+      "next": "Next review",
+      "language": "Language",
+      "switchTo": "中文版",
+      "print": "Print this document",
+      "live": "Underlined numbers are filled in by the server, read at {{time}}.",
+      "liveLoading": "Underlined numbers are being read from the server.",
+      "liveFailed": "The server’s live numbers cannot be read now; they show as “unavailable”.",
+      "liveTitle": "Live number from the server",
+      "factMissing": "unavailable",
+      "refs": "References cited here",
+      "refsNote": "Numbers are the same as in References and changelog.",
+      "citedBy": "Cited by:",
+      "prev": "Previous",
+      "next_": "Next",
+      "all": "All documents",
+      "nav": "Between documents",
+      "table": "Table: {{title}}",
+      "code": "Commands",
+      "printedFrom": "Printed from {{url}}, {{date}}",
+      "loadFailed": "The document did not load"
+    }
+  },
+  "handbook": {
+    "title": "Health handbook",
+    "lede": "How to prepare for a visit, what cannot wait, and when to see a doctor. Every section names its source and the date it was checked; if the handbook has no answer, the AI says so.",
+    "note": "It contains no doses, diagnoses or treatment instructions.",
+    "chineseOnly": "The handbook exists in Traditional Chinese only. The text below is shown as it is.",
+    "search": "Search the handbook",
+    "placeholder": "In Chinese, e.g. 頭痛, 血壓",
+    "results": "{{count}} sections for “{{q}}”",
+    "none": "The handbook has nothing on “{{q}}”",
+    "noneBody": "Try another word in Chinese, or use the chapters below. If you feel unwell, see a doctor.",
+    "source": "Source",
+    "verified": "Checked on",
+    "sourceType": { "official": "Government", "authority": "Hospital", "project": "Project note" },
+    "openSource": "Open the original",
+    "urgentTitle": "These are warning signs",
+    "urgentBody": "If this is happening now, stop reading and call 119.",
+    "prev": "Previous section",
+    "next": "Next section",
+    "back": "All chapters",
+    "related": "Same chapter",
+    "notFoundTitle": "No such section",
+    "notFoundBody": "The number may have changed; look in the chapters.",
+    "see": "See {{section}}"
+  },
+  "emergency": {
+    "title": "In an emergency",
+    "lede": "Call first, then do the rest. This site does not call an ambulance for you, and nobody is waiting behind it. The numbers below work in Taiwan.",
+    "medicalTitle": "A medical emergency",
+    "crisisTitle": "Thinking of hurting yourself, or someone near you is",
+    "crisisBody": "1925 is free and answered day and night, all year. Lifeline 1995 and Teacher Chang 1980 can also be called; their hours are announced by each organisation. If someone is hurt or in danger now, call 119.",
+    "whenTitle": "Call 119 or go to an emergency department for",
+    "when": [
+      { "t": "Chest pain or tightness with cold sweat or breathlessness", "s": "2.1" },
+      { "t": "Face drooping, weakness on one side, slurred speech", "s": "2.2" },
+      { "t": "Trouble breathing, blue lips or nails", "s": "2.3" },
+      { "t": "Tight throat, swollen face, rash and breathlessness after food or medicine", "s": "2.4" },
+      { "t": "Vomiting blood, or black stool with dizziness and cold sweat", "s": "2.5" },
+      { "t": "Sudden severe headache, confusion, cannot be woken", "s": "2.6" }
+    ],
+    "whenNote": "From chapter 2 of the handbook (in Chinese), where every section names a government or hospital source. If something is not listed, that does not mean it can wait; if you are worried, call.",
+    "sayTitle": "When they answer",
+    "say": ["Say where first: address, crossing, floor or a landmark.", "Say what happened, since when, and whether the person is awake.", "Mention long-term illnesses, current medicines and allergies.", "Stay on the line and follow the instructions.", "Send someone to the door; take the health card and medicine bags along."],
+    "siteTitle": "What this site does",
+    "site": ["If a warning sign is mentioned in any conversation, the rules stop the interview and show fixed text and phone numbers, without calling the AI.", "An urgent ticket opens in the demo doctors’ workspace. Nobody gets a phone call.", "Red-flag checks keep working when the AI is off or its quota is used up."],
+    "link": "How red flags are checked, and what they miss"
+  },
+  "credits": {
+    "title": "Photos and licences",
+    "lede": "Every photograph on this site is a real photograph. None is AI-generated, and recognisable faces are avoided. The people, things and places in them have no connection with this service.",
+    "photosTitle": "Photographs",
+    "license": "Licence",
+    "checked": "Checked {{date}}",
+    "view": "Original",
+    "softwareTitle": "Typefaces and icons",
+    "software": [
+      { "name": "Noto Sans TC, Noto Serif TC", "by": "Google and Adobe", "license": "SIL Open Font License 1.1", "url": "https://fonts.google.com/noto" },
+      { "name": "Tabler Icons", "by": "Paweł Kuna and contributors", "license": "MIT License", "url": "https://tabler.io/icons" }
+    ],
+    "contentTitle": "Sources of the text",
+    "contentBody": "Every section of the handbook and every document of the trust centre lists its own sources.",
+    "handbook": "Health handbook",
+    "references": "References"
+  },
+  "login": {
+    "title": "Sign in",
+    "lede": "Patients, doctors, pharmacists, care coordinators and administrators all sign in here and land in their own workspace.",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in",
+    "expired": "Your session has ended. Sign in again and you will return to where you were.",
+    "next": "After signing in you will return to the page you asked for.",
+    "failed": "Wrong username or password. Check upper and lower case; the eye icon shows the password.",
+    "wrongWorkspace": "That page belongs to another workspace, so you are in your own.",
+    "demoTitle": "Demo accounts",
+    "demoBody": "Press one to fill in the username. Passwords are not on this site; the presenter gives them out.",
+    "demo": [
+      { "u": "patient_demo", "name": "Hsiu-Chin Lin", "role": "Patient" },
+      { "u": "dr_demo", "name": "Po-Yu Chen", "role": "Doctor" },
+      { "u": "rph_demo", "name": "Szu-Ying Wu", "role": "Pharmacist" },
+      { "u": "cm_demo", "name": "Ya-Wen Hsu", "role": "Care coordinator" }
+    ],
+    "useAccount": "Use {{u}}, {{name}}, {{role}}",
+    "filled": "{{u}} is filled in. Enter the password.",
+    "noPassword": "No password? You can try it without an account.",
+    "noAccount": "No account yet?",
+    "register": "Create a patient account",
+    "signedInTitle": "You are signed in",
+    "signedIn": "You are {{name}} ({{role}}).",
+    "enter": "Go to my workspace",
+    "signOut": "Sign out and use another account"
+  },
+  "register": {
+    "title": "Create a patient account",
+    "lede": "A username, a password and a nickname are enough. Please do not use your real name or enter real medical records.",
+    "displayName": "Nickname",
+    "displayNameHint": "The care team sees this name. Make one up.",
+    "username": "Username",
+    "usernameHint": "3 to 32 characters: letters, digits and . _ -",
+    "password": "Password",
+    "passwordHint": "At least 8 characters. Do not reuse a password from elsewhere.",
+    "adult": "I am 18 or older",
+    "adultHint": "The model provider’s terms require it.",
+    "adultError": "You have to be 18 or older to register. Please confirm.",
+    "fictional": "I will enter fictional data only",
+    "fictionalHint": "Text sent to the AI uses a free tier; the provider may read it and use it to improve products.",
+    "fictionalError": "This is a demonstration and not for real records. Please confirm.",
+    "submit": "Register and sign in",
+    "have": "Already have an account?",
+    "login": "Sign in",
+    "guest": "Just looking? You can try it without registering.",
+    "nextTitle": "After registering",
+    "next": ["You go straight to the patient workspace with an empty record.", "Interviews are deleted after {{days}} days without activity.", "You can export your data or delete the account at any time.", "Administrators see your username and status, not your password."],
+    "nextNoDays": "Interviews are deleted when the retention period is over."
+  },
+  "try": {
+    "title": "Pick a demo patient",
+    "lede": "No registration. For a while you are one of these fictional patients; the record, medicines and prescriptions are already filled in.",
+    "choose": "Pick one",
+    "age": "aged {{band}}",
+    "takes": "Medicines",
+    "canTry": "Things to try",
+    "persona": {
+      "lin": {
+        "takes": "Losartan, metformin, atorvastatin",
+        "things": ["Collect the second losartan fill: the window is open", "Ask to renew metformin: all three fills are used", "Interview: describe morning dizziness and see the summary"]
+      },
+      "chang": {
+        "takes": "Budesonide/formoterol inhaler, cetirizine, montelukast",
+        "things": ["Collect the second inhaler fill", "The antihistamine ran out two days ago: see the reminder", "Interview: a cough and blocked nose as the season changes"]
+      },
+      "wu": {
+        "takes": "Amlodipine, rosuvastatin, tamsulosin, zolpidem",
+        "things": ["Request the sleeping pill: see why a controlled drug is refused", "Ask to renew rosuvastatin", "Collect the third amlodipine fill"]
+      },
+      "other": { "takes": "See the health record", "things": ["Previsit interview", "Refill dates", "Renewal request"] }
+    },
+    "isolationTitle": "This data belongs to this browser",
+    "isolation": ["Other visitors cannot see your session, and you cannot see theirs.", "The demo doctor and pharmacist accounts can see interviews and requests you send; that is how the process can be completed.", "The sandbox is deleted after {{days}} days. To keep it, set a username and password in the patient workspace.", "On a shared computer choose “end trial” before leaving, or the next person can see it."],
+    "isolationNoDays": "The sandbox is deleted when it expires. To keep it, set a username and password in the patient workspace.",
+    "adult": "I am 18 or older",
+    "adultHint": "The model provider’s terms require it.",
+    "adultError": "You have to be 18 or older to try it. Please confirm.",
+    "agree": "Do not enter real medical records or personal data. Text sent to the AI uses a free tier; the provider may read it and use it to improve products.",
+    "privacy": "Privacy and data",
+    "submit": "Start as {{name}}",
+    "submitNone": "Pick a patient first",
+    "personasFailed": "The demo patients did not load",
+    "already": "You are trying it as {{name}}.",
+    "alreadyAccount": "You are signed in as {{name}} ({{role}}). Starting a trial signs that account out first.",
+    "continue": "Back to the current trial",
+    "replace": "A new trial replaces the current sandbox; what is in it can no longer be opened.",
+    "claimHint": "To keep it, set a username and password in the patient workspace first."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The link may have changed or the address has a typo. These pages are often looked for.",
+    "path": "Address: {{path}}"
+  }
+}

@@ -4,30 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
     <meta name="color-scheme" content="light dark" />
-    <!-- Matches the header surface (--color-surface) so the status bar and header read as one bar. -->
-    <meta name="theme-color" content="#fffdf9" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#1a201f" media="(prefers-color-scheme: dark)" />
+    <!-- Same values as --surface in src/styles/tokens.css: the status bar continues the page header. -->
+    <meta name="theme-color" content="#fdfefd" />
+    <meta name="format-detection" content="telephone=no" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <!-- Replaced with the translated title once the language file is applied (src/i18n). -->
+    <link rel="apple-touch-icon" href="/icon-180.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <!-- Replaced with the translated title once the language files are applied (src/i18n). -->
     <title>PreVisit Desk</title>
     <script>
-      // Apply the saved theme before first paint to avoid a flash.
-      try {
-        var t = localStorage.getItem("pv-theme");
-        if (t === "light" || t === "dark") {
-          document.documentElement.dataset.theme = t;
-          // Same colours as --color-surface in tokens.css, so the bar matches before the CSS is read.
-          var metas = document.querySelectorAll('meta[name="theme-color"]');
-          for (var i = 0; i < metas.length; i++) {
-            metas[i].removeAttribute("media");
-            metas[i].setAttribute("content", t === "dark" ? "#1a201f" : "#fffdf9");
-          }
-        }
-      } catch (e) {}
+      // Resolve theme and text size before first paint. The server hashes this script for the CSP.
+      (function () {
+        var d = document.documentElement, t = null, s = null;
+        try {
+          t = localStorage.getItem("pv-theme");
+          s = localStorage.getItem("pv-text");
+        } catch (e) {}
+        if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        d.dataset.theme = t;
+        if (s === "112" || s === "125") d.dataset.text = s;
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m && t === "dark") m.setAttribute("content", "#161c18");
+      })();
     </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/app/main.tsx"></script>
   </body>
 </html>

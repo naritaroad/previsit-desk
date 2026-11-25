@@ -1,0 +1,75 @@
+/* Two small sheets a pharmacy prints: the medicine-bag label and the pick-up slip. The preview and the printed sheet
+   are the same markup; while printing, everything else on the page is hidden. Both always say 示範. */
+.slip {
+  position: relative;
+  width: 100%;
+  max-width: 25rem;
+  margin-inline: auto;
+  border: 2px solid #111;
+  background: #fff;
+  color: #111;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+.slip-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 2px solid #111;
+  font-weight: 700;
+}
+.slip-head b {
+  padding-inline: 0.4rem;
+  border: 2px solid #111;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+.slip-big {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #111;
+}
+.slip-big strong {
+  display: block;
+  font-size: 1.375rem;
+  line-height: 1.4;
+}
+.slip dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+.slip dt,
+.slip dd {
+  padding: 0.3rem 0.75rem;
+  border-bottom: 1px solid #999;
+  overflow-wrap: anywhere;
+}
+.slip dt {
+  border-inline-end: 1px solid #999;
+  font-size: 0.875rem;
+  color: #333;
+}
+.slip-foot {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+.slip + .slip {
+  margin-top: 1rem;
+}
+.print-sheet {
+  display: none;
+}
+@media print {
+  body:has(> .print-sheet) > :not(.print-sheet) {
+    display: none !important;
+  }
+  body > .print-sheet {
+    display: block;
+  }
+  .print-sheet .slip {
+    max-width: 100mm;
+    margin: 0 0 8mm;
+    break-inside: avoid;
+  }
+}

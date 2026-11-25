@@ -1,0 +1,250 @@
+{
+  "action": {
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "close": "Close",
+    "loadMore": "Load more",
+    "nextPage": "Next page",
+    "open": "View",
+    "prevPage": "Previous page",
+    "resend": "Send again",
+    "retry": "Try again",
+    "search": "Search"
+  },
+  "field": {
+    "choose": "Choose",
+    "decrease": "Decrease",
+    "hidePassword": "Hide password",
+    "increase": "Increase",
+    "optional": "optional",
+    "required": "required",
+    "showPassword": "Show password"
+  },
+  "state": {
+    "empty": "Nothing here yet",
+    "loading": "Loading",
+    "noMatch": "No matches"
+  },
+  "error": {
+    "loadBody": "The network may be unstable or the server did not answer. What you filled in is still here.",
+    "loadTitle": "This did not load"
+  },
+  "save": {
+    "conflict": "Conflicting edits",
+    "error": "Not saved",
+    "offline": "Offline, kept on this device",
+    "resolve": "See differences",
+    "saved": "Saved",
+    "savedAt": "Saved {{time}}",
+    "saving": "Saving"
+  },
+  "filter": {
+    "clearAll": "Clear all filters",
+    "remove": "Remove filter: {{name}}"
+  },
+  "table": {
+    "count": "Showing {{shown}} of {{total}}",
+    "selectAll": "Select all",
+    "selectRow": "Select this row"
+  },
+  "list": {
+    "sentenceSep": ". ",
+    "sep": ", ",
+    "noValue": "No data"
+  },
+  "step": {
+    "current": " (current step)",
+    "done": " (done)",
+    "error": " (needs fixing)",
+    "todo": " (not started)"
+  },
+  "presence": {
+    "editing": "{{names}} is editing",
+    "viewing": "{{names}} also has this open"
+  },
+  "a11y": {
+    "pagination": "Pagination",
+    "panes": "Panes",
+    "resize": "Resize {{name}}",
+    "toasts": "Messages"
+  },
+  "command": {
+    "placeholder": "Type a name or number",
+    "title": "Quick search"
+  },
+  "notif": {
+    "all": "See all notifications",
+    "bellUnread_one": "Notifications, {{count}} unread",
+    "bellUnread_other": "Notifications, {{count}} unread",
+    "emptyBody": "Request updates, visit reminders and replies from the care team appear here.",
+    "emptyTitle": "No notifications",
+    "readAll": "Mark all as read",
+    "title": "Notifications",
+    "unread": "Unread: "
+  },
+  "photo": {
+    "credit": "Photo:",
+    "via": " ({{source}})"
+  },
+  "doc": {
+    "backToText": "Back to the text at note {{n}}",
+    "claim": "Claim",
+    "contents": "Contents",
+    "evidence": "Evidence",
+    "footnote": "Note {{n}}",
+    "footnotes": "Notes and references",
+    "limits": "Limits",
+    "linkTo": "Link to this section",
+    "meta": "Document information",
+    "no": "No."
+  },
+  "emergency": {
+    "body": "With chest pain, trouble breathing, confusion, weakness on one side or heavy bleeding, do not wait for this site. Call 119 or go to the nearest emergency department now.",
+    "button": "Emergency help",
+    "call119": "Ambulance",
+    "call1925": "Crisis line",
+    "crisisBody": "You do not have to carry this alone. The 1925 line answers 24 hours a day. If you are hurt or in immediate danger, call 119.",
+    "crisisTitle": "Please talk to someone now",
+    "label": "Emergency help",
+    "sheetNote": "This site does not alert an ambulance or the clinic by itself. You or someone with you has to make the call.",
+    "sheetTitle": "Emergency help",
+    "title": "Get medical help now"
+  },
+  "chat": {
+    "assistant": "Pre-visit assistant (AI)",
+    "count": "{{count}} of {{max}} characters",
+    "draft": {
+      "offline": "Draft on this device",
+      "saved": "Draft saved",
+      "saving": "Saving draft"
+    },
+    "failed": "Not sent.",
+    "interrupted": "This reply did not finish.",
+    "jump": "Newest messages",
+    "offline": "Offline, you can keep writing",
+    "openingLabel": "Before you start",
+    "queued": "Sends when you are back online",
+    "queuedCount_one": "{{count}} message waiting to send",
+    "queuedCount_other": "{{count}} messages waiting to send",
+    "refusalLabel": "This needs a clinician",
+    "send": "Send",
+    "sendLater": "Queue to send",
+    "sending": "Sending",
+    "stop": "Stop reply",
+    "thinking": "Reading your answer",
+    "you": "You said: "
+  },
+  "merge": {
+    "allMine": "Use all of mine",
+    "allTheirs": "Use all of theirs",
+    "blank": "(blank)",
+    "body": "This record was changed elsewhere while you were editing. Choose what to keep for each field; nothing is saved until you do.",
+    "later": "Not now",
+    "left_one": "{{count}} field left to choose",
+    "left_other": "{{count}} fields left to choose",
+    "mine": "What you have now",
+    "ready": "All chosen",
+    "save": "Save choices",
+    "title": "This record has two versions"
+  },
+  "measure": {
+    "diastolic": "Diastolic",
+    "empty": "No readings yet.",
+    "kind": {
+      "bp": "Blood pressure",
+      "glucose": "Blood glucose",
+      "lab": "Lab result",
+      "pulse": "Pulse",
+      "weight": "Weight"
+    },
+    "latest": "Latest {{date}}",
+    "systolic": "Systolic",
+    "unit": {
+      "bp": "mmHg",
+      "glucose": "mg/dL",
+      "lab": "value",
+      "pulse": "per min",
+      "weight": "kg"
+    },
+    "when": "Time"
+  },
+  "refill": {
+    "cellNext": "Next",
+    "cellOpen": "Collect now",
+    "dIssued": "Issued",
+    "dSupply": "Supply ends",
+    "expired": "This prescription has expired",
+    "finished": "All refills collected",
+    "inDays_one": "Collect in {{count}} day",
+    "inDays_other": "Collect in {{count}} days",
+    "late": "The collection window has passed",
+    "lateBody": "It was due by {{date}}. Ask the clinic what to do next.",
+    "noWindow": "No further refill",
+    "openNow": "You can collect now",
+    "openUntil_one": "Refill {{n}} until {{date}}, {{count}} day left",
+    "openUntil_other": "Refill {{n}} until {{date}}, {{count}} days left",
+    "spokenFill": "Refill {{n}} on {{date}} at {{pharmacy}}",
+    "spokenFills": "{{done}} of {{total}} collected",
+    "stamp": "FILLED",
+    "supplyTo": "Supply lasts until {{date}}",
+    "today": "Today {{date}}",
+    "validUntil": "Valid until {{date}}",
+    "windowIs": "Refill {{n}}: {{range}}",
+    "lValid": "Valid until",
+    "lWindow": "Collect"
+  },
+  "status": {
+    "account": {
+      "active": "Active",
+      "disabled": "Disabled"
+    },
+    "appointment": {
+      "booked": "Booked",
+      "cancelled": "Cancelled",
+      "checked_in": "Checked in",
+      "completed": "Seen"
+    },
+    "care": {
+      "active": "Followed",
+      "inactive": "Not followed",
+      "new": "New",
+      "watch": "Watch"
+    },
+    "note": {
+      "draft": "Draft",
+      "signed": "Signed"
+    },
+    "previsit": {
+      "active": "In progress",
+      "none": "Not started",
+      "red_flag": "Red flag",
+      "reviewed": "Reviewed",
+      "submitted": "To review"
+    },
+    "run": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "interrupted": "Interrupted",
+      "running": "Running",
+      "skipped": "Model not called"
+    },
+    "source": {
+      "clinic": "Clinic record",
+      "patient": "Self-reported",
+      "self_reported": "Self-reported"
+    },
+    "ticket": {
+      "open": "Open",
+      "resolved": "Resolved"
+    }
+  },
+  "review": {
+    "editedBy": "Edited by {{name}}, {{time}}",
+    "original": "AI wording",
+    "originalNote": "As the AI wrote it",
+    "restore": "Restore",
+    "editLine": "Edit this line",
+    "jump": "Go to what was said at {{time}}",
+    "signed": "Signed by {{name}} at {{time}}. Locked."
+  }
+}

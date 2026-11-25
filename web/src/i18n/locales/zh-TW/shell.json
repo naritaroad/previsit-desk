@@ -1,0 +1,276 @@
+{
+  "title": "{{page}}｜診前助理 PreVisit Desk",
+  "skip": "跳到主要內容",
+  "offline": "目前離線。可以繼續寫，恢復連線後會自動送出。",
+  "brand": {
+    "name": "診前助理",
+    "sub": "PreVisit Desk"
+  },
+  "ws": {
+    "public": "公開網站",
+    "patient": "病人站",
+    "clinic": "醫師站",
+    "pharmacy": "藥局站",
+    "admin": "管理站"
+  },
+  "role": {
+    "patient": "病人",
+    "guest": "試用中的示範病人",
+    "physician": "醫師",
+    "pharmacist": "藥師",
+    "coordinator": "個案管理師",
+    "admin": "管理員"
+  },
+  "nav": {
+    "main": "主選單",
+    "open": "開啟選單",
+    "collapse": "收合側欄",
+    "expand": "展開側欄",
+    "count": "{{count}} 件",
+    "unread": "未讀",
+    "path": "目前位置",
+    "urgent": "{{count}} 件緊急"
+  },
+  "menu": {
+    "account": "帳號選單：{{name}}",
+    "display": "語言、主題與字級",
+    "language": "語言",
+    "zh": "繁體中文",
+    "en": "English",
+    "theme": "主題",
+    "theme_system": "跟隨系統",
+    "theme_light": "淺色",
+    "theme_dark": "深色",
+    "text": "字級",
+    "text_100": "標準",
+    "text_112": "大",
+    "text_125": "特大",
+    "sessions": "帳號與登入裝置",
+    "public": "公開網站",
+    "signOut": "登出",
+    "leaveGuest": "結束試用",
+    "switchWorkspace": "切換站台",
+    "accountShort": "帳號選單",
+    "density": "列表密度",
+    "density_compact": "緊湊",
+    "density_comfortable": "寬鬆"
+  },
+  "command": {
+    "open": "搜尋",
+    "go": "前往",
+    "do": "操作",
+    "light": "切換成淺色",
+    "dark": "切換成深色",
+    "search_clinic": "搜尋病人、申請或頁面",
+    "search_pharmacy": "搜尋單號、病人或藥名",
+    "search_admin": "搜尋帳號或頁面"
+  },
+  "public": {
+    "login": "登入",
+    "try": "用示範病人試用",
+    "toWorkspace": "進入我的站台",
+    "nav": {
+      "service": "服務怎麼運作",
+      "trust": "信任中心",
+      "handbook": "衛教手冊"
+    }
+  },
+  "patient": {
+    "home": "首頁",
+    "visits": "預問診",
+    "medications": "用藥與續方",
+    "appointments": "約診",
+    "messages": "訊息",
+    "mine": "我的資料",
+    "profile": "健康檔案",
+    "privacy": "隱私與資料",
+    "settings": "設定",
+    "notifications": "通知",
+    "start": "開始預問診",
+    "guest": "正在用示範資料試用，請勿輸入真實病歷或個資。",
+    "claim": "設定帳號，保留這些資料",
+    "tab": {
+      "home": "首頁",
+      "visits": "預問診",
+      "medications": "用藥",
+      "appointments": "約診",
+      "more": "更多"
+    }
+  },
+  "clinic": {
+    "today": "今天",
+    "overview": "總覽",
+    "worklist": "工作清單",
+    "rx": "續方審核",
+    "tickets": "訊息接手",
+    "schedule": "門診表",
+    "records": "病人與規則",
+    "patients": "病人管理",
+    "oversight": "監督指標",
+    "rules": "規則檢視"
+  },
+  "pharmacy": {
+    "queue": "調劑佇列",
+    "history": "調劑紀錄",
+    "formulary": "藥品範圍",
+    "rules": "規則檢視",
+    "board": "調劑階段",
+    "stage": {
+      "check": "待核對",
+      "prepare": "備藥中",
+      "ready": "可領取",
+      "returned": "已退回",
+      "done": "今日已領"
+    }
+  },
+  "admin": {
+    "overview": "總覽",
+    "people": "人員",
+    "accounts": "帳號",
+    "permissions": "角色權限",
+    "ai_group": "AI 與監督",
+    "ai": "AI 設定",
+    "oversight": "監督指標",
+    "runs": "執行紀錄",
+    "eval": "評測結果",
+    "rules": "規則檢視",
+    "records": "紀錄與資料",
+    "audit": "稽核紀錄",
+    "data": "資料保留",
+    "settings": "設定",
+    "notifications": "通知",
+    "detail": "明細",
+    "system": "系統狀態"
+  },
+  "trust": {
+    "overview": "總覽",
+    "intended-use": "預定用途",
+    "how-it-works": "AI 怎麼運作",
+    "clinical-safety": "臨床安全",
+    "oversight": "人為監督",
+    "renewal-safety": "續方安全",
+    "privacy": "隱私與資料",
+    "security": "資訊安全",
+    "evidence": "評測與證據",
+    "incidents": "事件通報與更正",
+    "regulation": "法規對應",
+    "references": "名詞與參考文獻",
+    "changelog": "變更紀錄"
+  },
+  "footer": {
+    "service": "服務",
+    "trust": "信任中心",
+    "help": "協助",
+    "emergency": "緊急情況怎麼辦",
+    "credits": "照片與授權",
+    "intendedUse": "診前助理在看診前整理病人的說法與用藥紀錄，交給醫師和藥師判斷。它不診斷、不開藥、不給劑量，也不取代看診。",
+    "demo": "這是展示系統，人物與資料皆為虛構。請勿輸入真實病歷或個資。",
+    "docVersion": "文件版本 {{version}}",
+    "docDate": "更新日期 {{date}}",
+    "notDevice": "不是醫療器材"
+  },
+  "guard": {
+    "unreachableTitle": "連不上伺服器",
+    "unreachableBody": "請確認網路連線。若網路正常，可能是服務正在更新，過幾分鐘再試。",
+    "retry": "重試",
+    "forbiddenTitle": "這個帳號不能使用這個站台",
+    "forbiddenBody": "您目前以「{{name}}」（{{role}}）登入。要使用其他站台，請換帳號登入。",
+    "goHome": "回到我的首頁"
+  },
+  "notFound": {
+    "title": "找不到這一頁",
+    "body": "連結可能已經改變，或這筆資料已經刪除。",
+    "home": "回到公開網站首頁"
+  },
+  "crash": {
+    "title": "這一頁出了問題",
+    "body": "已填的內容會保留在草稿裡。重新載入後可以接著做。",
+    "staleTitle": "網站更新了",
+    "staleBody": "這個分頁還是舊版。重新載入就能繼續，草稿會保留。",
+    "reload": "重新載入"
+  },
+  "placeholder": {
+    "title": "這一頁還在建置",
+    "body": "版面與資料由負責這個站台的工程師接手。"
+  },
+  "page": {
+    "public": {
+      "home": "首頁",
+      "service": "服務怎麼運作",
+      "clinicians": "給醫師與藥師",
+      "trustOverview": "信任中心",
+      "trustSection": "信任中心",
+      "handbook": "衛教手冊",
+      "handbookArticle": "衛教手冊",
+      "emergency": "緊急情況怎麼辦",
+      "credits": "照片與授權",
+      "login": "登入",
+      "register": "註冊病人帳號",
+      "try": "用示範病人試用"
+    },
+    "patient": {
+      "home": "首頁",
+      "visits": "預問診",
+      "visitNew": "開始預問診",
+      "visit": "預問診",
+      "visitSummary": "預問診摘要",
+      "medications": "用藥與續方",
+      "rxList": "我的申請",
+      "rxNew": "新的申請",
+      "rxDetail": "申請進度",
+      "rxWizard": "填寫申請",
+      "appointments": "約診",
+      "appointmentBook": "預約門診",
+      "messages": "訊息",
+      "messageThread": "訊息",
+      "profile": "健康檔案",
+      "measurements": "量測紀錄",
+      "privacy": "隱私與資料",
+      "settings": "設定",
+      "notifications": "通知"
+    },
+    "clinic": {
+      "overview": "今日總覽",
+      "worklist": "工作清單",
+      "visitReview": "審閱台",
+      "rxQueue": "續方審核",
+      "rxReview": "續方審核",
+      "tickets": "訊息接手",
+      "ticketThread": "訊息接手",
+      "patients": "病人管理",
+      "patient": "病人",
+      "schedule": "門診表",
+      "oversight": "監督指標",
+      "rules": "規則檢視",
+      "settings": "設定",
+      "notifications": "通知"
+    },
+    "pharmacy": {
+      "queue": "調劑佇列",
+      "rxDispense": "核對與調劑",
+      "patient": "病人用藥",
+      "history": "調劑紀錄",
+      "formulary": "藥品範圍",
+      "rules": "規則檢視",
+      "settings": "設定",
+      "notifications": "通知"
+    },
+    "admin": {
+      "overview": "總覽",
+      "accounts": "帳號",
+      "account": "帳號",
+      "permissions": "角色權限",
+      "aiSettings": "AI 設定",
+      "oversight": "監督指標",
+      "runs": "執行紀錄",
+      "run": "執行紀錄",
+      "audit": "稽核紀錄",
+      "rules": "規則檢視",
+      "eval": "評測結果",
+      "data": "資料保留與示範資料",
+      "settings": "設定",
+      "notifications": "通知"
+    },
+    "notFound": "找不到這一頁"
+  }
+}

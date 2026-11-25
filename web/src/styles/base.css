@@ -1,0 +1,145 @@
+html {
+  font-family: var(--font-sans);
+  font-size: calc(100% * var(--text-scale));
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.75;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+  scrollbar-color: var(--rule-strong) transparent;
+  /* Chinese line breaking and punctuation: no hanging 、。 at line starts, no squeezed Latin. */
+  line-break: strict;
+  word-break: normal;
+  text-autospace: normal;
+  text-spacing-trim: trim-start;
+}
+body {
+  margin: 0;
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--fg);
+}
+html[data-shell="app"],
+html[data-shell="app"] body {
+  overscroll-behavior: none;
+}
+:lang(en) {
+  line-break: auto;
+  hyphens: manual;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+/* Chinese headings break after punctuation (and at <wbr> or U+200B), never inside a phrase, and closing punctuation
+   stays with the character before it. `auto-phrase` segments Japanese only, so keep-all does the work. */
+h1,
+h2,
+h3 {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+  hanging-punctuation: allow-end;
+}
+.phrase {
+  display: inline-block;
+  max-width: 100%;
+}
+p,
+li,
+dd {
+  text-wrap: pretty;
+}
+::selection {
+  background: var(--selection);
+  color: var(--fg);
+}
+input,
+textarea {
+  caret-color: var(--ink);
+}
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: max(1rem, 16px) !important; /* below 16px iOS zooms the page on focus */
+  }
+}
+button,
+a,
+summary,
+label,
+[role="button"],
+[role="tab"],
+[role="menuitem"],
+[role="option"] {
+  touch-action: manipulation;
+}
+button,
+[role="tab"],
+[role="menuitem"],
+summary {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+button:not(:disabled),
+summary,
+select {
+  cursor: pointer;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
+time,
+.num,
+table td {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Focus appears at once, two pixels off the element, in a hue no ink uses. */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+main:focus-visible,
+h1:focus-visible,
+[data-focus-silent]:focus-visible {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}
+@media (forced-colors: active) {
+  .tag,
+  .btn {
+    border: 1px solid;
+  }
+}

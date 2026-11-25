@@ -1,0 +1,78 @@
+/* Summaries, notes and trust documents print as documents: black on white, no chrome, no scroll boxes. */
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+  html {
+    font-size: 11pt;
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --raised: #ffffff;
+    --sunken: #ffffff;
+    --fg: #000000;
+    --fg-2: #333333;
+    --fg-3: #444444;
+    --rule: #999999;
+    --ink: #000000;
+    --ink-text: #000000;
+    --ink-soft: #ffffff;
+    --ink-line: #777777;
+    color-scheme: light;
+  }
+  body {
+    background: none;
+  }
+  .no-print,
+  .rail,
+  .shell-top,
+  .tabbar,
+  .site-header,
+  .site-footer,
+  .doc-toc,
+  .skip-link,
+  .composer,
+  .step-form-foot,
+  .split-handle,
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+  .shell,
+  .shell-main,
+  .shell-scroll,
+  .split,
+  .split-pane,
+  .transcript-scroll,
+  .dt-wrap,
+  .doc {
+    display: block !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .panel,
+  .form-sheet,
+  .banner,
+  .refill,
+  .emergency,
+  tr,
+  .msg {
+    break-inside: avoid;
+  }
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+  a[href^="http"]:not(.btn)::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    overflow-wrap: anywhere;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
+.print-only {
+  display: none;
+}

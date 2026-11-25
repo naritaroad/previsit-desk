@@ -1,11 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="PreVisit Desk">
-  <style>
-    .b{fill:#0e6b66}.m{stroke:#ffffff}
-    @media (prefers-color-scheme:dark){.b{fill:#5cc0b5}.m{stroke:#08201e}}
-  </style>
-  <path class="b" d="M8 3h16a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H13.5l-5.6 4.4A1 1 0 0 1 6.3 28.6V24.6A6 6 0 0 1 2 19V9a6 6 0 0 1 6-6z"/>
-  <g class="m" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M8.5 13.6l3 3 5.5-6"/>
-    <path d="M20 11.5h4.5M20 16.5h3"/>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><style>g{color:#0a6141}@media (prefers-color-scheme:dark){g{color:#72c79d}}</style><g><rect x="3.5" y="2.5" width="25" height="27" rx="2" fill="none" stroke="currentColor" stroke-width="3"/><path d="M3.5 13h25M12 13v16.5M20 13v16.5" stroke="currentColor" stroke-width="2.5"/><path d="M4 13h8v16H4z" fill="currentColor"/><path d="M9 7.75h14" stroke="currentColor" stroke-width="2.5"/></g></svg>

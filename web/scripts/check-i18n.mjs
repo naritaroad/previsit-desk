@@ -1,12 +1,14 @@
-// Checks the UI copy before every build (npm run i18n:check):
-//   1. every language file has the keys of the reference (zh-TW) and no empty strings;
+// Checks the UI copy before every build (npm run i18n:check). Namespaces are files: locales/<lng>/<namespace>.json.
+//   1. every language has every namespace of the reference (zh-TW) with the same keys, and no empty strings;
 //   2. each translation uses the same {{placeholders}} as the reference;
-//   3. every key the code asks for exists, and every key in the files is used somewhere;
-//   4. no user-visible words are written straight into components (JSX text or text attributes).
-// Plural forms (key_one, key_other, ...) count as one key: zh-TW only needs key_other, en has more.
-// Exit code 1 on any error; unused keys are reported as warnings.
+//   3. every key the code asks for exists (t("ns:key"), useTranslation("ns") + t("key"), useTranslation(["a","b"]));
+//   4. no words are written straight into components: any CJK in .tsx outside comments, and Latin words in JSX text
+//      or in placeholder/title/alt/aria-label/label;
+//   5. zh-TW has no Simplified characters and none of the Mainland terms people slip into most often.
+// Plural forms (key_one, key_other, ...) count as one key: zh-TW needs the plain key or key_other, en has more.
+// Exit code 1 on any error; unused keys are warnings (--strict makes them errors).
 
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -14,8 +16,10 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const src = join(root, "src");
 const localeDir = join(src, "i18n", "locales");
 const REFERENCE = "zh-TW";
-// Components that only hold drawing data (icon paths), no words people read.
-const NO_UI_TEXT = new Set(["src/components/Icon.tsx"]);
+const DEFAULT_NS = "common";
+const strict = process.argv.includes("--strict");
+/** Development only; its words never reach the build. */
+const SKIP = ["src/kit-gallery/", "src/mocks/"];
 const PLURAL = /_(zero|one|two|few|many|other)$/;
 
 const errors = [];
@@ -24,106 +28,154 @@ const warnings = [];
 function flatten(obj, prefix = "", out = new Map()) {
   for (const [k, v] of Object.entries(obj)) {
     const key = prefix ? `${prefix}.${k}` : k;
-    if (v && typeof v === "object") flatten(v, key, out);
+    if (v && typeof v === "object" && !Array.isArray(v)) flatten(v, key, out);
+    else if (Array.isArray(v)) v.forEach((x, i) => (x && typeof x === "object" ? flatten(x, `${key}.${i}`, out) : out.set(`${key}.${i}`, String(x))));
     else out.set(key, String(v));
   }
   return out;
 }
-
 const base = (key) => key.replace(PLURAL, "");
-const placeholders = (s) =>
-  [...s.matchAll(/\{\{\s*(\w+)[^}]*\}\}/g)]
-    .map((m) => m[1])
-    .filter((v, i, a) => a.indexOf(v) === i)
-    .sort()
-    .join(",");
+const placeholders = (s) => [...new Set([...s.matchAll(/\{\{\s*(\w+)[^}]*\}\}/g)].map((m) => m[1]))].sort().join(",");
 
-// ---- 1 & 2: language files ----
-const locales = Object.fromEntries(
-  readdirSync(localeDir)
-    .filter((f) => f.endsWith(".json"))
-    .map((f) => [f.replace(/\.json$/, ""), flatten(JSON.parse(readFileSync(join(localeDir, f), "utf8")))]),
-);
-const reference = locales[REFERENCE];
-if (!reference) {
-  console.error(`missing reference language file ${REFERENCE}.json`);
+// ---- 1, 2, 5: language files ----
+const languages = readdirSync(localeDir).filter((d) => statSync(join(localeDir, d)).isDirectory());
+if (!languages.includes(REFERENCE)) {
+  console.error(`missing reference language ${REFERENCE}`);
   process.exit(1);
 }
-const refBases = new Map();
-for (const [key, value] of reference) if (!refBases.has(base(key))) refBases.set(base(key), value);
-
-for (const [lng, keys] of Object.entries(locales)) {
-  const bases = new Set();
-  for (const [key, value] of keys) {
-    bases.add(base(key));
-    if (!value.trim()) errors.push(`${lng}.json: "${key}" is empty`);
-    if (lng === REFERENCE) continue;
-    const refValue = refBases.get(base(key));
-    if (refValue === undefined) errors.push(`${lng}.json: "${key}" is not in ${REFERENCE}.json`);
-    else if (placeholders(value) !== placeholders(refValue))
-      errors.push(`${lng}.json: "${key}" uses {{${placeholders(value)}}} but ${REFERENCE} uses {{${placeholders(refValue)}}}`);
+const load = (lng) =>
+  Object.fromEntries(
+    readdirSync(join(localeDir, lng))
+      .filter((f) => f.endsWith(".json"))
+      .map((f) => {
+        try {
+          return [f.replace(/\.json$/, ""), flatten(JSON.parse(readFileSync(join(localeDir, lng, f), "utf8")))];
+        } catch (e) {
+          errors.push(`${lng}/${f}: ${e.message}`);
+          return [f.replace(/\.json$/, ""), new Map()];
+        }
+      }),
+  );
+const files = Object.fromEntries(languages.map((l) => [l, load(l)]));
+const reference = files[REFERENCE];
+const refBases = {}; // ns -> Map(base -> value)
+for (const [ns, keys] of Object.entries(reference)) {
+  refBases[ns] = new Map();
+  for (const [k, v] of keys) if (!refBases[ns].has(base(k))) refBases[ns].set(base(k), v);
+}
+for (const lng of languages) {
+  for (const ns of Object.keys(reference)) if (!files[lng][ns]) errors.push(`${lng}/${ns}.json is missing`);
+  for (const [ns, keys] of Object.entries(files[lng])) {
+    const ref = refBases[ns];
+    if (!ref) {
+      errors.push(`${lng}/${ns}.json has no ${REFERENCE}/${ns}.json`);
+      continue;
+    }
+    const seen = new Set();
+    for (const [key, value] of keys) {
+      seen.add(base(key));
+      if (!value.trim()) errors.push(`${lng}/${ns}.json: "${key}" is empty`);
+      if (lng === REFERENCE) continue;
+      const r = ref.get(base(key));
+      if (r === undefined) errors.push(`${lng}/${ns}.json: "${key}" is not in ${REFERENCE}`);
+      else if (placeholders(value) !== placeholders(r) && !PLURAL.test(key)) errors.push(`${lng}/${ns}.json: "${key}" uses {{${placeholders(value)}}} but ${REFERENCE} uses {{${placeholders(r)}}}`);
+    }
+    if (lng !== REFERENCE) for (const b of ref.keys()) if (!seen.has(b)) errors.push(`${lng}/${ns}.json: missing "${b}"`);
   }
-  if (lng !== REFERENCE) for (const b of refBases.keys()) if (!bases.has(b)) errors.push(`${lng}.json: missing "${b}"`);
+}
+// Common characters whose code point is Simplified only, and Mainland terms that slip in.
+const SIMP_ONLY = /[们这说时间诊药单录设备问题资讯发现应该与为从来头动务员处过还进远连运边达选适医护检验询车东书买卖观规视语读让认识计订论证评词译试话详误调谁负责败货质购费]/g;
+const TERMS = ["視頻", "軟件", "網絡", "信息化", "默認", "數據庫", "打印", "鼠標", "屏幕", "賬號", "登錄", "註銷", "點擊", "短信", "質量分", "優化體驗", "用戶", "服務器", "激活", "菜單", "二維碼", "在線", "線下", "反饋", "郵箱", "緩存", "保存成功", "加載", "刷新"];
+for (const [ns, keys] of Object.entries(reference)) {
+  for (const [key, value] of keys) {
+    const bad = [...value.matchAll(SIMP_ONLY)].map((m) => m[0]);
+    if (bad.length) errors.push(`${REFERENCE}/${ns}.json: "${key}" has Simplified characters: ${[...new Set(bad)].join("")}`);
+    for (const t of TERMS) if (value.includes(t)) errors.push(`${REFERENCE}/${ns}.json: "${key}" uses 「${t}」`);
+  }
 }
 
 // ---- 3 & 4: source files ----
 function walk(dir) {
+  if (!existsSync(dir)) return [];
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) return walk(path);
-    return /\.(tsx?|jsx?)$/.test(name) ? [path] : [];
+    return /\.(tsx?|jsx?)$/.test(name) && !/\.(test|spec)\./.test(name) ? [path] : [];
   });
 }
-
-const isKey = (k) => refBases.has(k);
-const isPrefix = (p) => [...refBases.keys()].some((k) => k.startsWith(p));
-const used = new Set();
-const dynamicPrefixes = new Set();
-// Words people read: Latin letters, kana or CJK ideographs.
-const WORDS = /[A-Za-z぀-ヿ㐀-鿿]/;
+const CJK = /[぀-ヿ㐀-鿿豈-﫿]/;
+const WORDS = /[A-Za-z]{2,}/;
+const stripComments = (s) =>
+  s
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "))
+    .replace(/(^|[\s;{}(,])\/\/[^\n]*/g, (m, p) => p + " ".repeat(m.length - p.length));
+const used = {};
+const dynamic = {};
+for (const ns of Object.keys(refBases)) {
+  used[ns] = new Set();
+  dynamic[ns] = new Set();
+}
+const has = (ns, key) => refBases[ns]?.has(key) || [...(refBases[ns]?.keys() ?? [])].some((k) => k.startsWith(`${key}.`));
 
 for (const file of walk(src)) {
   const rel = relative(root, file).replaceAll("\\", "/");
-  const code = readFileSync(file, "utf8");
+  if (SKIP.some((s) => rel.startsWith(s))) continue;
+  const raw = readFileSync(file, "utf8");
+  const code = stripComments(raw);
 
-  // t("a.b"), t('a.b'), t(`a.${x}`), i18n.t(...), i18n.exists(...)
-  for (const m of code.matchAll(/\b(?:t|exists)\(\s*(["'`])([^"'`]+)\1/g)) {
-    const key = m[2];
-    const dyn = key.indexOf("${");
+  const scopes = new Set();
+  for (const m of code.matchAll(/useTranslation\(\s*(?:\[([^\]]*)\]|["'`]([\w-]+)["'`])?\s*[,)]/g)) {
+    if (m[1]) for (const n of m[1].matchAll(/["'`]([\w-]+)["'`]/g)) scopes.add(n[1]);
+    else scopes.add(m[2] ?? DEFAULT_NS);
+  }
+  if (scopes.size === 0) scopes.add(DEFAULT_NS);
+
+  for (const m of code.matchAll(/\b(?:t|tc|ts|exists|i18nKey=\{?)\(?\s*(["'`])((?:[\w-]+:)?[\w.$\-{}()?|&!='"\s]+?)\1/g)) {
+    const full = m[2];
+    if (!/^(?:[\w-]+:)?[\w-]+(?:\.|$|\$)/.test(full) && !full.includes("${")) continue;
+    const [nsPart, keyPart] = full.includes(":") && !full.startsWith("${") ? [full.slice(0, full.indexOf(":")), full.slice(full.indexOf(":") + 1)] : [null, full];
+    const candidates = nsPart ? [nsPart] : [...scopes];
+    const dyn = keyPart.indexOf("${");
     if (dyn === -1) {
-      if (isKey(key)) used.add(key);
-      else errors.push(`${rel}: t("${key}") has no entry in ${REFERENCE}.json`);
+      const hit = candidates.find((ns) => has(ns, keyPart));
+      if (hit) used[hit].add(keyPart);
+      else if (candidates.some((ns) => refBases[ns])) errors.push(`${rel}: t("${full}") has no entry in ${REFERENCE}/${candidates.join(", ")}`);
+      else warnings.push(`${rel}: namespace "${candidates.join(", ")}" does not exist yet (t("${full}"))`);
     } else {
-      const prefix = key.slice(0, dyn);
-      if (!isPrefix(prefix)) errors.push(`${rel}: t(\`${key}\`) matches no key in ${REFERENCE}.json`);
-      dynamicPrefixes.add(prefix);
+      const prefix = keyPart.slice(0, dyn);
+      const hit = candidates.filter((ns) => refBases[ns] && (prefix === "" || [...refBases[ns].keys()].some((k) => k.startsWith(prefix))));
+      if (hit.length === 0 && candidates.some((ns) => refBases[ns])) errors.push(`${rel}: t(\`${full}\`) matches no key in ${REFERENCE}/${candidates.join(", ")}`);
+      for (const ns of hit) dynamic[ns].add(prefix);
     }
   }
-  // Keys passed around as plain strings, e.g. lookup tables returning a key.
-  for (const m of code.matchAll(/["'`]([a-zA-Z]+(?:\.[\w-]+)+)["'`]/g)) if (isKey(m[1])) used.add(m[1]);
-
-  if (!file.endsWith("x") || NO_UI_TEXT.has(rel)) continue;
-  // JSX text between tags, e.g. <th>capacity</th>; "=>" is an arrow function, not a tag.
-  for (const m of code.matchAll(/(?<!=)>([^<>{}()=;&|]*)</g)) {
-    const text = m[1].trim();
-    if (text && WORDS.test(text)) errors.push(`${rel}: hard-coded text "${text}" (move it to the language files)`);
+  // Keys passed around as plain strings: "ns:key.path", and "key.path" in lookup tables and route handles.
+  for (const m of code.matchAll(/["'`](?:([\w-]+):)?([a-zA-Z][\w-]*(?:\.[\w-]+)+)["'`]/g)) {
+    for (const ns of m[1] ? [m[1]] : Object.keys(refBases)) if (refBases[ns]?.has(m[2])) used[ns].add(m[2]);
   }
-  // Text-bearing attributes with a literal value
-  for (const m of code.matchAll(/\b(placeholder|title|alt|aria-label|label)="([^"]*)"/g))
-    if (WORDS.test(m[2])) errors.push(`${rel}: hard-coded ${m[1]}="${m[2]}"`);
+
+  if (!file.endsWith("x")) continue;
+  code.split("\n").forEach((line, i) => {
+    if (CJK.test(line)) errors.push(`${rel}:${i + 1}: hard-coded Chinese "${line.trim().slice(0, 60)}" (move it to the language files)`);
+  });
+  for (const m of code.matchAll(/(?<![=\w)\]])>([^<>{}()=;&|"]*)</g)) {
+    const text = m[1].trim();
+    if (text && !/^[,:?]/.test(text) && WORDS.test(text)) errors.push(`${rel}: hard-coded text "${text.slice(0, 60)}"`);
+  }
+  for (const m of code.matchAll(/\b(placeholder|title|alt|aria-label|label)="([^"]*)"/g)) if (WORDS.test(m[2])) errors.push(`${rel}: hard-coded ${m[1]}="${m[2]}"`);
 }
 
-for (const key of refBases.keys()) {
-  // Keys built from API codes (e.g. refill.outcome.<code>) count as used through their prefix.
-  if (used.has(key) || [...dynamicPrefixes].some((p) => key.startsWith(p))) continue;
-  warnings.push(`unused key "${key}"`);
-}
+for (const [ns, bases] of Object.entries(refBases))
+  for (const key of bases.keys()) {
+    if (used[ns].has(key) || [...dynamic[ns]].some((p) => key.startsWith(p)) || [...used[ns]].some((u) => key.startsWith(`${u}.`))) continue;
+    (strict ? errors : warnings).push(`unused key ${ns}:${key}`);
+  }
 
-for (const w of warnings) console.warn(`warning: ${w}`);
+if (warnings.length) console.warn(warnings.slice(0, 40).map((w) => `warning: ${w}`).join("\n") + (warnings.length > 40 ? `\n(${warnings.length - 40} more warnings)` : ""));
 for (const e of errors) console.error(`error: ${e}`);
-const langs = Object.keys(locales).join(", ");
+const total = Object.values(refBases).reduce((n, m) => n + m.size, 0);
+const summary = `${total} keys in ${Object.keys(refBases).length} namespaces × ${languages.length} languages (${languages.join(", ")})`;
 if (errors.length) {
-  console.error(`i18n check failed: ${errors.length} error(s) in ${langs}`);
+  console.error(`i18n check failed: ${errors.length} error(s); ${summary}`);
   process.exit(1);
 }
-console.log(`i18n check passed: ${refBases.size} keys × ${Object.keys(locales).length} languages (${langs})${warnings.length ? `, ${warnings.length} warning(s)` : ""}`);
+console.log(`i18n check passed: ${summary}${warnings.length ? `, ${warnings.length} warning(s)` : ""}`);

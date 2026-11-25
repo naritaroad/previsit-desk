@@ -1,0 +1,71 @@
+{
+  "offline": "目前連不上網路。已輸入的內容會保留，恢復連線後再試一次。",
+  "badResponse": "伺服器的回應不完整，請再試一次。",
+  "rateLimited": "操作太頻繁，請等 {{seconds}} 秒再試。",
+  "notFound": "找不到這筆資料，可能已刪除或超過保留期限。",
+  "visitClosed": "這次預問診已送出，不能再補充。",
+  "busy": "系統正在處理上一個動作，請稍候。",
+  "stale": "這筆資料剛被更新過。已載入最新內容，請確認後再送出。",
+  "unauthorized": "登入已過期，請重新登入。",
+  "forbidden": "這個帳號沒有權限。",
+  "invalidCredentials": "帳號或密碼不正確。",
+  "tooLarge": "內容太長，請縮短後再送出。",
+  "invalidFields": "有些欄位需要修正。",
+  "invalidRequest": "送出的內容不正確，請檢查後再試。",
+  "invalidState": "目前的狀態不能做這個動作，請重新整理後再看。",
+  "internal": "系統發生問題，請稍後再試。",
+  "run": {
+    "budget": "今天的 AI 使用額度已用完。紅旗檢查和慢箋檢核照常運作，您也可以直接送出。",
+    "timeout": "AI 回覆逾時，請重試。",
+    "interrupted": "上一則訊息沒有處理完，請重試。",
+    "model": "AI 暫時無法回覆，請重試。",
+    "unknown": "這則回覆沒有完成，請重試。"
+  },
+  "field": {
+    "required": "這一欄要填。",
+    "tooLong": "內容太長。",
+    "number": "請填數字。",
+    "range": "數字超出範圍，請再確認一次。",
+    "date": "日期請寫成 YYYY-MM-DD。",
+    "future": "不能晚於今天。",
+    "usernameShort": "帳號至少 3 個字元。",
+    "usernameLong": "帳號最多 32 個字元。",
+    "usernameChars": "只能用英文字母、數字和 . _ -，開頭要是字母或數字。",
+    "passwordShort": "密碼至少 8 個字元。",
+    "passwordLong": "密碼最多 128 個字元。",
+    "passwordMismatch": "兩次輸入的密碼不一樣。",
+    "passwordSame": "新密碼不能和目前的密碼相同。",
+    "bpOrder": "舒張壓要比收縮壓小。",
+    "perFillExceedsTotal": "每次給藥日數不能超過總日數。",
+    "beforePrescription": "上次領藥日不能早於開立日。",
+    "messageLong": "字數超過上限，請縮短。"
+  },
+  "draft": {
+    "saving": "儲存中",
+    "saved": "已儲存",
+    "savedAt": "{{time}} 已儲存",
+    "offline": "離線，先存在這台裝置",
+    "conflict": "另一台裝置有較新的內容"
+  },
+  "outbox": {
+    "queued": "等待送出",
+    "sending": "傳送中",
+    "sent": "已送出",
+    "failed": "沒有送出"
+  },
+  "connection": {
+    "connecting": "連線中",
+    "retrying": "連線中斷，正在重新連線",
+    "offline": "離線",
+    "paused": "已暫停更新",
+    "closed": "已停止更新"
+  },
+  "leave": {
+    "unsaved": "有內容還沒儲存，離開後可能會遺失。",
+    "unsent": "有訊息還沒送出。離開後會留在這台裝置，下次開啟時再送。"
+  },
+  "session": {
+    "expired": "登入已過期。請重新登入，未送出的內容還在。",
+    "unreachable": "連不上伺服器，請確認網路後再試。"
+  }
+}
