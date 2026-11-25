@@ -129,18 +129,6 @@ rx_texts! {
     EvCancelled => ("病人取消申請", "Cancelled by the patient"),
     EvOverdue => ("超過預計處理時間", "Past the expected handling time"),
 
-    // ---- notifications ----
-    NtStatusTitle => ("申請 {no} 有新進度", "Update on request {no}"),
-    NtMoreInfoTitle => ("申請 {no} 需要您補充資料", "Request {no} needs more information from you"),
-    NtReadyTitle => ("申請 {no} 可以取藥了", "Request {no} is ready to collect"),
-    NtMessageTitle => ("申請 {no} 有新訊息", "New message on request {no}"),
-    NtNewTitle => ("新的申請 {no}", "New request {no}"),
-    NtOverdueTitle => ("申請 {no} 已逾時", "Request {no} is overdue"),
-    NtRedFlagTitle => ("申請 {no} 出現緊急情況", "Request {no} shows an emergency"),
-    NtReadyBody => ("藥已備好，請到{pharmacy}取藥。", "Your medicine is ready at {pharmacy}."),
-    NtMessageBody => ("請打開申請查看內容。", "Open the request to read it."),
-    NtRedFlagBody => ("請先聯絡病人，再處理申請。", "Contact the patient before handling the request."),
-
     // ---- tickets ----
     TicketRxUrgent => (
         "申請 {no} 的回答出現緊急情況：{reasons}。系統已顯示固定的緊急提醒，請盡快聯絡病人。",

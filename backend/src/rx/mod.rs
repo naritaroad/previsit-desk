@@ -18,6 +18,7 @@ use std::path::Path;
 
 use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 use crate::types::Locale;
 
@@ -163,6 +164,35 @@ impl RxRules {
         })
     }
 
+    pub fn protocol_version(&self) -> Option<String> {
+        Some(self.protocols.version.clone())
+    }
+
+    /// `{in_scope, physician_only, excluded}` drug counts for `/meta` and `/trust/facts`.
+    pub fn formulary_counts(&self) -> Value {
+        RenewalScope::ALL
+            .iter()
+            .map(|s| {
+                (
+                    s.as_str().to_string(),
+                    Value::from(self.formulary.count(*s)),
+                )
+            })
+            .collect::<serde_json::Map<_, _>>()
+            .into()
+    }
+
+    /// `{protocols, formulary}` for the read-only rules page (`GET /admin/rules`).
+    pub fn rules_view(&self, locale: Locale) -> Value {
+        let drugs: Vec<_> = self
+            .formulary
+            .drugs()
+            .iter()
+            .map(|d| d.to_out(locale))
+            .collect();
+        serde_json::json!({ "protocols": self.protocols.public(locale), "formulary": drugs })
+    }
+
     /// Lines for the `check-data` command.
     pub fn report(&self) -> Vec<String> {
         let count = |scope| self.formulary.count(scope);
@@ -275,6 +305,12 @@ mod tests {
         let lines = fixtures::rules().report();
         assert_eq!(lines.len(), 2);
         assert!(lines[0].contains("in scope") && lines[1].contains("version"));
+        let rules = fixtures::rules();
+        assert_eq!(rules.formulary_counts()["excluded"], 2);
+        assert_eq!(rules.protocol_version().as_deref(), Some("fixture-1"));
+        let view = rules.rules_view(Locale::En);
+        assert_eq!(view["formulary"].as_array().map(Vec::len), Some(7));
+        assert_eq!(view["protocols"]["version"], "fixture-1");
     }
 
     /// The shipped files, when they are in the tree (they are written by another workstream).
