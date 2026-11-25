@@ -1,0 +1,269 @@
+{
+  "hero": {
+    "widths": [
+      640,
+      1280,
+      1920,
+      2400
+    ],
+    "w": 2400,
+    "h": 1600,
+    "focal": "55% 55%",
+    "blur": "data:image/webp;base64,UklGRnoAAABXRUJQVlA4IG4AAADQAwCdASoUAA0APxFysFAsJqSisAgBgCIJQBOgBF7OivNv7kuVFRAA/ukAbXnZ9nVLqkXUMeRLB2eFSgJIxP/BaBSloK+sLStH5SR553iTPt2ytDyzYSclQrmU2lGxbhB2ud5Kh6K3VLrR7AAAAA==",
+    "color": "#786b5b",
+    "alt_zh": "午後的陽光從百葉窗斜照進客廳，在地毯上投下格狀光影，小矮桌上擺著一組茶具。",
+    "alt_en": "Afternoon sun through window blinds casts a lattice of light across a carpet; a low tray table holds a small tea set.",
+    "credit": {
+      "photographer": "Ivan Konev",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/zCWrwoD5FdE",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    }
+  },
+  "pharmacy": {
+    "widths": [
+      640,
+      1280,
+      1920
+    ],
+    "w": 1920,
+    "h": 1278,
+    "focal": "60% 50%",
+    "blur": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAABwAwCdASoUAA0APxFysFAsJqSisAgBgCIJZV2AVpATaSxeQAAA/uNNNwnNmghyJw7fgHgIKDwlBsYLSawwiyBPhy2YWP+Yh6/I0NtkE3zDQ0rCPmfzQKTwRcIAAA==",
+    "color": "#5a524b",
+    "alt_zh": "一整面舊木抽屜櫃，其中一格被拉開，裡面放著紙片，抽屜面板上有漢字編號。",
+    "alt_en": "A cabinet of small aged wooden drawers, one pulled open and holding slips of paper; the drawer fronts carry numbers in Chinese characters.",
+    "credit": {
+      "photographer": "Moritz Näf",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/Er_AaM8-BLo",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    },
+    "note": "Drawers at a temple in Asakusa, Tokyo (omikuji fortune drawers); used as an apothecary-drawer texture, not a pharmacy."
+  },
+  "medicine_table": {
+    "widths": [
+      640,
+      1280,
+      1920
+    ],
+    "w": 1920,
+    "h": 1280,
+    "focal": "55% 60%",
+    "blur": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAACQAwCdASoUAA0APxFwsFAsJiSisAgBgCIJYwDDNBVGKgEmsGgsAP7RzOkYpUgVtTct9xElejbWFm9GdpPpahwGbMisrHT5z2A/2apfBqCIQ2dyJgyxPQuQAAA=",
+    "color": "#5e5953",
+    "alt_zh": "桌上，一隻手正從每週藥盒中取出藥丸，旁邊放著一板藥片。",
+    "alt_en": "At a table, a hand picks a pill from a weekly pill organiser; a blister pack lies beside it.",
+    "credit": {
+      "photographer": "Laurynas Me",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/1TL8AoEDj_c",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    }
+  },
+  "bp_home": {
+    "widths": [
+      640,
+      1280,
+      1920
+    ],
+    "w": 1920,
+    "h": 1280,
+    "focal": "55% 50%",
+    "blur": "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAADQAwCdASoUAA0APxFysFAsJqSisAgBgCIJZQDE2CFJ9v3Ef2/I4nAA/rH53SMB8kFJYgCSP7Y//kuKFJDSQL2oZv8o2r9/+qiUM8zfPONGhEloBvZImlVITzLfo4TF/sUAAA==",
+    "color": "#d1cbc3",
+    "alt_zh": "手臂綁著灰色壓脈帶，另一隻手拿著電子血壓計，螢幕顯示收縮壓與舒張壓數字。",
+    "alt_en": "An arm wrapped in a grey cuff while a hand holds a digital blood-pressure monitor showing a reading.",
+    "credit": {
+      "photographer": "Mockup Graphics",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/i1iqQRLULlg",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    }
+  },
+  "clinic_corridor": {
+    "widths": [
+      640,
+      1280,
+      1920
+    ],
+    "w": 1920,
+    "h": 1440,
+    "focal": "50% 55%",
+    "blur": "data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAADQAwCdASoUAA8APxFysFAsJqSisAgBgCIJZwDMHCIBnOCdpoOkKuIA/MpKms2Jh/tGnPhibTalk3O+b8vFVNAAEJPMZmXNgAA=",
+    "color": "#bcbdb6",
+    "alt_zh": "明亮空蕩的醫院走廊，一側靠牆有一排藍綠色座椅。",
+    "alt_en": "A bright, empty hospital corridor with a row of teal seats along one wall.",
+    "credit": {
+      "photographer": "Tasha Kostyuk",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/Pk-KuizxQv8",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    }
+  },
+  "waiting": {
+    "widths": [
+      640,
+      1280,
+      1920
+    ],
+    "w": 1920,
+    "h": 1440,
+    "focal": "45% 60%",
+    "blur": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAADQAwCdASoUAA8APxFysFAsJqSisAgBgCIJZQCzgBIkdc4PP82rsgAA/RmLIpEEY8OWKmYyVuLFE1zgtdbEXbs02amWgxq6I3L8+zH+94pEZjWaGs07xyzV0dbMaWToSyY5A4gA",
+    "color": "#625952",
+    "alt_zh": "空無一人的候診區，窗邊並排三張紅色塑膠椅，窗外光線柔和。",
+    "alt_en": "An empty waiting area with three red plastic chairs in a row beneath a window, in soft daylight.",
+    "credit": {
+      "photographer": "Adhitya Sibikumar",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/2d3cHa8RMSY",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    }
+  },
+  "consultation": {
+    "widths": [
+      640,
+      1280,
+      1920
+    ],
+    "w": 1920,
+    "h": 1280,
+    "focal": "45% 55%",
+    "blur": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAABwAwCdASoUAA0APxFysFAsJqSisAgBgCIJZQAANzTdCFpFrwAA+QQ/Vr8GPSlLSum9fI3Bd96lomBn9R078y4Hqsg5DrPBx8kV3LvmT+dae6nPpMg79IF679PL64lmml1/3II4AAA=",
+    "color": "#5e5956",
+    "alt_zh": "桌上兩人的手正一起翻看一份印好的表單，旁邊有一支筆、一支手機與一台平板。",
+    "alt_en": "Two people's hands rest over a printed form on a desk, with a pen, a phone and a tablet beside it; no faces are shown.",
+    "credit": {
+      "photographer": "Olena Kholina",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/MhqUBTxQ3Hw",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    }
+  },
+  "notes_hand": {
+    "widths": [
+      640,
+      1280,
+      1920
+    ],
+    "w": 1920,
+    "h": 1280,
+    "focal": "65% 35%",
+    "blur": "data:image/webp;base64,UklGRoYAAABXRUJQVlA4IHoAAADQAwCdASoUAA0APxFysFAsJqSisAgBgCIJQBOiP/wHU1KxHEJu0cAA/oQOEME1MwG+i/9/105lL50HI7Z9WS+ebTkOMaWBfbCdCb3zW9khBnFD8TFH47iBcx8fQFmfowWgtDMjeFZ0+pSEMlWnLNWnK89+bLF+bJ7gAA==",
+    "color": "#9d918b",
+    "alt_zh": "一隻手握著原子筆，在攤開的筆記本上書寫，窗邊光線斜照。",
+    "alt_en": "A hand holding a pen writes on an open notebook, lit from a window on the left.",
+    "credit": {
+      "photographer": "Hannah Olinger",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/8eSrC43qdro",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    }
+  },
+  "doctor_desk": {
+    "widths": [
+      640,
+      1280,
+      1920
+    ],
+    "w": 1920,
+    "h": 1080,
+    "focal": "50% 55%",
+    "blur": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAAAQBACdASoUAAsAPxFysFAsJqSisAgBgCIJZwAAYY0wVfIWDCXX2LZAAAD91dIUi9/wmSAOxoKWXppvah78R0K074eXW6iXYyvVikF0crjhAA/VkK/CEwCLZDAAAA==",
+    "color": "#b4b1a9",
+    "alt_zh": "診間桌上，醫師的雙手在鍵盤上打字，聽診器放在一旁，看不到螢幕。",
+    "alt_en": "On a clinic desk a doctor's hands type on a keyboard with a stethoscope beside it; no screen is visible.",
+    "credit": {
+      "photographer": "Vitaly Gariev",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/FQQoUPVb_1c",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    }
+  },
+  "herbarium_or_paper": {
+    "widths": [
+      640,
+      1280,
+      1920
+    ],
+    "w": 1920,
+    "h": 1280,
+    "focal": "50% 50%",
+    "blur": "data:image/webp;base64,UklGRogAAABXRUJQVlA4IHwAAADQAwCdASoUAA0APxFysFAsJqSisAgBgCIJYwCsABtz6LpTwlnPagAA99CaBkot6lRE+7KyjXS4PwcIRNvAAInACx0dYR8IRYFFYfjbwYqdpnhmXkiBAXUrvkZ/+sbeI89Z/u8P8wN8OnTJqsfl5PmxX3xwOs4c0VTqbqIA",
+    "color": "#b4b0a9",
+    "alt_zh": "手工紙上壓著藍紫色的草葉與乾燥花瓣，紙面粗糙帶纖維質感。",
+    "alt_en": "Pressed blue-purple grass and dried petals set into coarse handmade paper.",
+    "credit": {
+      "photographer": "Tasha Kostyuk",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/JV9lwBaS6_o",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    }
+  },
+  "nature_calm": {
+    "widths": [
+      640,
+      1280,
+      1920
+    ],
+    "w": 1920,
+    "h": 1280,
+    "focal": "45% 55%",
+    "blur": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAACQAwCdASoUAA0APxFysFAsJqSisAgBgCIJZQDE2CGUQxPa4kgAAP7f9L0ntw+/19dSCr5p6I2SERnzDhScw9zGireNOf3VS8fM5p+Q+YA6wVJDt0UQoisQtvVBVEIvuAW8wCNSvWAAAA==",
+    "color": "#8f8e85",
+    "alt_zh": "窗台上一盆綠葉植物，傍晚的暖光斜照，窗外是模糊的樹林與河面。",
+    "alt_en": "A green potted plant on a windowsill in warm low light, with blurred trees and water outside.",
+    "credit": {
+      "photographer": "Lesly Juarez",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/58-iZiXTwNA",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    }
+  },
+  "city_taiwan": {
+    "widths": [
+      640,
+      1280,
+      1920
+    ],
+    "w": 1920,
+    "h": 1280,
+    "focal": "50% 60%",
+    "blur": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAACwAwCdASoUAA0APxFysVAsJqSisAgBgCIJYwC2yBbsSw8iULUkAAD571CW4h1iZhtCPR0JtsA2nkg7t5ikdwcxmJK8l7a7j14SUzNf2HisnzKKUq1DmZnAAAA=",
+    "color": "#625f58",
+    "alt_zh": "台南一條窄街，兩側是密集的老舊樓房，路上只有零星機車，天色偏暖。",
+    "alt_en": "A narrow street in Tainan lined with dense older buildings, a few scooters on the road under a warm sky.",
+    "credit": {
+      "photographer": "Lennon Cheng",
+      "source": "Unsplash",
+      "url": "https://unsplash.com/photos/Qtg_zPrrB3A",
+      "license": "Unsplash License",
+      "license_url": "https://unsplash.com/license",
+      "checked": "2026-11-25"
+    },
+    "note": "Shopfront signs in Chinese are visible but generic."
+  }
+}
