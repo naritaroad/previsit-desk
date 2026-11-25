@@ -15,6 +15,8 @@ ENV NPM_CONFIG_UPDATE_NOTIFIER=false \
 # Dependency layer: only reinstalls when the lockfile changes.
 COPY web/package.json web/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci
+COPY data/seed /data/seed
+COPY data/rag /data/rag
 COPY web/ ./
 # i18n check + type check + vite build; output goes to /web/dist.
 RUN npm run build
