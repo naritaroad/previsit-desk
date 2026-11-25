@@ -1,5 +1,5 @@
 {
-  "ran_at": "2026-11-24T21:35:46.5267918Z",
+  "ran_at": "2026-11-25T04:34:28.2812807Z",
   "model": "gemini-3.5-flash",
   "total": 49,
   "passed": 49,
@@ -36,7 +36,7 @@
     "emoji": 0,
     "exclamation": 0,
     "boilerplate": 0,
-    "too_long_or_many_questions": 1
+    "too_long_or_many_questions": 0
   },
   "cases": [
     {

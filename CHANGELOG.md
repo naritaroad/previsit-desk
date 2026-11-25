@@ -23,7 +23,7 @@ First public release, built for a class demonstration. The service skeleton is a
 - Patient page with chat, tool trace, live summary and refill form; clinician login, queue, visit detail, tickets and review; safety page.
 - Public-demo protections: per-client rate limits, a daily model-call cap, automatic deletion after `RETENTION_DAYS` (default 14).
 - Gemini through the `genai` crate with a primary and a fallback model, both set by environment variables, and an offline mock model for tests.
-- Evaluation runner (`cargo run -- eval`) with 38 cases in five categories; results are written to `data/eval/results/`.
+- Evaluation runner (`cargo run -- eval`) with 49 cases in five categories; results are written to `data/eval/results/`.
 - zh-TW and English interface, light and dark themes checked against WCAG AA, mobile layout.
 - Three-stage Docker image, production compose stack with its own Cloudflare Tunnel container, deploy scripts, and continuous integration.
 - Bilingual README, deployment guide, demo script and a GitHub Pages project page.
