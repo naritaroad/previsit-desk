@@ -5,25 +5,35 @@
 //!   previsit-api eval [...]    run data/eval/cases.jsonl against the configured model
 //!   previsit-api healthcheck   GET /api/v1/health on the local port; exit 0 on 200, else 1 (for container health checks)
 
+mod audit;
 mod auth;
 mod clock;
 mod config;
+mod demo;
 mod engine;
 mod error;
 mod eval;
 mod guard;
 mod health_edu;
 mod http;
+mod hub;
+mod idem;
 mod intake;
 mod limits;
 mod llm;
+mod me;
+mod notify;
+mod page;
+mod people;
+mod perm;
 mod pii;
 mod precheck;
 mod prompt;
 mod refill;
 mod routes;
-#[allow(dead_code)]
 mod rx;
+mod settings;
+mod sse;
 mod state;
 mod style;
 mod summary;
@@ -35,16 +45,21 @@ mod visits;
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail};
 use sqlx::postgres::PgPoolOptions;
+use tokio::sync::watch;
 use tracing_subscriber::EnvFilter;
 
 use crate::clock::Clock;
 use crate::config::Config;
+use crate::demo::DemoData;
 use crate::health_edu::Handbook;
+use crate::hub::Hub;
 use crate::limits::Limiter;
+use crate::settings::{Settings, SettingsStore};
+use crate::sse::StreamSlots;
 use crate::state::{AppState, Rules, VisitLocks};
 
 const HANDBOOK_FILE: &str = "health_education.zh-TW.md";
@@ -72,7 +87,10 @@ fn enter_project_root() {
         Some(root) => {
             let env_file = root.join(".env");
             if env_file.is_file() {
-                let _ = dotenvy::from_path(&env_file);
+                // A line that does not parse (a value with spaces and no quotes) drops everything after it.
+                if let Err(dotenvy::Error::LineParse(_, at)) = dotenvy::from_path(&env_file) {
+                    eprintln!(".env: a line could not be read (column {at}); later lines are ignored");
+                }
             }
             let _ = std::env::set_current_dir(&root);
         }
@@ -126,6 +144,15 @@ fn check_data(data_dir: &Path) -> Result<()> {
         )
         .with_context(|| format!("check {}", cases.display()))?;
         println!("cases.jsonl       {} cases", parsed.len());
+    }
+    let demo = DemoData::load(data_dir)?;
+    println!(
+        "demo              {} accounts, {} personas",
+        demo.accounts.len(),
+        demo.personas.len()
+    );
+    for line in rx::check_data(data_dir)? {
+        println!("{line}");
     }
     println!("data ok");
     Ok(())
@@ -197,13 +224,28 @@ async fn connect(config: &Config) -> Result<sqlx::PgPool> {
     .context("connect to PostgreSQL")
 }
 
-async fn build_state(mut config: Config, offline: bool) -> Result<AppState> {
-    if offline {
+/// What the process is for: the API reads settings from the database, the eval command runs the environment's models
+/// so that a result says which configuration produced it.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Mode {
+    Serve,
+    Eval { offline: bool },
+}
+
+async fn build_state(
+    mut config: Config,
+    mode: Mode,
+    shutdown: watch::Receiver<bool>,
+) -> Result<AppState> {
+    if mode == (Mode::Eval { offline: true }) {
         config.model = "mock".to_string();
         config.model_fallback = None;
+        config.model_choices = vec!["mock".to_string()];
     }
     let config = Arc::new(config);
     let rules = Arc::new(Rules::load(&config.data_dir)?);
+    let rx_rules = Arc::new(rx::RxRules::load(&config.data_dir)?);
+    let demo = Arc::new(DemoData::load(&config.data_dir)?);
     let handbook = match load_handbook(&config.data_dir)? {
         Some(handbook) => handbook,
         None => {
@@ -214,9 +256,15 @@ async fn build_state(mut config: Config, offline: bool) -> Result<AppState> {
         }
     };
     let db = connect(&config).await?;
-    auth::ensure_account(&db, &config).await?;
+    let settings = match mode {
+        Mode::Serve => {
+            auth::ensure_accounts(&db, &config.logins, &demo).await?;
+            SettingsStore::load(&db, &config).await?
+        }
+        Mode::Eval { .. } => SettingsStore::fixed(Settings::defaults(&config)),
+    };
     let clock = Clock::system();
-    match visits::cleanup(&db, clock.retention_cutoff(config.retention_days)).await {
+    match visits::cleanup(&db, clock.retention_cutoff(settings.get().retention_days)).await {
         Ok(n) if n > 0 => tracing::info!(deleted = n, "removed visits past the retention period"),
         Ok(_) => {}
         Err(e) => tracing::warn!(error = %e, "retention sweep failed"),
@@ -230,6 +278,13 @@ async fn build_state(mut config: Config, offline: bool) -> Result<AppState> {
         rules,
         clock,
         visit_locks: Arc::new(VisitLocks::default()),
+        settings: Arc::new(settings),
+        hub: Arc::new(Hub::default()),
+        streams: Arc::new(StreamSlots::default()),
+        shutdown,
+        demo,
+        rx: rx_rules,
+        started: Instant::now(),
     })
 }
 
@@ -257,7 +312,11 @@ async fn main() -> Result<()> {
         "eval" => {
             let config = Config::from_env()?;
             let eval_args = eval::parse_args(&args[1..], &config.data_dir)?;
-            let state = build_state(config, eval_args.offline).await?;
+            let (_stop, stopping) = watch::channel(false);
+            let mode = Mode::Eval {
+                offline: eval_args.offline,
+            };
+            let state = build_state(config, mode, stopping).await?;
             tracing::info!(model = %state.config.model, "eval");
             eval::run(&state, eval_args).await
         }
@@ -266,9 +325,26 @@ async fn main() -> Result<()> {
     }
 }
 
+/// Ctrl-C, or SIGTERM (what `docker stop` sends).
+async fn stop_signal() {
+    #[cfg(unix)]
+    {
+        use tokio::signal::unix::{SignalKind, signal};
+        if let Ok(mut term) = signal(SignalKind::terminate()) {
+            tokio::select! {
+                _ = tokio::signal::ctrl_c() => {}
+                _ = term.recv() => {}
+            }
+            return;
+        }
+    }
+    let _ = tokio::signal::ctrl_c().await;
+}
+
 async fn serve() -> Result<()> {
     let config = Config::from_env()?;
-    let state = build_state(config, false).await?;
+    let (stop, stopping) = watch::channel(false);
+    let state = build_state(config, Mode::Serve, stopping).await?;
     let config = state.config.clone();
     tracing::info!(addr = %config.bind, model = %config.model, fallback = ?config.model_fallback, thinking = ?config.thinking, model_ready = config.model_ready(), handbook_sections = state.handbook.section_count(), "listening");
 
@@ -281,7 +357,9 @@ async fn serve() -> Result<()> {
             tick.tick().await;
             match visits::cleanup(
                 &sweep.db,
-                sweep.clock.retention_cutoff(sweep.config.retention_days),
+                sweep
+                    .clock
+                    .retention_cutoff(sweep.settings.get().retention_days),
             )
             .await
             {
@@ -301,8 +379,10 @@ async fn serve() -> Result<()> {
         listener,
         routes::app(state).into_make_service_with_connect_info::<std::net::SocketAddr>(),
     )
-    .with_graceful_shutdown(async {
-        let _ = tokio::signal::ctrl_c().await;
+    .with_graceful_shutdown(async move {
+        stop_signal().await;
+        // Open event streams would otherwise keep the server alive.
+        let _ = stop.send(true);
     })
     .await?;
     Ok(())

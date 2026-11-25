@@ -1,0 +1,2659 @@
+{
+  "version": "2026.11.1",
+  "approved_by_note": "僅供課堂展示，未經臨床驗證，也未經任何醫師或藥師核可。數字與間隔皆來自文中所列公開來源（2026-11-25 查閱）；實際續開一律由醫師決定。 / Classroom demo only. Not clinically validated and not approved by any physician or pharmacist. Numbers and intervals come from the public sources cited (checked 2026-11-25); a physician always decides on renewal.",
+  "general": {
+    "questions": [
+      {
+        "id": "taking_as_prescribed",
+        "kind": "choice",
+        "label_zh": "這顆藥，你最近都是照醫師交代的方式吃嗎？",
+        "label_en": "Have you been taking this medicine the way your doctor told you to?",
+        "help_zh": "漏吃、晚吃、自己調量或停藥，都請如實選，醫師看了才能判斷。",
+        "help_en": "Missed or late doses, changing the dose yourself or stopping all matter. Please answer honestly so the doctor can judge.",
+        "options": [
+          {
+            "value": "all",
+            "label_zh": "都照醫師說的吃",
+            "label_en": "Yes, exactly as told"
+          },
+          {
+            "value": "missed_some",
+            "label_zh": "偶爾漏吃或晚吃",
+            "label_en": "I sometimes miss or delay doses"
+          },
+          {
+            "value": "changed_myself",
+            "label_zh": "我自己調整過劑量或次數",
+            "label_en": "I changed the dose or timing myself"
+          },
+          {
+            "value": "stopped",
+            "label_zh": "我已經停藥一陣子",
+            "label_en": "I stopped for a while"
+          }
+        ],
+        "required": true,
+        "rules": [
+          {
+            "when": {
+              "op": "eq",
+              "value": "missed_some"
+            },
+            "disposition": "review",
+            "reason_zh": "偶爾漏吃或晚吃，請醫師確認目前的用法。",
+            "reason_en": "You sometimes miss or delay doses; the doctor should confirm how you are taking it.",
+            "source_url": ""
+          },
+          {
+            "when": {
+              "op": "eq",
+              "value": "changed_myself"
+            },
+            "disposition": "review",
+            "reason_zh": "你自己調整過劑量或次數，請醫師確認。",
+            "reason_en": "You changed the dose or timing yourself; the doctor should confirm.",
+            "source_url": ""
+          },
+          {
+            "when": {
+              "op": "eq",
+              "value": "stopped"
+            },
+            "disposition": "in_person",
+            "reason_zh": "你已經停藥一陣子，重新開始前需要先回診評估。",
+            "reason_en": "You stopped the medicine for a while; a visit is needed before restarting.",
+            "source_url": ""
+          }
+        ]
+      },
+      {
+        "id": "urgent_symptoms_now",
+        "kind": "boolean",
+        "label_zh": "你現在有沒有胸痛、呼吸很喘、快要昏倒、單側手腳無力或說話不清楚，或嘴唇、喉嚨腫起來？",
+        "label_en": "Right now, do you have chest pain, severe breathlessness, near-fainting, one-sided weakness or slurred speech, or swelling of the lips or throat?",
+        "help_zh": "只要有其中一項，請先不要填表。",
+        "help_en": "If any of these apply, please stop filling in this form.",
+        "required": true,
+        "rules": [
+          {
+            "when": {
+              "op": "eq",
+              "value": true
+            },
+            "disposition": "urgent",
+            "reason_zh": "這些症狀可能很危急，請立刻撥 119 或到急診。",
+            "reason_en": "These symptoms can be an emergency. Call 119 or go to the emergency room now.",
+            "source_url": ""
+          }
+        ]
+      },
+      {
+        "id": "new_or_worse_symptoms",
+        "kind": "boolean",
+        "label_zh": "和上次看診比起來，有沒有出現新的不舒服，或原本的症狀變嚴重？",
+        "label_en": "Compared with your last visit, are there any new symptoms, or have existing ones got worse?",
+        "help_zh": "",
+        "help_en": "",
+        "required": true,
+        "rules": [
+          {
+            "when": {
+              "op": "eq",
+              "value": true
+            },
+            "disposition": "in_person",
+            "reason_zh": "症狀有變化，續藥前需要先回診讓醫師看。",
+            "reason_en": "Symptoms have changed; a visit is needed before renewal.",
+            "source_url": ""
+          }
+        ]
+      },
+      {
+        "id": "side_effects",
+        "kind": "boolean",
+        "label_zh": "吃這顆藥之後，有沒有覺得不舒服、疑似是藥的副作用？",
+        "label_en": "Do you think this medicine is causing side effects?",
+        "help_zh": "例如頭暈、胃不舒服、起疹子、咳嗽、很想睡。",
+        "help_en": "For example dizziness, stomach upset, rash, cough or drowsiness.",
+        "required": true,
+        "rules": [
+          {
+            "when": {
+              "op": "eq",
+              "value": true
+            },
+            "disposition": "review",
+            "reason_zh": "你覺得可能有副作用，請醫師確認。",
+            "reason_en": "You suspect a side effect; the doctor should look at it.",
+            "source_url": ""
+          }
+        ]
+      },
+      {
+        "id": "new_allergy",
+        "kind": "boolean",
+        "label_zh": "上次看診之後，有沒有對藥物或食物出現過敏，例如起疹子、癢或腫？",
+        "label_en": "Since your last visit, have you had any new allergic reaction to a medicine or food, such as rash, itching or swelling?",
+        "help_zh": "",
+        "help_en": "",
+        "required": true,
+        "rules": [
+          {
+            "when": {
+              "op": "eq",
+              "value": true
+            },
+            "disposition": "review",
+            "reason_zh": "出現新的過敏反應，請醫師確認。",
+            "reason_en": "A new allergic reaction was reported; the doctor should look at it.",
+            "source_url": ""
+          }
+        ]
+      },
+      {
+        "id": "new_medicines",
+        "kind": "boolean",
+        "label_zh": "上次看診之後，有沒有新增其他藥物、成藥、中藥或保健食品？",
+        "label_en": "Since your last visit, have you started any other medicine, over-the-counter product, herbal remedy or supplement?",
+        "help_zh": "有些藥或保健食品會影響這顆藥的作用。",
+        "help_en": "Some products change how this medicine works.",
+        "required": true,
+        "rules": [
+          {
+            "when": {
+              "op": "eq",
+              "value": true
+            },
+            "disposition": "review",
+            "reason_zh": "有新增藥物或保健食品，請醫師確認是否互相影響。",
+            "reason_en": "New medicines or supplements were added; the doctor should check for interactions.",
+            "source_url": ""
+          }
+        ]
+      },
+      {
+        "id": "hospital_or_er",
+        "kind": "boolean",
+        "label_zh": "上次看診之後，有沒有住院或掛過急診？",
+        "label_en": "Since your last visit, have you been admitted to hospital or gone to the emergency room?",
+        "help_zh": "",
+        "help_en": "",
+        "required": true,
+        "rules": [
+          {
+            "when": {
+              "op": "eq",
+              "value": true
+            },
+            "disposition": "in_person",
+            "reason_zh": "住院或急診後，續藥前需要先回診評估。",
+            "reason_en": "After a hospital stay or ER visit, a visit is needed before renewal.",
+            "source_url": ""
+          }
+        ]
+      },
+      {
+        "id": "pregnancy_status",
+        "kind": "choice",
+        "label_zh": "你目前有懷孕、準備懷孕或正在哺乳嗎？",
+        "label_en": "Are you pregnant, planning a pregnancy or breastfeeding?",
+        "help_zh": "不會懷孕的人請選「不適用」。",
+        "help_en": "If pregnancy is not possible for you, choose Not applicable.",
+        "options": [
+          {
+            "value": "not_applicable",
+            "label_zh": "不適用",
+            "label_en": "Not applicable"
+          },
+          {
+            "value": "no",
+            "label_zh": "沒有",
+            "label_en": "No"
+          },
+          {
+            "value": "pregnant",
+            "label_zh": "懷孕中",
+            "label_en": "Pregnant"
+          },
+          {
+            "value": "planning",
+            "label_zh": "準備懷孕",
+            "label_en": "Planning a pregnancy"
+          },
+          {
+            "value": "breastfeeding",
+            "label_zh": "哺乳中",
+            "label_en": "Breastfeeding"
+          }
+        ],
+        "required": true,
+        "rules": [
+          {
+            "when": {
+              "op": "eq",
+              "value": "pregnant"
+            },
+            "disposition": "in_person",
+            "reason_zh": "懷孕期間用藥要由醫師重新評估，請先回診。",
+            "reason_en": "Medicines in pregnancy need a doctor reassessment; please visit first.",
+            "source_url": ""
+          },
+          {
+            "when": {
+              "op": "eq",
+              "value": "planning"
+            },
+            "disposition": "in_person",
+            "reason_zh": "準備懷孕前，用藥要先由醫師評估，請先回診。",
+            "reason_en": "Before a planned pregnancy the medicine needs a doctor reassessment; please visit first.",
+            "source_url": ""
+          },
+          {
+            "when": {
+              "op": "eq",
+              "value": "breastfeeding"
+            },
+            "disposition": "in_person",
+            "reason_zh": "哺乳期間用藥要由醫師重新評估，請先回診。",
+            "reason_en": "Medicines while breastfeeding need a doctor reassessment; please visit first.",
+            "source_url": ""
+          }
+        ]
+      },
+      {
+        "id": "last_seen_days",
+        "kind": "number",
+        "label_zh": "距離上次當面看診已經幾天？",
+        "label_en": "How many days ago was your last in-person visit?",
+        "help_zh": "系統會依你的看診紀錄自動算出，不用自己填。",
+        "help_en": "The system works this out from your visit record; you do not need to enter it.",
+        "unit": "天",
+        "min": 0,
+        "max": 3650,
+        "required": true,
+        "rules": [
+          {
+            "when": {
+              "op": "missing"
+            },
+            "disposition": "in_person",
+            "reason_zh": "查不到上次當面看診的日期，請先回診。",
+            "reason_en": "No last in-person visit date was found; please visit first.",
+            "source_url": ""
+          },
+          {
+            "when": {
+              "op": "gt",
+              "value": 90
+            },
+            "disposition": "review",
+            "reason_zh": "距離上次看診已超過 90 天（慢性病連續處方箋每次處方最長 90 天），請醫師確認是否需要先回診。",
+            "reason_en": "It is more than 90 days since your last visit (a refillable prescription covers at most 90 days); the doctor should decide whether a visit is needed first.",
+            "source_url": "https://www.mohw.gov.tw/dl-93633-3bde2ef4-420d-4498-b056-e54019bab357.html"
+          }
+        ]
+      },
+      {
+        "id": "kidney_liver_change",
+        "kind": "boolean",
+        "label_zh": "上次看診之後，有沒有被告知腎臟或肝臟的狀況變差，或新診斷出腎臟病、肝病？",
+        "label_en": "Since your last visit, have you been told your kidney or liver condition got worse, or been newly diagnosed with kidney or liver disease?",
+        "help_zh": "",
+        "help_en": "",
+        "required": true,
+        "rules": [
+          {
+            "when": {
+              "op": "eq",
+              "value": true
+            },
+            "disposition": "in_person",
+            "reason_zh": "腎臟或肝臟狀況有變，藥量可能要調整，請先回診。",
+            "reason_en": "Kidney or liver status changed and the dose may need adjusting; please visit first.",
+            "source_url": ""
+          }
+        ]
+      },
+      {
+        "id": "consent_physician_review",
+        "kind": "boolean",
+        "label_zh": "你同意這份申請由醫師審核，並由醫師決定是否續開嗎？",
+        "label_en": "Do you agree that a doctor will review this request and decide whether to renew?",
+        "help_zh": "本系統只做檢核，不會開藥。",
+        "help_en": "This tool only checks; it never prescribes.",
+        "required": true,
+        "rules": [
+          {
+            "when": {
+              "op": "eq",
+              "value": false
+            },
+            "disposition": "in_person",
+            "reason_zh": "需要你同意由醫師審核才能送出，否則請回診。",
+            "reason_en": "You must agree to doctor review to submit; otherwise please visit.",
+            "source_url": ""
+          }
+        ]
+      }
+    ]
+  },
+  "classes": [
+    {
+      "class_id": "antihypertensive_raas",
+      "title_zh": "降血壓藥：ACEI／ARB",
+      "title_en": "Blood pressure: ACE inhibitor / ARB",
+      "summary_zh": "這類藥（名稱常以 -pril 或 -sartan 結尾）用來控制血壓、保護腎臟，要留意咳嗽、血管性水腫、血鉀與腎功能，懷孕時不能用。",
+      "summary_en": "These medicines (names often end in -pril or -sartan) lower blood pressure and protect the kidneys. Watch for cough, angioedema, potassium and kidney function; they must not be used in pregnancy.",
+      "questions": [
+        {
+          "id": "home_sbp",
+          "kind": "number",
+          "label_zh": "最近一週在家量血壓，早晚平均的收縮壓（上面的數字）是多少？",
+          "label_en": "Over the past week at home, what is your average systolic (top) blood pressure?",
+          "help_zh": "請照「722」方式量：連續 7 天，早晚各量 2 次，每次量 2 回，再取平均。",
+          "help_en": "Use the 722 method: 7 days, morning and evening, 2 readings each time, then average.",
+          "unit": "mmHg",
+          "min": 50,
+          "max": 300,
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "missing"
+              },
+              "disposition": "review",
+              "reason_zh": "沒有居家血壓數字，請醫師確認血壓控制情形。",
+              "reason_en": "No home blood pressure was given; the doctor should check blood pressure control.",
+              "source_url": ""
+            },
+            {
+              "when": {
+                "op": "gte",
+                "value": 130
+              },
+              "disposition": "review",
+              "reason_zh": "居家平均收縮壓 130 mmHg 以上，高於台灣高血壓指引的目標（低於 130/80），請醫師確認。",
+              "reason_en": "Average home systolic is 130 mmHg or higher, above the Taiwan guideline target (below 130/80); the doctor should review.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756"
+            }
+          ]
+        },
+        {
+          "id": "home_dbp",
+          "kind": "number",
+          "label_zh": "同一段時間，早晚平均的舒張壓（下面的數字）是多少？",
+          "label_en": "Over the same time, what is your average diastolic (bottom) blood pressure?",
+          "help_zh": "",
+          "help_en": "",
+          "unit": "mmHg",
+          "min": 30,
+          "max": 200,
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "missing"
+              },
+              "disposition": "review",
+              "reason_zh": "沒有居家血壓數字，請醫師確認血壓控制情形。",
+              "reason_en": "No home blood pressure was given; the doctor should check blood pressure control.",
+              "source_url": ""
+            },
+            {
+              "when": {
+                "op": "gte",
+                "value": 80
+              },
+              "disposition": "review",
+              "reason_zh": "居家平均舒張壓 80 mmHg 以上，高於台灣高血壓指引的目標（低於 130/80），請醫師確認。",
+              "reason_en": "Average home diastolic is 80 mmHg or higher, above the Taiwan guideline target (below 130/80); the doctor should review.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756"
+            }
+          ]
+        },
+        {
+          "id": "dizzy_standing",
+          "kind": "boolean",
+          "label_zh": "站起來的時候，會不會頭暈、眼前發黑，或差點跌倒？",
+          "label_en": "When you stand up, do you get dizzy, see black, or nearly fall?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "可能是血壓太低或體位性低血壓，請醫師確認。",
+              "reason_en": "Possible low blood pressure on standing; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "raas_angioedema",
+          "kind": "boolean",
+          "label_zh": "最近有沒有嘴唇、舌頭、臉或喉嚨突然腫起來？",
+          "label_en": "Recently, have your lips, tongue, face or throat suddenly swollen?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "嘴唇、舌頭或喉嚨腫脹可能讓呼吸變困難，請立刻就醫。",
+              "reason_en": "Swelling of the lips, tongue or throat can block breathing. Seek care now.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "raas_cough",
+          "kind": "boolean",
+          "label_zh": "有沒有持續乾咳，而且是開始吃這類藥之後才有的？",
+          "label_en": "Do you have a dry cough that started after you began this medicine?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "持續乾咳是 ACEI 常見的副作用，請醫師確認是否要換藥。",
+              "reason_en": "A persistent dry cough is a common ACE inhibitor side effect; the doctor should consider switching.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "raas_bloodtest_after_change",
+          "kind": "boolean",
+          "label_zh": "最近 2 至 4 週內，你的劑量有調高或剛開始吃嗎？",
+          "label_en": "In the past 2 to 4 weeks, was your dose raised or did you just start this medicine?",
+          "help_zh": "剛開始或調高劑量後，需要抽血看腎功能與血鉀。",
+          "help_en": "After starting or raising the dose, kidney function and potassium need checking by blood test.",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "剛開始或調高劑量後 2 至 4 週內要檢查血壓、肌酸酐與血鉀，請醫師確認。",
+              "reason_en": "Blood pressure, creatinine and potassium should be checked within 2 to 4 weeks of starting or raising the dose; the doctor should confirm.",
+              "source_url": "https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf"
+            }
+          ]
+        }
+      ],
+      "monitoring": [
+        {
+          "id": "egfr_k_annual",
+          "label_zh": "腎功能與血鉀（最近一次抽血日期）",
+          "label_en": "Kidney function and potassium (date of latest blood test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "指引對慢性腎臟病患者建議至少每年檢查一次腎功能；本系統對這類藥沿用相同間隔，這是保守的設定，最後由醫師決定。",
+          "reason_en": "KDIGO advises checking kidney function at least yearly in people with CKD; this tool applies the same interval to this class as a conservative setting, and the doctor makes the final call.",
+          "source_type": "guideline",
+          "source_url": "https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "bp_check",
+          "label_zh": "居家血壓量測紀錄（最近一次日期）",
+          "label_en": "Home blood pressure log (date of latest check)",
+          "max_age_days": 90,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "血壓控制穩定時，台灣指引建議約每 3 個月檢視一次居家血壓；超過這段時間沒量，請先補量。",
+          "reason_en": "When blood pressure is controlled, the Taiwan guideline suggests checking home blood pressure about every 3 months; if it has been longer, please measure again first.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756",
+          "verified_on": "2026-11-25"
+        }
+      ]
+    },
+    {
+      "class_id": "antihypertensive_ccb",
+      "title_zh": "降血壓藥：鈣離子阻斷劑",
+      "title_en": "Blood pressure: calcium channel blocker",
+      "summary_zh": "這類藥（如 amlodipine、nifedipine）用來控制血壓，常見副作用是腳踝水腫、臉潮紅與頭痛。",
+      "summary_en": "These medicines (such as amlodipine and nifedipine) lower blood pressure. Ankle swelling, flushing and headache are common side effects.",
+      "questions": [
+        {
+          "id": "home_sbp",
+          "kind": "number",
+          "label_zh": "最近一週在家量血壓，早晚平均的收縮壓（上面的數字）是多少？",
+          "label_en": "Over the past week at home, what is your average systolic (top) blood pressure?",
+          "help_zh": "請照「722」方式量：連續 7 天，早晚各量 2 次，每次量 2 回，再取平均。",
+          "help_en": "Use the 722 method: 7 days, morning and evening, 2 readings each time, then average.",
+          "unit": "mmHg",
+          "min": 50,
+          "max": 300,
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "missing"
+              },
+              "disposition": "review",
+              "reason_zh": "沒有居家血壓數字，請醫師確認血壓控制情形。",
+              "reason_en": "No home blood pressure was given; the doctor should check blood pressure control.",
+              "source_url": ""
+            },
+            {
+              "when": {
+                "op": "gte",
+                "value": 130
+              },
+              "disposition": "review",
+              "reason_zh": "居家平均收縮壓 130 mmHg 以上，高於台灣高血壓指引的目標（低於 130/80），請醫師確認。",
+              "reason_en": "Average home systolic is 130 mmHg or higher, above the Taiwan guideline target (below 130/80); the doctor should review.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756"
+            }
+          ]
+        },
+        {
+          "id": "home_dbp",
+          "kind": "number",
+          "label_zh": "同一段時間，早晚平均的舒張壓（下面的數字）是多少？",
+          "label_en": "Over the same time, what is your average diastolic (bottom) blood pressure?",
+          "help_zh": "",
+          "help_en": "",
+          "unit": "mmHg",
+          "min": 30,
+          "max": 200,
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "missing"
+              },
+              "disposition": "review",
+              "reason_zh": "沒有居家血壓數字，請醫師確認血壓控制情形。",
+              "reason_en": "No home blood pressure was given; the doctor should check blood pressure control.",
+              "source_url": ""
+            },
+            {
+              "when": {
+                "op": "gte",
+                "value": 80
+              },
+              "disposition": "review",
+              "reason_zh": "居家平均舒張壓 80 mmHg 以上，高於台灣高血壓指引的目標（低於 130/80），請醫師確認。",
+              "reason_en": "Average home diastolic is 80 mmHg or higher, above the Taiwan guideline target (below 130/80); the doctor should review.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756"
+            }
+          ]
+        },
+        {
+          "id": "dizzy_standing",
+          "kind": "boolean",
+          "label_zh": "站起來的時候，會不會頭暈、眼前發黑，或差點跌倒？",
+          "label_en": "When you stand up, do you get dizzy, see black, or nearly fall?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "可能是血壓太低或體位性低血壓，請醫師確認。",
+              "reason_en": "Possible low blood pressure on standing; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "ccb_ankle_swelling",
+          "kind": "boolean",
+          "label_zh": "腳踝或小腿有沒有新的水腫，或比之前更腫？",
+          "label_en": "Do you have new or worse swelling of the ankles or lower legs?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "腳踝水腫是這類藥常見的副作用，請醫師確認。",
+              "reason_en": "Ankle swelling is a common side effect of this class; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "ccb_palpitations",
+          "kind": "boolean",
+          "label_zh": "有沒有心跳很快、很用力，或胸口悶悶的感覺？",
+          "label_en": "Do you feel a fast or pounding heartbeat, or chest tightness?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "心悸或胸悶需要先讓醫師當面評估。",
+              "reason_en": "Palpitations or chest tightness need a doctor to see you in person first.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": [
+        {
+          "id": "bp_check",
+          "label_zh": "居家血壓量測紀錄（最近一次日期）",
+          "label_en": "Home blood pressure log (date of latest check)",
+          "max_age_days": 90,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "血壓控制穩定時，台灣指引建議約每 3 個月檢視一次居家血壓；超過這段時間沒量，請先補量。",
+          "reason_en": "When blood pressure is controlled, the Taiwan guideline suggests checking home blood pressure about every 3 months; if it has been longer, please measure again first.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756",
+          "verified_on": "2026-11-25"
+        }
+      ]
+    },
+    {
+      "class_id": "antihypertensive_bb",
+      "title_zh": "降血壓藥：乙型阻斷劑",
+      "title_en": "Blood pressure: beta blocker",
+      "summary_zh": "這類藥（名稱常以 -olol 結尾）可降低血壓與心跳；突然停藥有風險，氣喘患者與心跳過慢的人要特別留意。",
+      "summary_en": "These medicines (names often end in -olol) lower blood pressure and heart rate. Stopping suddenly is risky, and people with asthma or a very slow pulse need extra care.",
+      "questions": [
+        {
+          "id": "home_sbp",
+          "kind": "number",
+          "label_zh": "最近一週在家量血壓，早晚平均的收縮壓（上面的數字）是多少？",
+          "label_en": "Over the past week at home, what is your average systolic (top) blood pressure?",
+          "help_zh": "請照「722」方式量：連續 7 天，早晚各量 2 次，每次量 2 回，再取平均。",
+          "help_en": "Use the 722 method: 7 days, morning and evening, 2 readings each time, then average.",
+          "unit": "mmHg",
+          "min": 50,
+          "max": 300,
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "missing"
+              },
+              "disposition": "review",
+              "reason_zh": "沒有居家血壓數字，請醫師確認血壓控制情形。",
+              "reason_en": "No home blood pressure was given; the doctor should check blood pressure control.",
+              "source_url": ""
+            },
+            {
+              "when": {
+                "op": "gte",
+                "value": 130
+              },
+              "disposition": "review",
+              "reason_zh": "居家平均收縮壓 130 mmHg 以上，高於台灣高血壓指引的目標（低於 130/80），請醫師確認。",
+              "reason_en": "Average home systolic is 130 mmHg or higher, above the Taiwan guideline target (below 130/80); the doctor should review.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756"
+            }
+          ]
+        },
+        {
+          "id": "home_dbp",
+          "kind": "number",
+          "label_zh": "同一段時間，早晚平均的舒張壓（下面的數字）是多少？",
+          "label_en": "Over the same time, what is your average diastolic (bottom) blood pressure?",
+          "help_zh": "",
+          "help_en": "",
+          "unit": "mmHg",
+          "min": 30,
+          "max": 200,
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "missing"
+              },
+              "disposition": "review",
+              "reason_zh": "沒有居家血壓數字，請醫師確認血壓控制情形。",
+              "reason_en": "No home blood pressure was given; the doctor should check blood pressure control.",
+              "source_url": ""
+            },
+            {
+              "when": {
+                "op": "gte",
+                "value": 80
+              },
+              "disposition": "review",
+              "reason_zh": "居家平均舒張壓 80 mmHg 以上，高於台灣高血壓指引的目標（低於 130/80），請醫師確認。",
+              "reason_en": "Average home diastolic is 80 mmHg or higher, above the Taiwan guideline target (below 130/80); the doctor should review.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756"
+            }
+          ]
+        },
+        {
+          "id": "dizzy_standing",
+          "kind": "boolean",
+          "label_zh": "站起來的時候，會不會頭暈、眼前發黑，或差點跌倒？",
+          "label_en": "When you stand up, do you get dizzy, see black, or nearly fall?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "可能是血壓太低或體位性低血壓，請醫師確認。",
+              "reason_en": "Possible low blood pressure on standing; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bb_stopped_suddenly",
+          "kind": "boolean",
+          "label_zh": "最近有沒有突然停過這類藥，或超過幾天沒吃？",
+          "label_en": "Recently, did you stop this medicine suddenly or go several days without it?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "突然停用乙型阻斷劑可能讓心跳與血壓反彈，請醫師確認。",
+              "reason_en": "Stopping a beta blocker suddenly can cause a rebound in heart rate and blood pressure; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bb_slow_pulse",
+          "kind": "boolean",
+          "label_zh": "有沒有覺得心跳特別慢、很容易喘或很容易累？",
+          "label_en": "Does your pulse feel very slow, or do you get breathless or tired very easily?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "心跳過慢或容易喘，請醫師確認藥量。",
+              "reason_en": "A very slow pulse or easy breathlessness; the doctor should review the dose.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bb_wheeze",
+          "kind": "boolean",
+          "label_zh": "最近有沒有新的喘鳴聲或氣喘發作變多？",
+          "label_en": "Recently, have you had new wheezing or more asthma attacks?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "乙型阻斷劑可能讓氣喘惡化，請先回診評估。",
+              "reason_en": "Beta blockers can worsen asthma; please visit first.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": [
+        {
+          "id": "bp_check",
+          "label_zh": "居家血壓量測紀錄（最近一次日期）",
+          "label_en": "Home blood pressure log (date of latest check)",
+          "max_age_days": 90,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "血壓控制穩定時，台灣指引建議約每 3 個月檢視一次居家血壓；超過這段時間沒量，請先補量。",
+          "reason_en": "When blood pressure is controlled, the Taiwan guideline suggests checking home blood pressure about every 3 months; if it has been longer, please measure again first.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756",
+          "verified_on": "2026-11-25"
+        }
+      ]
+    },
+    {
+      "class_id": "diuretic",
+      "title_zh": "利尿劑（thiazide 類）",
+      "title_en": "Diuretic (thiazide-type)",
+      "summary_zh": "這類藥（如 hydrochlorothiazide、indapamide）幫助排水降血壓，要留意脫水、抽筋、血鈉血鉀偏低與痛風。",
+      "summary_en": "These medicines (such as hydrochlorothiazide and indapamide) remove fluid to lower blood pressure. Watch for dehydration, cramps, low sodium or potassium, and gout.",
+      "questions": [
+        {
+          "id": "home_sbp",
+          "kind": "number",
+          "label_zh": "最近一週在家量血壓，早晚平均的收縮壓（上面的數字）是多少？",
+          "label_en": "Over the past week at home, what is your average systolic (top) blood pressure?",
+          "help_zh": "請照「722」方式量：連續 7 天，早晚各量 2 次，每次量 2 回，再取平均。",
+          "help_en": "Use the 722 method: 7 days, morning and evening, 2 readings each time, then average.",
+          "unit": "mmHg",
+          "min": 50,
+          "max": 300,
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "missing"
+              },
+              "disposition": "review",
+              "reason_zh": "沒有居家血壓數字，請醫師確認血壓控制情形。",
+              "reason_en": "No home blood pressure was given; the doctor should check blood pressure control.",
+              "source_url": ""
+            },
+            {
+              "when": {
+                "op": "gte",
+                "value": 130
+              },
+              "disposition": "review",
+              "reason_zh": "居家平均收縮壓 130 mmHg 以上，高於台灣高血壓指引的目標（低於 130/80），請醫師確認。",
+              "reason_en": "Average home systolic is 130 mmHg or higher, above the Taiwan guideline target (below 130/80); the doctor should review.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756"
+            }
+          ]
+        },
+        {
+          "id": "home_dbp",
+          "kind": "number",
+          "label_zh": "同一段時間，早晚平均的舒張壓（下面的數字）是多少？",
+          "label_en": "Over the same time, what is your average diastolic (bottom) blood pressure?",
+          "help_zh": "",
+          "help_en": "",
+          "unit": "mmHg",
+          "min": 30,
+          "max": 200,
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "missing"
+              },
+              "disposition": "review",
+              "reason_zh": "沒有居家血壓數字，請醫師確認血壓控制情形。",
+              "reason_en": "No home blood pressure was given; the doctor should check blood pressure control.",
+              "source_url": ""
+            },
+            {
+              "when": {
+                "op": "gte",
+                "value": 80
+              },
+              "disposition": "review",
+              "reason_zh": "居家平均舒張壓 80 mmHg 以上，高於台灣高血壓指引的目標（低於 130/80），請醫師確認。",
+              "reason_en": "Average home diastolic is 80 mmHg or higher, above the Taiwan guideline target (below 130/80); the doctor should review.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756"
+            }
+          ]
+        },
+        {
+          "id": "dizzy_standing",
+          "kind": "boolean",
+          "label_zh": "站起來的時候，會不會頭暈、眼前發黑，或差點跌倒？",
+          "label_en": "When you stand up, do you get dizzy, see black, or nearly fall?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "可能是血壓太低或體位性低血壓，請醫師確認。",
+              "reason_en": "Possible low blood pressure on standing; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "sick_day",
+          "kind": "boolean",
+          "label_zh": "最近有沒有嚴重嘔吐、拉肚子，或吃喝很少、脫水的情形？",
+          "label_en": "Recently, have you had bad vomiting or diarrhoea, or eaten and drunk very little, or become dehydrated?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "脫水或吃喝很少時，這類藥可能要暫停，請醫師確認。",
+              "reason_en": "When dehydrated or not eating or drinking, this medicine may need pausing; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "diuretic_cramps",
+          "kind": "boolean",
+          "label_zh": "有沒有常常抽筋、全身無力，或心跳不規律？",
+          "label_en": "Do you often get cramps or feel weak all over, or notice an irregular heartbeat?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "抽筋、無力或心律不整可能是電解質失衡，請先回診抽血。",
+              "reason_en": "Cramps, weakness or an irregular heartbeat may mean an electrolyte imbalance; please visit for blood tests.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "diuretic_gout",
+          "kind": "boolean",
+          "label_zh": "最近有沒有痛風發作，例如腳趾、腳踝突然紅腫痛？",
+          "label_en": "Recently, have you had a gout attack, such as a suddenly red, swollen, painful toe or ankle?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "利尿劑可能讓尿酸升高，請醫師確認。",
+              "reason_en": "Diuretics can raise uric acid; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": [
+        {
+          "id": "egfr_k_annual",
+          "label_zh": "腎功能與血鉀（最近一次抽血日期）",
+          "label_en": "Kidney function and potassium (date of latest blood test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "指引對慢性腎臟病患者建議至少每年檢查一次腎功能；本系統對這類藥沿用相同間隔，這是保守的設定，最後由醫師決定。",
+          "reason_en": "KDIGO advises checking kidney function at least yearly in people with CKD; this tool applies the same interval to this class as a conservative setting, and the doctor makes the final call.",
+          "source_type": "guideline",
+          "source_url": "https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "bp_check",
+          "label_zh": "居家血壓量測紀錄（最近一次日期）",
+          "label_en": "Home blood pressure log (date of latest check)",
+          "max_age_days": 90,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "血壓控制穩定時，台灣指引建議約每 3 個月檢視一次居家血壓；超過這段時間沒量，請先補量。",
+          "reason_en": "When blood pressure is controlled, the Taiwan guideline suggests checking home blood pressure about every 3 months; if it has been longer, please measure again first.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9121756",
+          "verified_on": "2026-11-25"
+        }
+      ]
+    },
+    {
+      "class_id": "statin",
+      "title_zh": "降血脂藥（statin 與 ezetimibe）",
+      "title_en": "Lipid lowering (statin and ezetimibe)",
+      "summary_zh": "這類藥幫助降低壞膽固醇、減少心血管事件；要留意肌肉痠痛無力、茶色尿與肝功能。",
+      "summary_en": "These medicines lower LDL cholesterol and reduce heart and vessel events. Watch for muscle pain or weakness, dark urine and liver problems.",
+      "questions": [
+        {
+          "id": "statin_muscle",
+          "kind": "boolean",
+          "label_zh": "有沒有不明原因的肌肉痠痛、無力或抽痛，尤其是大腿或肩膀？",
+          "label_en": "Do you have unexplained muscle pain, weakness or cramps, especially in the thighs or shoulders?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "肌肉症狀可能與 statin 有關，請醫師確認。",
+              "reason_en": "Muscle symptoms may be related to the statin; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "statin_dark_urine",
+          "kind": "boolean",
+          "label_zh": "肌肉痠痛時，尿液有沒有變成茶色或可樂色？",
+          "label_en": "With muscle pain, has your urine turned tea- or cola-coloured?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "肌肉痠痛加上茶色尿，可能是肌肉受損，請先回診檢查。",
+              "reason_en": "Muscle pain with dark urine may mean muscle damage; please visit for tests.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "statin_liver",
+          "kind": "boolean",
+          "label_zh": "有沒有皮膚或眼白變黃、右上腹痛，或食慾變很差？",
+          "label_en": "Do you have yellow skin or eyes, pain in the upper right belly, or a much poorer appetite?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "可能是肝臟問題，請先回診檢查。",
+              "reason_en": "This may be a liver problem; please visit for tests.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": [
+        {
+          "id": "lipid_panel",
+          "label_zh": "血脂檢查（最近一次日期）",
+          "label_en": "Lipid panel (date of latest test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "ACC/AHA 指引建議開始用藥或調藥後 4 至 12 週檢查血脂，之後依需要每 3 至 12 個月一次；超過 12 個月沒檢查就請醫師看。",
+          "reason_en": "ACC/AHA advise a lipid check 4 to 12 weeks after starting or adjusting a statin, then every 3 to 12 months as needed; no check in over 12 months goes to the doctor.",
+          "source_type": "guideline",
+          "source_url": "https://www.aafp.org/pubs/afp/issues/2019/0501/p589.html",
+          "verified_on": "2026-11-25"
+        }
+      ]
+    },
+    {
+      "class_id": "antidiabetic_metformin",
+      "title_zh": "降血糖藥：metformin",
+      "title_en": "Diabetes: metformin",
+      "summary_zh": "Metformin 是常用的第一線口服降血糖藥；腎功能太差時不能用，要留意腸胃不適與罕見但嚴重的乳酸中毒。",
+      "summary_en": "Metformin is a common first-line oral diabetes medicine. It must not be used when kidney function is too low; watch for stomach upset and the rare but serious lactic acidosis.",
+      "questions": [
+        {
+          "id": "met_gi",
+          "kind": "boolean",
+          "label_zh": "有沒有持續的噁心、腹瀉或胃不舒服，是吃這個藥之後才有的？",
+          "label_en": "Do you have lasting nausea, diarrhoea or stomach upset since starting this medicine?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "腸胃不適是常見副作用，請醫師確認是否要調整。",
+              "reason_en": "Stomach upset is a common side effect; the doctor should consider adjusting.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "sick_day",
+          "kind": "boolean",
+          "label_zh": "最近有沒有嚴重嘔吐、拉肚子，或吃喝很少、脫水的情形？",
+          "label_en": "Recently, have you had bad vomiting or diarrhoea, or eaten and drunk very little, or become dehydrated?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "脫水或吃喝很少時，這類藥可能要暫停，請醫師確認。",
+              "reason_en": "When dehydrated or not eating or drinking, this medicine may need pausing; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "met_contrast_surgery",
+          "kind": "boolean",
+          "label_zh": "近期有沒有安排打顯影劑的檢查（例如電腦斷層）或手術？",
+          "label_en": "Do you have a scan with contrast dye (such as a CT) or surgery coming up?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "做顯影劑檢查或手術前後，metformin 可能要暫停，請醫師確認。",
+              "reason_en": "Metformin may need pausing around contrast scans or surgery; the doctor should review.",
+              "source_url": "https://www.accessdata.fda.gov/spl/data/5768a8bd-9de5-4989-8780-4a180f2cc82e/5768a8bd-9de5-4989-8780-4a180f2cc82e.xml"
+            }
+          ]
+        },
+        {
+          "id": "met_lactic",
+          "kind": "boolean",
+          "label_zh": "有沒有突然很喘、肌肉痠痛、很想吐、肚子痛，或異常疲倦？",
+          "label_en": "Do you have sudden breathlessness, muscle pain, nausea, belly pain or unusual tiredness?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "這些可能是乳酸中毒的警訊，請立刻就醫。",
+              "reason_en": "These may be signs of lactic acidosis. Seek care now.",
+              "source_url": "https://www.accessdata.fda.gov/spl/data/5768a8bd-9de5-4989-8780-4a180f2cc82e/5768a8bd-9de5-4989-8780-4a180f2cc82e.xml"
+            }
+          ]
+        }
+      ],
+      "monitoring": [
+        {
+          "id": "egfr_metformin",
+          "label_zh": "腎功能 eGFR（最近一次數值）",
+          "label_en": "Kidney function eGFR (latest value)",
+          "max_age_days": 365,
+          "value_kind": "number",
+          "unit": "mL/min/1.73 m²",
+          "rules": [
+            {
+              "when": {
+                "op": "lt",
+                "value": 30
+              },
+              "disposition": "in_person",
+              "reason_zh": "eGFR 低於 30，metformin 不建議使用，請先回診。",
+              "reason_en": "eGFR below 30: metformin is contraindicated; please visit first.",
+              "source_url": "https://www.accessdata.fda.gov/spl/data/5768a8bd-9de5-4989-8780-4a180f2cc82e/5768a8bd-9de5-4989-8780-4a180f2cc82e.xml"
+            },
+            {
+              "when": {
+                "op": "lt",
+                "value": 45
+              },
+              "disposition": "review",
+              "reason_zh": "eGFR 低於 45，請醫師評估繼續使用的好處與風險。",
+              "reason_en": "eGFR below 45: the doctor should weigh the benefit and risk of continuing.",
+              "source_url": "https://www.accessdata.fda.gov/spl/data/5768a8bd-9de5-4989-8780-4a180f2cc82e/5768a8bd-9de5-4989-8780-4a180f2cc82e.xml"
+            }
+          ],
+          "stale_disposition": "review",
+          "reason_zh": "使用 metformin 的人至少每年檢查一次 eGFR，高風險者要更頻繁。",
+          "reason_en": "People on metformin should have eGFR checked at least yearly, more often if at higher risk.",
+          "source_type": "official",
+          "source_url": "https://www.accessdata.fda.gov/spl/data/5768a8bd-9de5-4989-8780-4a180f2cc82e/5768a8bd-9de5-4989-8780-4a180f2cc82e.xml",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "a1c",
+          "label_zh": "糖化血色素 HbA1c（最近一次數值）",
+          "label_en": "HbA1c (latest value)",
+          "max_age_days": 183,
+          "value_kind": "number",
+          "unit": "%",
+          "rules": [
+            {
+              "when": {
+                "op": "gte",
+                "value": 7
+              },
+              "disposition": "review",
+              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值可依個人情況調整。",
+              "reason_en": "HbA1c is 7% or higher, above the target for many adults (below 7%); the doctor should review. Targets can be individualised.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
+            }
+          ],
+          "stale_disposition": "review",
+          "reason_zh": "血糖穩定時至少每年檢查兩次，因此超過約半年沒有數值就請醫師看。",
+          "reason_en": "At least twice a year when stable, so a value older than about six months goes to the doctor.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "egfr_annual",
+          "label_zh": "腎功能 eGFR（最近一次抽血日期）",
+          "label_en": "Kidney function eGFR (date of latest test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "糖尿病患者的腎功能與尿液白蛋白檢查，ADA 建議每年至少一次。",
+          "reason_en": "The ADA lists kidney function and urine albumin testing at least yearly for people with diabetes.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "uacr_annual",
+          "label_zh": "尿液白蛋白／肌酸酐比值 UACR（最近一次日期）",
+          "label_en": "Urine albumin-to-creatinine ratio (date of latest test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "糖尿病患者的尿液白蛋白檢查，ADA 建議每年至少一次。",
+          "reason_en": "The ADA lists urine albumin testing at least yearly for people with diabetes.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "eye_exam",
+          "label_zh": "散瞳眼底檢查（最近一次日期）",
+          "label_en": "Dilated eye exam (date of latest exam)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "ADA 列出糖尿病患者每年做一次散瞳眼底檢查（沒有病變且血糖達標時，可考慮 1 至 2 年一次，由醫師決定）。",
+          "reason_en": "The ADA lists an annual dilated eye exam for people with diabetes (every 1-2 years may be considered when there is no retinopathy and goals are met; the doctor decides).",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "foot_exam",
+          "label_zh": "完整足部檢查（最近一次日期）",
+          "label_en": "Comprehensive foot exam (date of latest exam)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "ADA 建議糖尿病患者至少每年做一次完整的足部檢查。",
+          "reason_en": "The ADA recommends a comprehensive foot exam at least once a year.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690177",
+          "verified_on": "2026-11-25"
+        }
+      ]
+    },
+    {
+      "class_id": "antidiabetic_dpp4",
+      "title_zh": "降血糖藥：DPP-4 抑制劑",
+      "title_en": "Diabetes: DPP-4 inhibitor",
+      "summary_zh": "這類藥（名稱常以 -gliptin 結尾）單獨使用時較少造成低血糖，要留意胰臟炎、關節痛與水泡。",
+      "summary_en": "These medicines (names often end in -gliptin) rarely cause low blood sugar on their own. Watch for pancreatitis, joint pain and blisters.",
+      "questions": [
+        {
+          "id": "dpp4_pancreatitis",
+          "kind": "boolean",
+          "label_zh": "有沒有嚴重、持續不退的上腹痛，可能伴隨嘔吐？",
+          "label_en": "Do you have severe, lasting upper belly pain, possibly with vomiting?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "持續的劇烈上腹痛可能是胰臟炎，請立刻就醫。",
+              "reason_en": "Severe lasting upper belly pain may be pancreatitis. Seek care now.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "dpp4_joint",
+          "kind": "boolean",
+          "label_zh": "有沒有新的嚴重關節痛，痛到影響活動？",
+          "label_en": "Do you have new severe joint pain that limits your activity?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "嚴重關節痛是這類藥已知的副作用，請醫師確認。",
+              "reason_en": "Severe joint pain is a known side effect of this class; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "dpp4_blisters",
+          "kind": "boolean",
+          "label_zh": "皮膚有沒有出現水泡或大片脫皮？",
+          "label_en": "Do you have blisters or large areas of peeling skin?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "皮膚水泡可能是藥物反應，請先回診。",
+              "reason_en": "Skin blisters may be a drug reaction; please visit first.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "dpp4_heart_failure",
+          "kind": "boolean",
+          "label_zh": "有沒有新的腿腫、躺下會喘，或體重短時間內明顯增加？",
+          "label_en": "Do you have new leg swelling, breathlessness lying down, or quick weight gain?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "可能是心臟衰竭的徵兆，請先回診評估。",
+              "reason_en": "These may be signs of heart failure; please visit first.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": [
+        {
+          "id": "a1c",
+          "label_zh": "糖化血色素 HbA1c（最近一次數值）",
+          "label_en": "HbA1c (latest value)",
+          "max_age_days": 183,
+          "value_kind": "number",
+          "unit": "%",
+          "rules": [
+            {
+              "when": {
+                "op": "gte",
+                "value": 7
+              },
+              "disposition": "review",
+              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值可依個人情況調整。",
+              "reason_en": "HbA1c is 7% or higher, above the target for many adults (below 7%); the doctor should review. Targets can be individualised.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
+            }
+          ],
+          "stale_disposition": "review",
+          "reason_zh": "血糖穩定時至少每年檢查兩次，因此超過約半年沒有數值就請醫師看。",
+          "reason_en": "At least twice a year when stable, so a value older than about six months goes to the doctor.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "egfr_annual",
+          "label_zh": "腎功能 eGFR（最近一次抽血日期）",
+          "label_en": "Kidney function eGFR (date of latest test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "糖尿病患者的腎功能與尿液白蛋白檢查，ADA 建議每年至少一次。",
+          "reason_en": "The ADA lists kidney function and urine albumin testing at least yearly for people with diabetes.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "uacr_annual",
+          "label_zh": "尿液白蛋白／肌酸酐比值 UACR（最近一次日期）",
+          "label_en": "Urine albumin-to-creatinine ratio (date of latest test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "糖尿病患者的尿液白蛋白檢查，ADA 建議每年至少一次。",
+          "reason_en": "The ADA lists urine albumin testing at least yearly for people with diabetes.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "eye_exam",
+          "label_zh": "散瞳眼底檢查（最近一次日期）",
+          "label_en": "Dilated eye exam (date of latest exam)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "ADA 列出糖尿病患者每年做一次散瞳眼底檢查（沒有病變且血糖達標時，可考慮 1 至 2 年一次，由醫師決定）。",
+          "reason_en": "The ADA lists an annual dilated eye exam for people with diabetes (every 1-2 years may be considered when there is no retinopathy and goals are met; the doctor decides).",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "foot_exam",
+          "label_zh": "完整足部檢查（最近一次日期）",
+          "label_en": "Comprehensive foot exam (date of latest exam)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "ADA 建議糖尿病患者至少每年做一次完整的足部檢查。",
+          "reason_en": "The ADA recommends a comprehensive foot exam at least once a year.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690177",
+          "verified_on": "2026-11-25"
+        }
+      ]
+    },
+    {
+      "class_id": "antidiabetic_sglt2",
+      "title_zh": "降血糖藥：SGLT2 抑制劑",
+      "title_en": "Diabetes: SGLT2 inhibitor",
+      "summary_zh": "這類藥（名稱常以 -gliflozin 結尾）讓糖分從尿液排出；要留意生殖器與泌尿道感染、脫水，以及罕見但嚴重的酮酸中毒。",
+      "summary_en": "These medicines (names often end in -gliflozin) pass sugar out in the urine. Watch for genital and urinary infections, dehydration, and the rare but serious ketoacidosis.",
+      "questions": [
+        {
+          "id": "sglt2_ketoacidosis",
+          "kind": "boolean",
+          "label_zh": "有沒有噁心、嘔吐、肚子痛、非常疲倦或呼吸急促？即使血糖不高也一樣。",
+          "label_en": "Do you have nausea, vomiting, belly pain, extreme tiredness or fast breathing, even if your blood sugar is not high?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "這些可能是酮酸中毒的警訊，請立刻就醫。",
+              "reason_en": "These may be signs of ketoacidosis. Seek care now.",
+              "source_url": "https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf"
+            }
+          ]
+        },
+        {
+          "id": "sglt2_infection",
+          "kind": "boolean",
+          "label_zh": "有沒有私密處搔癢、紅腫、分泌物，或排尿灼熱疼痛？",
+          "label_en": "Do you have genital itching, redness or discharge, or burning or pain when passing urine?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "生殖器與泌尿道感染是這類藥的常見副作用，請醫師確認。",
+              "reason_en": "Genital and urinary infections are common side effects of this class; the doctor should review.",
+              "source_url": "https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf"
+            }
+          ]
+        },
+        {
+          "id": "sick_day",
+          "kind": "boolean",
+          "label_zh": "最近有沒有嚴重嘔吐、拉肚子，或吃喝很少、脫水的情形？",
+          "label_en": "Recently, have you had bad vomiting or diarrhoea, or eaten and drunk very little, or become dehydrated?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "脫水或吃喝很少時，這類藥可能要暫停，請醫師確認。",
+              "reason_en": "When dehydrated or not eating or drinking, this medicine may need pausing; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "sglt2_surgery_fasting",
+          "kind": "boolean",
+          "label_zh": "近期有沒有安排手術，或需要長時間禁食的檢查？",
+          "label_en": "Do you have surgery or a test needing a long fast coming up?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "手術或長時間禁食前，這類藥通常要暫停，請醫師確認。",
+              "reason_en": "Before surgery or a long fast this medicine usually needs pausing; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": [
+        {
+          "id": "a1c",
+          "label_zh": "糖化血色素 HbA1c（最近一次數值）",
+          "label_en": "HbA1c (latest value)",
+          "max_age_days": 183,
+          "value_kind": "number",
+          "unit": "%",
+          "rules": [
+            {
+              "when": {
+                "op": "gte",
+                "value": 7
+              },
+              "disposition": "review",
+              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值可依個人情況調整。",
+              "reason_en": "HbA1c is 7% or higher, above the target for many adults (below 7%); the doctor should review. Targets can be individualised.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
+            }
+          ],
+          "stale_disposition": "review",
+          "reason_zh": "血糖穩定時至少每年檢查兩次，因此超過約半年沒有數值就請醫師看。",
+          "reason_en": "At least twice a year when stable, so a value older than about six months goes to the doctor.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "egfr_annual",
+          "label_zh": "腎功能 eGFR（最近一次抽血日期）",
+          "label_en": "Kidney function eGFR (date of latest test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "糖尿病患者的腎功能與尿液白蛋白檢查，ADA 建議每年至少一次。",
+          "reason_en": "The ADA lists kidney function and urine albumin testing at least yearly for people with diabetes.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "uacr_annual",
+          "label_zh": "尿液白蛋白／肌酸酐比值 UACR（最近一次日期）",
+          "label_en": "Urine albumin-to-creatinine ratio (date of latest test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "糖尿病患者的尿液白蛋白檢查，ADA 建議每年至少一次。",
+          "reason_en": "The ADA lists urine albumin testing at least yearly for people with diabetes.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "eye_exam",
+          "label_zh": "散瞳眼底檢查（最近一次日期）",
+          "label_en": "Dilated eye exam (date of latest exam)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "ADA 列出糖尿病患者每年做一次散瞳眼底檢查（沒有病變且血糖達標時，可考慮 1 至 2 年一次，由醫師決定）。",
+          "reason_en": "The ADA lists an annual dilated eye exam for people with diabetes (every 1-2 years may be considered when there is no retinopathy and goals are met; the doctor decides).",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "foot_exam",
+          "label_zh": "完整足部檢查（最近一次日期）",
+          "label_en": "Comprehensive foot exam (date of latest exam)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "ADA 建議糖尿病患者至少每年做一次完整的足部檢查。",
+          "reason_en": "The ADA recommends a comprehensive foot exam at least once a year.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690177",
+          "verified_on": "2026-11-25"
+        }
+      ]
+    },
+    {
+      "class_id": "antidiabetic_su",
+      "title_zh": "降血糖藥：磺醯脲類",
+      "title_en": "Diabetes: sulfonylurea",
+      "summary_zh": "這類藥（如 glimepiride、gliclazide）會刺激胰島素分泌，最大的風險是低血糖，吃得少或年紀大時更要小心。",
+      "summary_en": "These medicines (such as glimepiride and gliclazide) push the body to release insulin. The main risk is low blood sugar, especially when eating less or in older age.",
+      "questions": [
+        {
+          "id": "hypo_episodes",
+          "kind": "choice",
+          "label_zh": "最近一個月，有沒有血糖過低的情形，例如冒冷汗、手抖、心悸、突然很餓？",
+          "label_en": "In the past month, have you had low blood sugar, such as cold sweats, shaking, a pounding heart or sudden hunger?",
+          "help_zh": "如果有量到血糖，低於 70 mg/dL 就算過低。",
+          "help_en": "If you measured it, below 70 mg/dL counts as low.",
+          "options": [
+            {
+              "value": "none",
+              "label_zh": "沒有",
+              "label_en": "None"
+            },
+            {
+              "value": "below_70",
+              "label_zh": "有，血糖低於 70 mg/dL 或有這些症狀",
+              "label_en": "Yes, below 70 mg/dL or with these symptoms"
+            },
+            {
+              "value": "below_54_or_help",
+              "label_zh": "有，血糖低於 54 mg/dL，或需要別人幫忙",
+              "label_en": "Yes, below 54 mg/dL or I needed help"
+            }
+          ],
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": "below_70"
+              },
+              "disposition": "review",
+              "reason_zh": "有血糖低於 70 mg/dL 的情形，請醫師確認用藥。",
+              "reason_en": "Blood sugar fell below 70 mg/dL; the doctor should review the medicine.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
+            },
+            {
+              "when": {
+                "op": "eq",
+                "value": "below_54_or_help"
+              },
+              "disposition": "in_person",
+              "reason_zh": "血糖低於 54 mg/dL，或需要別人幫忙處理，續藥前請先回診。",
+              "reason_en": "Blood sugar fell below 54 mg/dL or you needed someone to help; please visit before renewal.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
+            }
+          ]
+        },
+        {
+          "id": "su_skipped_meals",
+          "kind": "boolean",
+          "label_zh": "最近有沒有吃得比平常少，或常常跳過正餐？",
+          "label_en": "Recently, have you been eating less than usual or often skipping meals?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "吃得少時吃這類藥容易低血糖，請醫師確認。",
+              "reason_en": "Taking this medicine while eating less makes low blood sugar more likely; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "su_driving_fall",
+          "kind": "boolean",
+          "label_zh": "有沒有因為頭暈、冒冷汗或意識模糊而跌倒，或開車時差點出事？",
+          "label_en": "Have you fallen, or nearly had a driving accident, because of dizziness, sweating or confusion?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "可能是嚴重低血糖，續藥前請先回診。",
+              "reason_en": "This may be severe low blood sugar; please visit before renewal.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": [
+        {
+          "id": "a1c",
+          "label_zh": "糖化血色素 HbA1c（最近一次數值）",
+          "label_en": "HbA1c (latest value)",
+          "max_age_days": 183,
+          "value_kind": "number",
+          "unit": "%",
+          "rules": [
+            {
+              "when": {
+                "op": "gte",
+                "value": 7
+              },
+              "disposition": "review",
+              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值可依個人情況調整。",
+              "reason_en": "HbA1c is 7% or higher, above the target for many adults (below 7%); the doctor should review. Targets can be individualised.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
+            }
+          ],
+          "stale_disposition": "review",
+          "reason_zh": "血糖穩定時至少每年檢查兩次，因此超過約半年沒有數值就請醫師看。",
+          "reason_en": "At least twice a year when stable, so a value older than about six months goes to the doctor.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "egfr_annual",
+          "label_zh": "腎功能 eGFR（最近一次抽血日期）",
+          "label_en": "Kidney function eGFR (date of latest test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "糖尿病患者的腎功能與尿液白蛋白檢查，ADA 建議每年至少一次。",
+          "reason_en": "The ADA lists kidney function and urine albumin testing at least yearly for people with diabetes.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "uacr_annual",
+          "label_zh": "尿液白蛋白／肌酸酐比值 UACR（最近一次日期）",
+          "label_en": "Urine albumin-to-creatinine ratio (date of latest test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "糖尿病患者的尿液白蛋白檢查，ADA 建議每年至少一次。",
+          "reason_en": "The ADA lists urine albumin testing at least yearly for people with diabetes.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "eye_exam",
+          "label_zh": "散瞳眼底檢查（最近一次日期）",
+          "label_en": "Dilated eye exam (date of latest exam)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "ADA 列出糖尿病患者每年做一次散瞳眼底檢查（沒有病變且血糖達標時，可考慮 1 至 2 年一次，由醫師決定）。",
+          "reason_en": "The ADA lists an annual dilated eye exam for people with diabetes (every 1-2 years may be considered when there is no retinopathy and goals are met; the doctor decides).",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690184",
+          "verified_on": "2026-11-25"
+        },
+        {
+          "id": "foot_exam",
+          "label_zh": "完整足部檢查（最近一次日期）",
+          "label_en": "Comprehensive foot exam (date of latest exam)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "ADA 建議糖尿病患者至少每年做一次完整的足部檢查。",
+          "reason_en": "The ADA recommends a comprehensive foot exam at least once a year.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690177",
+          "verified_on": "2026-11-25"
+        }
+      ]
+    },
+    {
+      "class_id": "levothyroxine",
+      "title_zh": "甲狀腺素",
+      "title_en": "Thyroid hormone replacement",
+      "summary_zh": "Levothyroxine 用來補充甲狀腺素；劑量過多或不足都會有症狀，要定期追蹤甲狀腺刺激素 TSH，懷孕時需要更密集追蹤。",
+      "summary_en": "Levothyroxine replaces thyroid hormone. Too much or too little both cause symptoms; TSH needs regular follow-up, and pregnancy needs closer monitoring.",
+      "questions": [
+        {
+          "id": "levo_dose_changed",
+          "kind": "boolean",
+          "label_zh": "最近 6 週內，你的劑量有調整過嗎？",
+          "label_en": "In the past 6 weeks, was your dose changed?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "調整劑量後約 4 至 6 週才適合再測 TSH，請醫師確認時機。",
+              "reason_en": "TSH is usually rechecked about 4 to 6 weeks after a dose change; the doctor should confirm the timing.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4267409"
+            }
+          ]
+        },
+        {
+          "id": "levo_too_much",
+          "kind": "boolean",
+          "label_zh": "有沒有心悸、手抖、很怕熱、容易流汗，或體重不明原因下降？",
+          "label_en": "Do you have a pounding heart, tremor, heat intolerance, sweating, or unexplained weight loss?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "這些可能是藥量偏多的症狀，請醫師確認。",
+              "reason_en": "These may be signs of too much medicine; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "levo_too_little",
+          "kind": "boolean",
+          "label_zh": "有沒有很怕冷、容易累、反應變慢、便祕或體重增加？",
+          "label_en": "Do you feel very cold, tired or slow, constipated, or have you gained weight?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "這些可能是藥量不足的症狀，請醫師確認。",
+              "reason_en": "These may be signs of too little medicine; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "levo_timing",
+          "kind": "boolean",
+          "label_zh": "你有沒有常常和鈣片、鐵劑或制酸劑一起吃，或沒有空腹吃？",
+          "label_en": "Do you often take it together with calcium, iron or antacids, or not on an empty stomach?",
+          "help_zh": "這些會影響吸收。",
+          "help_en": "These affect absorption.",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "吃法可能影響吸收，請醫師或藥師說明正確吃法。",
+              "reason_en": "How you take it may affect absorption; the doctor or pharmacist should explain.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": [
+        {
+          "id": "tsh_test",
+          "label_zh": "甲狀腺刺激素 TSH（最近一次抽血日期）",
+          "label_en": "TSH (date of latest blood test)",
+          "max_age_days": 365,
+          "value_kind": "date_only",
+          "unit": "",
+          "rules": [],
+          "stale_disposition": "review",
+          "reason_zh": "劑量穩定後，指引建議約每年追蹤一次 TSH；超過一年沒檢查就請醫師看。",
+          "reason_en": "Once the dose is stable, guidance suggests checking TSH about once a year; no test in over a year goes to the doctor.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4267409",
+          "verified_on": "2026-11-25"
+        }
+      ]
+    },
+    {
+      "class_id": "bph",
+      "title_zh": "攝護腺肥大用藥",
+      "title_en": "Prostate (BPH) medicines",
+      "summary_zh": "這類藥（alpha 阻斷劑如 tamsulosin、silodosin，以及 5-alpha 還原酶抑制劑如 finasteride、dutasteride）改善排尿；要留意完全解不出尿、血尿、站起來頭暈。",
+      "summary_en": "These medicines (alpha blockers such as tamsulosin and silodosin, and 5-alpha reductase inhibitors such as finasteride and dutasteride) ease urination. Watch for being unable to pass urine, blood in urine, and dizziness on standing.",
+      "questions": [
+        {
+          "id": "bph_retention",
+          "kind": "boolean",
+          "label_zh": "有沒有突然完全解不出尿，或膀胱脹痛卻排不出來？",
+          "label_en": "Have you suddenly been unable to pass urine at all, or had a painful full bladder you cannot empty?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "完全解不出尿需要馬上處理，請立刻就醫。",
+              "reason_en": "Not being able to pass urine needs treatment right away. Seek care now.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bph_blood",
+          "kind": "boolean",
+          "label_zh": "尿液有沒有帶血，或排尿時發燒、寒顫？",
+          "label_en": "Is there blood in your urine, or fever and chills with urination?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "血尿或發燒需要先回診檢查。",
+              "reason_en": "Blood in the urine or fever needs a visit for tests first.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bph_cataract",
+          "kind": "boolean",
+          "label_zh": "近期有沒有安排白內障手術？",
+          "label_en": "Do you have cataract surgery planned?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "白內障手術前要告知眼科醫師你有吃 alpha 阻斷劑，請醫師確認。",
+              "reason_en": "Tell the eye surgeon you take an alpha blocker before cataract surgery; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bph_sexual",
+          "kind": "boolean",
+          "label_zh": "有沒有性慾下降、勃起困難，或射精量變少而困擾你？",
+          "label_en": "Are you bothered by lower sex drive, erection problems or less ejaculate?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "這些是這類藥可能的副作用，請醫師確認。",
+              "reason_en": "These can be side effects of this class; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "dizzy_standing",
+          "kind": "boolean",
+          "label_zh": "站起來的時候，會不會頭暈、眼前發黑，或差點跌倒？",
+          "label_en": "When you stand up, do you get dizzy, see black, or nearly fall?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "可能是血壓太低或體位性低血壓，請醫師確認。",
+              "reason_en": "Possible low blood pressure on standing; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": []
+    },
+    {
+      "class_id": "antiplatelet",
+      "title_zh": "抗血小板藥",
+      "title_en": "Antiplatelet",
+      "summary_zh": "低劑量阿斯匹靈、clopidogrel 用來預防血栓；最主要的風險是出血，裝過支架的人不能自行停藥。",
+      "summary_en": "Low-dose aspirin and clopidogrel prevent clots. The main risk is bleeding, and people with stents must not stop on their own.",
+      "questions": [
+        {
+          "id": "ap_black_stool",
+          "kind": "boolean",
+          "label_zh": "有沒有解黑色柏油狀的大便、吐血，或吐出像咖啡渣的東西？",
+          "label_en": "Have you passed black tarry stools, vomited blood, or vomited something like coffee grounds?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "這可能是消化道出血，請立刻就醫。",
+              "reason_en": "This may be bleeding in the digestive tract. Seek care now.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "ap_indication",
+          "kind": "choice",
+          "label_zh": "你吃這個藥主要是為了什麼？",
+          "label_en": "What is the main reason you take this medicine?",
+          "help_zh": "",
+          "help_en": "",
+          "options": [
+            {
+              "value": "prevention",
+              "label_zh": "預防心血管疾病",
+              "label_en": "Preventing heart and vessel disease"
+            },
+            {
+              "value": "stent_or_event",
+              "label_zh": "裝過心臟支架，或發生過心肌梗塞、中風",
+              "label_en": "After a stent, heart attack or stroke"
+            },
+            {
+              "value": "unsure",
+              "label_zh": "不確定",
+              "label_en": "Not sure"
+            }
+          ],
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": "stent_or_event"
+              },
+              "disposition": "review",
+              "reason_zh": "裝過支架或發生過心肌梗塞、中風，停藥時機要由醫師決定，請醫師確認。",
+              "reason_en": "After a stent, heart attack or stroke, the doctor decides when to stop; the doctor should review.",
+              "source_url": ""
+            },
+            {
+              "when": {
+                "op": "eq",
+                "value": "unsure"
+              },
+              "disposition": "review",
+              "reason_zh": "不確定吃藥原因，請醫師確認是否仍需要。",
+              "reason_en": "You are not sure why you take it; the doctor should confirm it is still needed.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "ap_bleeding",
+          "kind": "boolean",
+          "label_zh": "最近有沒有容易瘀青、流鼻血不容易止住、牙齦常出血，或血尿？",
+          "label_en": "Recently, do you bruise easily, have nosebleeds that are hard to stop, bleeding gums or blood in the urine?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "出血傾向變多，請醫師確認。",
+              "reason_en": "More bleeding than usual; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "ap_procedure",
+          "kind": "boolean",
+          "label_zh": "近期有沒有安排手術、拔牙或內視鏡檢查？",
+          "label_en": "Do you have surgery, a tooth extraction or an endoscopy planned?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "侵入性處置前，抗血小板藥是否要暫停要由醫師決定。",
+              "reason_en": "Whether to pause an antiplatelet before a procedure is the doctor's decision.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": []
+    },
+    {
+      "class_id": "ppi",
+      "title_zh": "氫離子幫浦抑制劑（胃藥）",
+      "title_en": "Proton pump inhibitor",
+      "summary_zh": "PPI（如 omeprazole、esomeprazole、pantoprazole）抑制胃酸；長期使用要定期確認是否仍需要，並留意警訊症狀。",
+      "summary_en": "PPIs (such as omeprazole, esomeprazole and pantoprazole) reduce stomach acid. Long-term use should be reviewed regularly, and alarm symptoms watched for.",
+      "questions": [
+        {
+          "id": "ppi_black_stool",
+          "kind": "boolean",
+          "label_zh": "有沒有解黑色柏油狀的大便，或吐血？",
+          "label_en": "Have you passed black tarry stools or vomited blood?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "這可能是消化道出血，請立刻就醫。",
+              "reason_en": "This may be bleeding in the digestive tract. Seek care now.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "ppi_alarm",
+          "kind": "boolean",
+          "label_zh": "有沒有吞嚥困難、不明原因體重下降、反覆嘔吐，或被告知有貧血？",
+          "label_en": "Do you have trouble swallowing, unexplained weight loss, repeated vomiting, or have you been told you are anaemic?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "這些是需要檢查的警訊，請先回診。",
+              "reason_en": "These are warning signs that need tests; please visit first.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "ppi_reviewed",
+          "kind": "boolean",
+          "label_zh": "過去一年內，醫師有跟你討論過是否還需要繼續吃這類胃藥嗎？",
+          "label_en": "In the past year, has a doctor discussed whether you still need this stomach medicine?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": false
+              },
+              "disposition": "review",
+              "reason_zh": "長期使用的胃藥要定期評估是否仍需要，請醫師確認。",
+              "reason_en": "Long-term acid medicine should be reviewed regularly; the doctor should confirm it is still needed.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": []
+    },
+    {
+      "class_id": "urate",
+      "title_zh": "降尿酸藥",
+      "title_en": "Urate lowering",
+      "summary_zh": "Allopurinol、febuxostat 用來把血中尿酸控制在目標以下、減少痛風發作；要留意嚴重皮疹，febuxostat 有心血管疾病的使用限制。",
+      "summary_en": "Allopurinol and febuxostat keep blood uric acid below target and reduce gout attacks. Watch for severe rash, and febuxostat has cardiovascular cautions.",
+      "questions": [
+        {
+          "id": "urate_rash",
+          "kind": "boolean",
+          "label_zh": "有沒有出現全身紅疹、口腔潰瘍、水泡或發燒？",
+          "label_en": "Do you have a widespread rash, mouth ulcers, blisters or fever?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "可能是嚴重的藥物過敏反應，請立刻停藥並就醫。",
+              "reason_en": "This may be a severe drug allergy. Stop the medicine and seek care now.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "urate_flare",
+          "kind": "boolean",
+          "label_zh": "最近三個月有沒有痛風發作？",
+          "label_en": "Have you had a gout attack in the past three months?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "仍有痛風發作，請醫師確認劑量是否足夠。",
+              "reason_en": "Gout attacks continue; the doctor should check whether the dose is enough.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "urate_cvd",
+          "kind": "boolean",
+          "label_zh": "你有沒有心臟病、心肌梗塞或中風的病史，或最近剛發生？",
+          "label_en": "Do you have a history of heart disease, heart attack or stroke, or has one just happened?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "有心血管疾病的人使用 febuxostat 要特別評估，請醫師確認。",
+              "reason_en": "In people with cardiovascular disease, febuxostat needs special assessment; the doctor should review.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10563586/"
+            }
+          ]
+        },
+        {
+          "id": "urate_liver",
+          "kind": "boolean",
+          "label_zh": "有沒有皮膚或眼白變黃，或右上腹痛？",
+          "label_en": "Do you have yellow skin or eyes, or pain in the upper right belly?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "可能是肝臟問題，請先回診檢查。",
+              "reason_en": "This may be a liver problem; please visit for tests.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": [
+        {
+          "id": "serum_urate",
+          "label_zh": "血清尿酸（最近一次數值）",
+          "label_en": "Serum uric acid (latest value)",
+          "max_age_days": null,
+          "value_kind": "number",
+          "unit": "mg/dL",
+          "rules": [
+            {
+              "when": {
+                "op": "gte",
+                "value": 6
+              },
+              "disposition": "review",
+              "reason_zh": "尿酸 6 mg/dL 以上，高於 ACR 指引的目標（低於 6），請醫師確認劑量。",
+              "reason_en": "Uric acid is 6 mg/dL or higher, above the ACR target (below 6); the doctor should check the dose.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10563586/"
+            }
+          ],
+          "stale_disposition": "review",
+          "reason_zh": "ACR 指引要求調整劑量後都要測尿酸，但沒有固定的追蹤間隔，所以這裡只看數值、不設期限。",
+          "reason_en": "The ACR guideline asks for a uric acid check after each dose change but gives no fixed interval, so only the value is checked here and no age limit is set.",
+          "source_type": "guideline",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10563586/",
+          "verified_on": "2026-11-25"
+        }
+      ]
+    },
+    {
+      "class_id": "inhaler_controller",
+      "title_zh": "控制型吸入劑（氣喘）",
+      "title_en": "Controller inhaler (asthma)",
+      "summary_zh": "含吸入型類固醇的控制型吸入劑用來預防氣喘發作；這裡用 GINA 的四個問題確認最近四週的控制情形。",
+      "summary_en": "Inhaled-steroid controller inhalers prevent asthma attacks. The four GINA questions check control over the last four weeks.",
+      "questions": [
+        {
+          "id": "gina_day",
+          "kind": "boolean",
+          "label_zh": "最近 4 週，白天有沒有每週超過 2 次的氣喘症狀？",
+          "label_en": "In the past 4 weeks, did you have daytime asthma symptoms more than twice a week?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "白天症狀偏多，氣喘可能控制不佳，請醫師確認。",
+              "reason_en": "Frequent daytime symptoms; asthma may not be well controlled. The doctor should review.",
+              "source_url": "https://www.tafp.org/media/downloads/GINA-2025-infographic.pdf"
+            }
+          ]
+        },
+        {
+          "id": "gina_night",
+          "kind": "boolean",
+          "label_zh": "最近 4 週，有沒有因為氣喘半夜醒來？",
+          "label_en": "In the past 4 weeks, did asthma wake you at night?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "夜裡會因氣喘醒來，氣喘可能控制不佳，請醫師確認。",
+              "reason_en": "Night waking; asthma may not be well controlled. The doctor should review.",
+              "source_url": "https://www.tafp.org/media/downloads/GINA-2025-infographic.pdf"
+            }
+          ]
+        },
+        {
+          "id": "gina_reliever",
+          "kind": "boolean",
+          "label_zh": "最近 4 週，需要用急救型（緩解）吸入劑的次數有沒有每週超過 2 次？",
+          "label_en": "In the past 4 weeks, did you need your reliever inhaler more than twice a week?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "急救用藥偏多，氣喘可能控制不佳，請醫師確認。",
+              "reason_en": "Frequent reliever use; asthma may not be well controlled. The doctor should review.",
+              "source_url": "https://www.tafp.org/media/downloads/GINA-2025-infographic.pdf"
+            }
+          ]
+        },
+        {
+          "id": "gina_activity",
+          "kind": "boolean",
+          "label_zh": "最近 4 週，有沒有因為氣喘而影響日常活動？",
+          "label_en": "In the past 4 weeks, did asthma limit your activities?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "活動受限，氣喘可能控制不佳，請醫師確認。",
+              "reason_en": "Activity limitation; asthma may not be well controlled. The doctor should review.",
+              "source_url": "https://www.tafp.org/media/downloads/GINA-2025-infographic.pdf"
+            }
+          ]
+        },
+        {
+          "id": "gina_exacerbation",
+          "kind": "boolean",
+          "label_zh": "過去一年內，有沒有因為氣喘發作而需要口服類固醇、掛急診或住院？",
+          "label_en": "In the past year, did an asthma attack need oral steroids, an ER visit or hospital admission?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "過去一年有嚴重發作，是日後再發作的風險因子，請醫師確認。",
+              "reason_en": "A severe attack in the past year is a risk factor for future attacks; the doctor should review.",
+              "source_url": "https://www.tafp.org/media/downloads/GINA-2025-infographic.pdf"
+            }
+          ]
+        }
+      ],
+      "monitoring": []
+    },
+    {
+      "class_id": "antihistamine",
+      "title_zh": "抗組織胺（過敏）",
+      "title_en": "Antihistamine (allergy)",
+      "summary_zh": "這類藥（如 cetirizine、fexofenadine）緩解過敏症狀；要留意嗜睡，以及症狀控制不佳或有嚴重過敏的警訊。",
+      "summary_en": "These medicines (such as cetirizine and fexofenadine) ease allergy symptoms. Watch for drowsiness, poor control, and signs of a severe allergy.",
+      "questions": [
+        {
+          "id": "ah_severe",
+          "kind": "boolean",
+          "label_zh": "過敏發作時，有沒有喘不過氣、喉嚨緊或臉、嘴唇腫起來？",
+          "label_en": "During an allergic reaction, have you had trouble breathing, a tight throat, or swelling of the face or lips?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "這可能是嚴重過敏反應，請立刻就醫。",
+              "reason_en": "This may be a severe allergic reaction. Seek care now.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "ah_drowsy",
+          "kind": "boolean",
+          "label_zh": "吃了之後會不會很想睡、影響開車或工作？",
+          "label_en": "Does it make you very sleepy or affect driving or work?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "嗜睡影響生活，請醫師確認是否要換藥。",
+              "reason_en": "Drowsiness is affecting daily life; the doctor should consider another medicine.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "ah_uncontrolled",
+          "kind": "boolean",
+          "label_zh": "吃藥之後，過敏症狀（鼻水、打噴嚏、癢）還是很困擾你嗎？",
+          "label_en": "Even on the medicine, are allergy symptoms (runny nose, sneezing, itching) still bothering you a lot?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "review",
+              "reason_zh": "症狀控制不佳，請醫師確認是否要調整治療。",
+              "reason_en": "Symptoms are not well controlled; the doctor should consider changing treatment.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "ah_wheeze",
+          "kind": "boolean",
+          "label_zh": "除了過敏症狀，有沒有喘鳴或胸悶？",
+          "label_en": "Besides allergy symptoms, do you have wheezing or chest tightness?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "可能合併氣喘，請先回診評估。",
+              "reason_en": "This may include asthma; please visit first.",
+              "source_url": ""
+            }
+          ]
+        }
+      ],
+      "monitoring": []
+    }
+  ]
+}

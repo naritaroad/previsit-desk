@@ -1,19 +1,25 @@
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
+use std::time::Instant;
 
 use anyhow::Result;
 use sqlx::PgPool;
-use tokio::sync::{Mutex as AsyncMutex, OwnedMutexGuard};
+use tokio::sync::{Mutex as AsyncMutex, OwnedMutexGuard, watch};
 use uuid::Uuid;
 
 use crate::clock::Clock;
 use crate::config::Config;
+use crate::demo::DemoData;
 use crate::health_edu::Handbook;
+use crate::hub::Hub;
 use crate::limits::Limiter;
 use crate::llm::Ai;
 use crate::precheck::{RedFlagRules, ScopeRules};
 use crate::refill::RefillRules;
+use crate::rx::RxRules;
+use crate::settings::SettingsStore;
+use crate::sse::StreamSlots;
 
 /// Every rule file the service needs, loaded and validated at start.
 pub struct Rules {
@@ -52,6 +58,7 @@ impl VisitLocks {
     }
 }
 
+/// Everything a handler needs. Cheap to clone.
 #[derive(Clone)]
 pub struct AppState {
     pub db: PgPool,
@@ -62,6 +69,15 @@ pub struct AppState {
     pub rules: Arc<Rules>,
     pub clock: Clock,
     pub visit_locks: Arc<VisitLocks>,
+    /// Live settings from the management site.
+    pub settings: Arc<SettingsStore>,
+    pub hub: Arc<Hub>,
+    pub streams: Arc<StreamSlots>,
+    /// Turns true when the server is stopping; long-lived streams end on it.
+    pub shutdown: watch::Receiver<bool>,
+    pub demo: Arc<DemoData>,
+    pub rx: Arc<RxRules>,
+    pub started: Instant,
 }
 
 #[cfg(test)]

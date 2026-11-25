@@ -34,6 +34,10 @@ pub enum Bucket {
     Reads,
     /// `POST /auth/login`
     Login,
+    /// `POST /auth/guest`, `/auth/register` and `/auth/claim`
+    Guest,
+    /// Every other change (autosave, settings, staff actions): a wide limit against runaway clients.
+    Writes,
 }
 
 pub type ClientKey = [u8; 16];
@@ -166,20 +170,33 @@ pub async fn record_call(
     model: &str,
     input_tokens: i64,
     output_tokens: i64,
+    cost_usd: f64,
 ) -> sqlx::Result<()> {
     sqlx::query(
-        "INSERT INTO usage_daily (day, model, calls, input_tokens, output_tokens) VALUES ($1, $2, 1, $3, $4)
+        "INSERT INTO usage_daily (day, model, calls, input_tokens, output_tokens, cost_usd) VALUES ($1, $2, 1, $3, $4, $5)
          ON CONFLICT (day, model) DO UPDATE SET calls = usage_daily.calls + 1,
              input_tokens = usage_daily.input_tokens + EXCLUDED.input_tokens,
-             output_tokens = usage_daily.output_tokens + EXCLUDED.output_tokens",
+             output_tokens = usage_daily.output_tokens + EXCLUDED.output_tokens,
+             cost_usd = usage_daily.cost_usd + EXCLUDED.cost_usd",
     )
     .bind(clock.today())
     .bind(model)
     .bind(input_tokens)
     .bind(output_tokens)
+    .bind(cost_usd)
     .execute(db)
     .await?;
     Ok(())
+}
+
+/// Spending since the first day of the Taipei month, at the prices that applied when each call was made.
+pub async fn spent_this_month(db: &PgPool, clock: &Clock) -> sqlx::Result<f64> {
+    let today = clock.today();
+    let first = Date::from_calendar_date(today.year(), today.month(), 1).unwrap_or(today);
+    sqlx::query_scalar("SELECT COALESCE(SUM(cost_usd), 0)::float8 FROM usage_daily WHERE day >= $1")
+        .bind(first)
+        .fetch_one(db)
+        .await
 }
 
 #[cfg(test)]

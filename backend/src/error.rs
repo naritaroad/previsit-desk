@@ -12,7 +12,7 @@ use crate::texts;
 use crate::types::Locale;
 
 tokio::task_local! {
-    /// Locale from the request's `Accept-Language`, set by a middleware around every API request.
+    /// The signed-in account's locale, else the request's `Accept-Language`; set by a middleware around every API request.
     pub static REQUEST_LOCALE: Locale;
 }
 
@@ -20,6 +20,8 @@ tokio::task_local! {
 pub enum AppError {
     #[error("not signed in")]
     Unauthorized,
+    #[error("no permission")]
+    Forbidden,
     #[error("wrong username or password")]
     InvalidCredentials,
     #[error("not found")]
@@ -32,6 +34,9 @@ pub enum AppError {
     PayloadTooLarge,
     #[error("another message is being processed")]
     Conflict,
+    /// The `revision` sent does not match: 409 `conflict` with the server's version in `error.current`.
+    #[error("stale revision")]
+    Stale(serde_json::Value),
     #[error("{0}")]
     InvalidState(&'static str),
     #[error("only application/json is accepted")]
@@ -42,6 +47,9 @@ pub enum AppError {
     /// Well-formed but invalid fields: 422 with `error.fields`.
     #[error("invalid fields")]
     Unprocessable(BTreeMap<String, String>),
+    /// 422 with `error.fields` and the object that explains it in `error.current` (for example a RefillResult).
+    #[error("invalid fields")]
+    UnprocessableWith(BTreeMap<String, String>, serde_json::Value),
     /// Same error, but worded in the visit's language.
     #[error("{0}")]
     Localized(Box<AppError>, Locale),
@@ -58,6 +66,11 @@ impl AppError {
         Self::Localized(Box::new(self), locale)
     }
 
+    /// 409 with the object as it is now on the server, so the client can let the user choose.
+    pub fn stale(current: impl serde::Serialize) -> Self {
+        Self::Stale(serde_json::to_value(current).unwrap_or(serde_json::Value::Null))
+    }
+
     pub fn field(name: &str, message: impl Into<String>) -> Self {
         Self::Unprocessable(BTreeMap::from([(name.to_string(), message.into())]))
     }
@@ -65,6 +78,8 @@ impl AppError {
     fn parts(&self) -> (StatusCode, &'static str) {
         match self {
             Self::Unauthorized => (StatusCode::UNAUTHORIZED, "unauthorized"),
+            Self::Forbidden => (StatusCode::FORBIDDEN, "forbidden"),
+            Self::Stale(_) => (StatusCode::CONFLICT, "conflict"),
             Self::InvalidCredentials => (StatusCode::UNAUTHORIZED, "invalid_credentials"),
             Self::NotFound => (StatusCode::NOT_FOUND, "not_found"),
             Self::VisitClosed => (StatusCode::CONFLICT, "visit_closed"),
@@ -76,7 +91,9 @@ impl AppError {
                 (StatusCode::UNSUPPORTED_MEDIA_TYPE, "unsupported_media_type")
             }
             Self::BadRequest(_) => (StatusCode::BAD_REQUEST, "invalid_request"),
-            Self::Unprocessable(_) => (StatusCode::UNPROCESSABLE_ENTITY, "invalid_request"),
+            Self::Unprocessable(_) | Self::UnprocessableWith(..) => {
+                (StatusCode::UNPROCESSABLE_ENTITY, "invalid_request")
+            }
             Self::Localized(inner, _) => inner.parts(),
             Self::Database(_) | Self::Internal(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "internal")
@@ -85,9 +102,14 @@ impl AppError {
     }
 }
 
+/// The locale of the request being handled.
+pub fn request_locale() -> Locale {
+    REQUEST_LOCALE.try_with(|l| *l).unwrap_or(Locale::ZhTw)
+}
+
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        let mut locale = REQUEST_LOCALE.try_with(|l| *l).unwrap_or(Locale::ZhTw);
+        let mut locale = request_locale();
         let mut error = self;
         while let Self::Localized(inner, l) = error {
             locale = l;
@@ -100,10 +122,19 @@ impl IntoResponse for AppError {
             AppError::Internal(e) => tracing::error!(error = ?e, "internal error"),
             _ => {}
         }
-        let mut body =
-            json!({ "error": { "code": code, "message": texts::error_message(code, locale) } });
-        if let AppError::Unprocessable(fields) = &error {
-            body["error"]["fields"] = json!(fields);
+        let message = match &error {
+            AppError::Stale(_) => texts::t(texts::T::ErrStale, locale),
+            _ => texts::error_message(code, locale),
+        };
+        let mut body = json!({ "error": { "code": code, "message": message } });
+        match &error {
+            AppError::Unprocessable(fields) => body["error"]["fields"] = json!(fields),
+            AppError::UnprocessableWith(fields, current) => {
+                body["error"]["fields"] = json!(fields);
+                body["error"]["current"] = current.clone();
+            }
+            AppError::Stale(current) => body["error"]["current"] = current.clone(),
+            _ => {}
         }
         let mut response = (status, Json(body)).into_response();
         if let AppError::RateLimited { retry_after } = &error
@@ -180,6 +211,25 @@ mod tests {
             body["error"]["message"],
             "The request is not valid. Check it and send it again."
         );
+    }
+
+    #[tokio::test]
+    async fn a_stale_revision_carries_the_current_object() {
+        let (status, body, _) = body_of(AppError::stale(json!({ "revision": 3 }))).await;
+        assert_eq!(status, StatusCode::CONFLICT);
+        assert_eq!(body["error"]["code"], "conflict");
+        assert_eq!(body["error"]["current"]["revision"], 3);
+        let (status, body, _) = body_of(AppError::Forbidden).await;
+        assert_eq!(status, StatusCode::FORBIDDEN);
+        assert_eq!(body["error"]["code"], "forbidden");
+        let (status, body, _) = body_of(AppError::UnprocessableWith(
+            BTreeMap::from([("x".into(), "bad".into())]),
+            json!({ "outcome": "too_early" }),
+        ))
+        .await;
+        assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+        assert_eq!(body["error"]["fields"]["x"], "bad");
+        assert_eq!(body["error"]["current"]["outcome"], "too_early");
     }
 
     #[tokio::test]
