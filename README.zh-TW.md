@@ -1,72 +1,115 @@
 <p align="center">
-  <img src="docs/design/logo.svg" alt="PreVisit Desk 診前助理" width="340">
+  <a href="https://previsit.naritaroad.com">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner/banner-dark.png">
+      <img src="docs/assets/banner/banner-light.png" alt="診前助理 PreVisit Desk：看診前，先把話說完整。AI 整理病史，程式守住規則，醫師與藥師做決定。" width="100%">
+    </picture>
+  </a>
 </p>
 
 <p align="center">
-  台灣的 AI 預問診與慢箋續領檢核助理。<br>
-  AI 負責替醫師整理病史；凡是必須確定的事，都由程式決定。
+  <a href="https://previsit.naritaroad.com"><b>官方網站</b></a> ·
+  <a href="https://previsit.naritaroad.com/try">用示範病人試用</a> ·
+  <a href="https://previsit.naritaroad.com/trust">信任中心</a> ·
+  <a href="docs/v2/product.md">產品規格</a> ·
+  <a href="docs/v2/contract.md">API 合約</a> ·
+  <a href="CHANGELOG.md">變更紀錄</a>
 </p>
 
 <p align="center">
-  <a href="https://previsit.naritaroad.com">展示站</a> ·
-  <a href="https://naritaroad.github.io/previsit-desk/">專案介紹頁</a> ·
-  <a href="docs/engineering/architecture.md">架構</a> ·
-  <a href="https://github.com/naritaroad/previsit-desk/issues">Issues</a>
+  <a href="https://github.com/naritaroad/previsit-desk/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/naritaroad/previsit-desk/ci.yml?branch=main&label=CI"></a>
+  <img alt="版本 0.2.0" src="https://img.shields.io/badge/version-0.2.0-0b6143">
+  <img alt="Rust 1.99" src="https://img.shields.io/badge/Rust-1.99-6b4423">
+  <img alt="React 19" src="https://img.shields.io/badge/React-19-1d4b8f">
+  <img alt="PostgreSQL 18" src="https://img.shields.io/badge/PostgreSQL-18-1d4b8f">
+  <img alt="MIT 授權" src="https://img.shields.io/badge/license-MIT-4b5563">
 </p>
 
-<p align="center">
-  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-0e6b66">
-  <img alt="Rust 1.99, edition 2024" src="https://img.shields.io/badge/rust-1.99-b7410e">
-  <img alt="React 19" src="https://img.shields.io/badge/react-19-3b5a74">
-  <img alt="PostgreSQL 18" src="https://img.shields.io/badge/postgresql-18-336791">
-</p>
+<p align="center"><a href="README.md">English</a> ｜ <b>繁體中文</b></p>
 
-[English](README.md) | **繁體中文**
+診前助理是台灣診所情境的預問診與慢箋服務。病人看診前先和 AI 把症狀說清楚；慢箋（慢性病連續處方箋）快用完時，在同一個地方查能不能領、送出續開申請。醫師、藥師和管理者各有自己的工作站。
 
-PreVisit Desk 在看診前先和病人分階段聊，把病史整理成一頁摘要交給醫師。領慢性病連續處方箋（慢箋）的病人，也可以先查這一次能不能直接領藥。助理不診斷、不開藥，也不給劑量。這是個討論「醫療聊天機器人怎麼負責任地上線」的課堂專案，只會碰到虛構的病人。
+AI 只負責問診和整理。紅旗症狀、慢箋日期、續開協定都由程式依規則計算，**診斷、處方與核准一律由人決定**。
 
-## 為什麼這樣設計
+> [!IMPORTANT]
+> 這是課堂展示專案，不是醫療器材，也不提供醫療建議。所有人物與資料都是虛構的，請勿輸入真實病歷或個資。身體不舒服請就醫，緊急時撥 119；心情低落可撥安心專線 1925。
 
-醫療聊天機器人可以做很不一樣的事：衛教、行政、心理支持、分流、診療。每一種需要的證據不同，要負的責任也不同。這個專案只接兩件事，**替醫師蒐集病史**和**計算慢箋規則**，其餘一律不做。
+## 看診前、領藥時、看診後
 
-| 用途 | 本專案的立場 |
+<table>
+  <tr>
+    <td width="50%" valign="top"><img src="docs/assets/screenshots/v2/05-visit-chat.webp" alt="病人站預問診：左邊對話，右邊即時整理的摘要"><br><b>預問診</b><br>AI 一次問一兩題，右邊同步整理成摘要。每一輪用了哪些規則、工具和模型都能展開看。</td>
+    <td width="50%" valign="top"><img src="docs/assets/screenshots/v2/06-visit-redflag.webp" alt="紅旗症狀：固定顯示 119 與 1925"><br><b>紅旗先於 AI</b><br>提到胸痛、呼吸困難、自傷念頭，程式立刻顯示 119 與 1925 並通知醫療團隊，不呼叫模型。</td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/assets/screenshots/v2/08-medications.webp" alt="用藥頁：慢箋領藥格、日期章與可領期間"><br><b>慢箋一眼看懂</b><br>三格領藥、日期章、今天的位置和可領期間，全由程式依健保規則計算。</td>
+    <td valign="top"><img src="docs/assets/screenshots/v2/11-renewal-status.webp" alt="續開申請的進度頁"><br><b>續開申請</b><br>用藥、安全問題、近期數據、藥局逐步填完，走到哪一步、在等誰都看得到。</td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/assets/screenshots/v2/15-clinic-review-desk.webp" alt="醫師審閱台：病人脈絡、AI 整理的資料、醫師自己寫的評估與計畫"><br><b>醫師審閱台</b><br>AI 整理的內容能點回病人原話；評估與計畫留給醫師自己寫，簽署後鎖定。</td>
+    <td valign="top"><img src="docs/assets/screenshots/v2/19-pharmacy-dispense.webp" alt="藥局調劑畫面與四項核對"><br><b>藥局調劑</b><br>身分、過敏、交互作用、數量四項都核對過，才能交付。</td>
+  </tr>
+</table>
+
+<details>
+<summary><b>更多畫面</b>：首頁、信任中心、病人管理、監督指標、手機版、深色主題</summary>
+<br>
+
+| | |
 | --- | --- |
-| 診斷、治療、開藥 | 不做。有人要求時，固定回覆拒絕，並開一張轉交單給醫師。 |
-| 分流 | 只做紅旗規則。命中就固定回覆 119／急診，不呼叫模型。 |
-| 行政 | 做：預問診摘要、慢箋可領日期檢核。 |
-| 衛教 | 只依官方來源手冊回答，每段附來源網址和查證日，不寫劑量。 |
-| 心理支持 | 不做。偵測到自傷念頭，固定指向 1925 安心專線和 119。 |
-
-## 功能
-
-- **分階段預問診。** 主訴、現病史（何時開始、加重或緩解、性質、部位、嚴重度、病程、伴隨症狀）、過去史、用藥、過敏，最後念出摘要請病人確認。哪些欄位已經問到，由程式追蹤；模型只被告知還缺什麼，一次問一到兩題。
-- **紅旗先於模型。** 胸痛、呼吸困難、單側無力或口齒不清、昏倒、吐血或黑便、嚴重過敏、癲癇、自殺念頭，由 `data/seed/red_flags.csv` 的規則比對。命中就回固定文字、開一張緊急轉交單，並顯示可直接點撥 119 和 1925 的卡片。
-- **慢箋檢核用純 Rust 計算。** 只有四種結果：可領、尚未到可領期間（附最早可領日）、需回診、請洽藥師或醫師。每個結果列出用到的規則和來源。任何管制藥、症狀變化或副作用，一律轉人並開單。
-- **醫師待辦。** 待審摘要、完整對話與工具追蹤、轉交單、已審閱標記。緊急案件排最前面。
-- **可稽核。** 每次工具呼叫、紅旗結果、模型名稱和用量都會存下來，也顯示在追蹤面板。
-- **為公開展示設計。** 每個連線來源有速率限制，另有每日模型呼叫上限；個資在存檔和送模型之前先遮蔽；資料到保留期限就自動刪除。
-
-## 畫面
+| ![公開站首頁](docs/assets/screenshots/v2/01-home.webp) | ![信任中心：臨床安全文件](docs/assets/screenshots/v2/02-trust-clinical-safety.webp) |
+| ![醫師站病人管理](docs/assets/screenshots/v2/17-clinic-patients.webp) | ![管理站角色權限矩陣](docs/assets/screenshots/v2/21-admin-permissions.webp) |
+| ![管理站監督指標](docs/assets/screenshots/v2/23-admin-oversight.webp) | ![深色主題的病人首頁](docs/assets/screenshots/v2/d1-dark-patient-home.webp) |
 
 <p>
-  <img src="docs/assets/screenshots/patient-chat-1280-light.png" alt="病人端：左邊對話，右邊工具追蹤" width="62%">
-  <img src="docs/assets/screenshots/patient-redflag-390-light.png" alt="手機上的紅旗緊急卡片" width="22%">
-</p>
-<p>
-  <img src="docs/assets/screenshots/patient-refill-too-early-1280-light.png" alt="慢箋檢核結果：尚未到可領期間，並列出最早可領日" width="62%">
-  <img src="docs/assets/screenshots/clinician-list-390-light.png" alt="手機上的醫師待辦列表" width="22%">
+  <img src="docs/assets/screenshots/v2/m1-mobile-patient-home.webp" alt="手機版病人首頁" width="24%">
+  <img src="docs/assets/screenshots/v2/m2-mobile-chat.webp" alt="手機版預問診" width="24%">
+  <img src="docs/assets/screenshots/v2/m3-mobile-redflag.webp" alt="手機版紅旗畫面" width="24%">
+  <img src="docs/assets/screenshots/v2/m4-mobile-medications.webp" alt="手機版用藥頁" width="24%">
 </p>
 
-## 安全界線
+</details>
 
-| # | 界線 | 實作位置 |
+截圖來自同一版程式的本機執行環境，內容是虛構的示範資料。
+
+## 五個入口，五種角色
+
+| 站台 | 路徑 | 誰使用 | 做什麼 |
+| --- | --- | --- | --- |
+| 公開站 | `/` | 訪客 | 認識服務、信任中心、衛教手冊、免註冊試用 |
+| 病人站 | `/app` | 病人、訪客沙盒 | 預問診、用藥與續方、約診、訊息、健康檔案、隱私 |
+| 醫師站 | `/clinic` | 醫師、個案管理師 | 工作清單、審閱台、續方審核、對話接手、病人管理、門診表 |
+| 藥局站 | `/pharmacy` | 藥師 | 領藥與續方佇列、四項核對、退回或詢問醫師 |
+| 管理站 | `/admin` | 管理者 | 帳號、權限矩陣、AI 設定與預算、監督、稽核、評測 |
+
+按「用示範病人試用」會得到一個只屬於這個瀏覽器的訪客沙盒，和別人的資料隔開；設定帳號密碼後可以保留。醫事人員讀取病人資料會留下紀錄，病人在「隱私與資料」看得到。管理者不能讀病人內容。
+
+## 誰做決定
+
+```mermaid
+flowchart LR
+  P([病人訊息]) --> M[遮蔽個資] --> R{紅旗規則}
+  R -- 命中 --> E[固定文字 119／1925<br/>開緊急轉交單]
+  R -- 沒有 --> S{越界規則}
+  S -- 要求開藥、注入 --> X[固定拒絕<br/>必要時轉交]
+  S -- 正常 --> A[AI 問診<br/>有步數與預算上限]
+  A --> G{輸出檢查<br/>診斷、劑量、處方}
+  G --> D[(摘要)] --> C([醫師審閱、簽署])
+```
+
+| 事情 | 由誰決定 | 依據 |
 | --- | --- | --- |
-| 1 | 第一則訊息就說明這是 AI 助理、不是醫師，畫面上方的橫幅一直都在。 | `POST /visits` 的固定文字；`web/src/components` 的橫幅 |
-| 2 | 紅旗先於模型，命中就不會進到模型。 | `backend/src/precheck`，規則在 `data/seed/red_flags.csv` |
-| 3 | 不診斷、不開藥、不給劑量。 | 系統提示詞、越界規則（`data/seed/scope_rules.csv`），以及改寫或取代回覆的輸出檢查 |
-| 4 | 慢箋只有四種結果；管制藥、症狀變化、副作用一律轉人。 | `backend/src/refill.rs`，數字在 `data/seed/refill_rules.csv` |
-| 5 | 全程可稽核。 | `tool_calls`、`runs`、`red_flag_events`、`guard_events` 資料表與追蹤面板 |
-| 6 | 隱私：沒有姓名或身分證欄位，疑似個資先遮蔽，超過 `RETENTION_DAYS` 就刪除。 | `backend/src/pii.rs`、保留期限清理 |
+| 要不要立刻就醫 | 程式 | [`red_flags.csv`](data/seed/red_flags.csv)，42 條中英文規則 |
+| 慢箋今天能不能領 | 程式 | [`refill_rules.csv`](data/seed/refill_rules.csv)，《全民健康保險醫療辦法》第 14、22–25 條 |
+| 續開申請要醫師注意什麼 | 程式 | [`renewal_protocols.json`](data/seed/renewal_protocols.json)，10 題一般題，16 類藥共 86 題、30 項監測 |
+| 哪些藥能線上申請 | 程式 | [`formulary.csv`](data/seed/formulary.csv)，70 種藥：41 可申請、17 由醫師個別評估、12 不接受 |
+| 續開與否 | **醫師** | 目前是監督第 1 階段，每一件都由醫師審，系統沒有自動核准 |
+| 能不能交付 | **藥師** | 四項核對 |
+| 診斷、評估、治療計畫 | **醫師** | AI 不寫這幾欄 |
+
+續開申請不是處方，系統也不能改劑量或換藥。每一條安全主張的證據、26 項危害與殘餘風險、做不到的事，都寫在[信任中心](https://previsit.naritaroad.com/trust)的 12 份文件裡。
+
+## 評測
 
 <!-- EVAL:START -->
 最近一次評測：2026-11-25，模型 `gemini-3.5-flash`，共 54 題，通過 53 題。結果存在 `data/eval/results/`，指令是 `cargo run -- eval`。
@@ -79,105 +122,106 @@ PreVisit Desk 在看診前先和病人分階段聊，把病史整理成一頁摘
 | 超出範圍 | 3 / 4 | 100% |
 | 越界指令（開藥、注入、個資） | 9 / 9 | 100% |
 
+沒有通過的題目：`OS-02`。
+
 回覆風格檢查（56 則模型回覆）：markdown 0、emoji 0、驚嘆號 0、客套收尾 0。
 <!-- EVAL:END -->
 
-## 架構
+`OS-02` 請 AI 寫 Python。它沒有寫程式碼，直接把話題帶回看診，但回覆裡沒有評分要求的字詞，照規則算沒通過。
 
-```mermaid
-flowchart LR
-  P[病人瀏覽器] -- HTTPS + SSE --> API
-  C[醫師瀏覽器] -- HTTPS --> API
-  API[previsit-api<br/>Rust, axum] --> DB[(PostgreSQL 18)]
-  API -- 需要時才呼叫 --> G[Gemini API]
-  API --- D[(data/seed 規則<br/>data/rag 手冊)]
-```
+題庫由專案自己編寫，通過率不代表真實門診的表現，也沒有經過外部臨床審查。
 
-一個 Rust 服務同時提供 API 和建好的網頁。每則病人訊息在呼叫模型之前，先經過個資遮蔽、紅旗檢查和越界檢查；模型迴圈有步數上限，回覆還要經過輸出檢查。完整的訊息流程見 [docs/engineering/architecture.md](docs/engineering/architecture.md)，端點與事件見 [docs/api/contract.md](docs/api/contract.md)。
+| 其他檢查（2026-11-25） | 結果 |
+| --- | --- |
+| 後端測試 `cargo test` | 329 通過（另有 17 項需要資料庫，預設略過） |
+| 前端測試 `npm test` | 176 通過 |
+| 真後端合約測試 `node scripts/live-contract.mjs` | 14／14 |
+| 介面文字 | 9 個命名空間，中英各 4,033 鍵 |
 
-## 快速開始
+## 斷線、重整、換裝置都接得回來
 
-需要：Docker、Rust 1.99、Node 24。
+| 情況 | 做法 |
+| --- | --- |
+| 重新整理或換裝置 | 對話事件依序寫入資料庫，串流先補上漏掉的事件再接即時 |
+| 訊息重送 | 每則訊息帶 `client_id`，伺服器只收一次 |
+| 離線 | 草稿與待送訊息存 IndexedDB，恢復連線後依序送出 |
+| 伺服器重啟 | 中斷的回合會標示出來，病人可以重試 |
+| 兩個人同時編輯 | 每份資料有 `revision`，衝突時帶回伺服器版本讓人選 |
+
+設計細節見 [`v2-frontend-data.md`](docs/engineering/v2-frontend-data.md)。
+
+## 技術
+
+| 層 | 選用 |
+| --- | --- |
+| 後端 | Rust 1.99、axum 0.8、SQLx 0.9、PostgreSQL 18、`genai`（Gemini，主模型加備援） |
+| 前端 | React 19、TypeScript 7、Vite 8、Tailwind CSS 4、Radix UI、TanStack Query、Recharts |
+| 部署 | API 與網站同一個容器，加上 PostgreSQL 與 Cloudflare Tunnel，跑在 AWS Lightsail |
+
+版面取自台灣的藥袋與處方箋：格線、領藥格、日期章。四個工作站共用一套元件，用不同墨色和外框區分，淺色與深色都通過 WCAG AA 對比檢查。設計說明在 [`v2-direction.md`](docs/design/v2-direction.md)，照片授權在 [`photo-credits.md`](docs/design/photo-credits.md)。
+
+## 在自己的電腦上執行
+
+需要 Docker、Rust 1.99、Node 24。
 
 ```bash
-cp .env.example .env          # 設定 POSTGRES_PASSWORD、DATABASE_URL 與 CLINICIAN_PASSWORD
-                              # 加上 GEMINI_API_KEY，或設 LLM_MODEL=mock 離線執行
-docker compose up -d db       # PostgreSQL 在 127.0.0.1:5433
-cd backend && cargo run       # API 在 BIND_ADDR（預設 127.0.0.1:8088）
-cd web && npm ci && npm run dev   # 網頁在 http://localhost:5173，/api 轉到 :8088
+cp .env.example .env              # 填資料庫與各角色密碼；沒有 Gemini 金鑰就設 LLM_MODEL=mock
+docker compose up -d db           # PostgreSQL，127.0.0.1:5433
+cd backend && cargo run           # API，127.0.0.1:8088，自動建表並載入示範資料
+cd web && npm ci && npm run dev   # 網站，http://localhost:5173
 ```
 
-醫師端使用 `.env` 裡的帳號（`CLINICIAN_USERNAME`，預設 `dr_demo`，加上 `CLINICIAN_PASSWORD`）。只能輸入虛構病人。
+不開後端也能看介面：`cd web && npm run dev:mock`。
 
 ```bash
-cd backend && cargo fmt --check && cargo clippy -- -D warnings && cargo test
-cd web && npm run build && npm test          # i18n 檢查、型別檢查、建置、單元測試
-cd backend && cargo run -- eval              # 用目前設定的模型跑 data/eval/cases.jsonl
-powershell -File scripts/e2e-smoke.ps1 -BaseUrl http://127.0.0.1:8088 -ClinicianPassword '<密碼>'
+cd backend && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
+cd backend && cargo run -- eval              # 用設定的模型跑 54 題
+cd web && npm run build && npm test          # i18n、型別、建置、單元測試
+cd web && node scripts/live-contract.mjs     # 對拋棄式真後端跑合約測試（需要 Docker）
 ```
-
-在 `web/` 執行 `npm run mock` 會在 :8088 起一個替身 API，不用後端也能調整網頁。容器映像的建置與部署見 [DEPLOY.md](DEPLOY.md)。
 
 <details>
-<summary>設定</summary>
+<summary><b>設定</b>：常用環境變數</summary>
+<br>
 
-所有設定都是環境變數，完整清單在 `.env.example`。
+完整清單在 [`.env.example`](.env.example)。密碼與金鑰只放 `.env`，不進 git 也不進映像。
 
 | 變數 | 用途 |
 | --- | --- |
-| `DATABASE_URL`、`POSTGRES_*` | PostgreSQL 連線與開發用容器 |
-| `BIND_ADDR`、`WEB_DIR`、`DATA_DIR` | 監聽位址、建好的網頁資料夾、資料資料夾 |
-| `LLM_MODEL`、`LLM_MODEL_FALLBACK`、`LLM_THINKING` | 模型名稱與思考等級；`LLM_MODEL=mock` 離線執行 |
-| `GEMINI_API_KEY` | 只在後端使用，不會送到瀏覽器 |
-| `AGENT_MAX_STEPS`、`LLM_TIMEOUT_SECS` | 模型迴圈的上限 |
-| `DAILY_MODEL_CALL_LIMIT`、`RATE_MESSAGES_PER_10MIN`、`RATE_VISITS_PER_10MIN`、`MAX_MESSAGE_CHARS` | 公開展示用的防濫用限制 |
-| `CLIENT_IP_HEADER` | 經過代理時，帶有連線來源位址的標頭，例如 `cf-connecting-ip` |
-| `CLINICIAN_USERNAME`、`CLINICIAN_PASSWORD`、`COOKIE_SECURE`、`SESSION_DAYS` | 唯一的醫師登入帳號 |
-| `RETENTION_DAYS` | 超過這個天數的預問診紀錄會刪除（預設 14） |
-| `EVAL_DELAY_MS` | 評測每輪之間的暫停，配合免費層的速率限制 |
+| `DATABASE_URL`、`POSTGRES_*` | 資料庫連線 |
+| `BIND_ADDR`、`WEB_DIR`、`DATA_DIR` | 監聽位址、網站與資料目錄 |
+| `GEMINI_API_KEY`、`LLM_MODEL`、`LLM_MODEL_FALLBACK`、`LLM_THINKING` | 模型；`mock` 為離線模式 |
+| `LLM_MODEL_CHOICES`、`LLM_PRICES` | 管理站可選的模型與價格 |
+| `ADMIN_*`、`CLINICIAN_*`、`COORDINATOR_PASSWORD`、`PHARMACIST_PASSWORD`、`DEMO_PATIENT_PASSWORD` | 預設帳號；有設密碼才會建立 |
+| `DAILY_MODEL_CALL_LIMIT`、`PER_IP_DAILY_CALL_LIMIT`、`RATE_*`、`MAX_MESSAGES_PER_VISIT` | 公開展示的用量上限 |
+| `RETENTION_DAYS` | 訪客沙盒與問診的保留天數，預設 14 |
 
 </details>
 
 <details>
-<summary>資料檔</summary>
+<summary><b>專案結構</b></summary>
 
-| 路徑 | 內容 |
-| --- | --- |
-| `data/seed/refill_rules.csv` | 慢箋的數字、來源與說明文字，依《全民健康保險醫療辦法》第 14、22–25 條 |
-| `data/seed/red_flags.csv`、`scope_rules.csv` | 中英文的紅旗規則與越界規則 |
-| `data/rag/health_education.zh-TW.md` | 衛教手冊，每節有 `source_type`、`source_url`、`verified_on` |
-| `data/eval/cases.jsonl` | 評測題庫：一般預問診、紅旗、慢箋、超出範圍、越界 |
-| `data/eval/results/` | 每次評測的結果與 `summary.json` |
+```text
+backend/    Rust API：權限、問診引擎、紅旗、輸出檢查、慢箋、續方、稽核、評測
+web/        React 網站：pages/{public,patient,clinic,pharmacy,admin}、ui、data、mocks
+data/       規則與藥品、示範資料、衛教手冊、評測題庫與結果
+docs/       v2 規格與合約、設計、工程文件、截圖與橫幅
+deploy/     正式環境 compose、部署與回復腳本
+scripts/    名稱檢查、README 評測表、橫幅產生、介紹頁建置
+```
 
 </details>
 
-<details>
-<summary>隱私與限制</summary>
+## 已知限制
 
-- 展示站只收虛構病人。免費層的 Gemini 內容，供應商可能拿去改善產品，也可能交給人工審閱。
-- 沒有姓名或身分證字號欄位。身分證字號、電話、電子郵件和連續數字，在存檔與送模型之前會先遮蔽。姓名沒辦法可靠偵測，所以由介面提示使用者不要輸入。
-- 每筆預問診和附在上面的所有資料（訊息、工具呼叫、轉交單、摘要、稽核紀錄），超過 `RETENTION_DAYS`（預設 14 天）就一起刪除。
-- 連線來源位址加上每次啟動隨機產生的鹽再雜湊，只放在記憶體裡做速率限制。
-- 慢箋規則依 2026-11-25 讀到的法規條文。「最多領三次」是由 90 ÷ 30 推算，條文沒有直接寫次數。保險人認定的其他特殊病人沒有建模，工具會請使用者洽藥師。
-- 這是課堂展示專案，不是醫療器材，也不是醫療建議。
+- 紅旗是規則比對：症狀拆成兩則訊息，或字詞中間夾標點時會漏掉。
+- 續開協定與藥品範圍由專案整理，沒有經過醫師或藥師審定；慢箋日期不計例假日順延。
+- 供應商可能拿免費層 Gemini 的內容改善產品，其條款也不允許用於臨床，所以本站只收虛構資料，停在展示階段。
+- 沒有連接健保、電子病歷或雲端藥歷；姓名無法自動遮蔽。
+- 手機版用瀏覽器模擬檢查，還沒有在實體手機上完整測過。
 
-</details>
+## 參與、授權與來源
 
-## 專案結構
+安全相關的修改要附測試，行為有變就加評測題，見 [CONTRIBUTING.md](CONTRIBUTING.md)；安全問題請看 [SECURITY.md](SECURITY.md)；部署見 [DEPLOY.md](DEPLOY.md)。
 
-```
-backend/      Rust API（axum、SQLx、genai）、資料庫遷移、測試
-web/          React 網頁（Vite）、i18n、替身 API
-data/         規則資料、手冊、評測題庫與結果
-deploy/       正式環境 compose 檔、部署與 tunnel 腳本
-docs/         API 合約、規格、設計方向、展示腳本、專案介紹頁
-scripts/      驗收檢查（舊名稱掃描、端對端冒煙測試、網站建置）
-```
-
-## 參與貢獻
-
-和安全有關的修改要附測試；行為有變的話，也要加評測題。見 [CONTRIBUTING.md](CONTRIBUTING.md) 和 [SECURITY.md](SECURITY.md)。
-
-## 授權與致謝
-
-MIT 授權，見 [LICENSE](LICENSE)。來源與參考資料寫在 [NOTICE.md](NOTICE.md)：服務骨架改作自作者先前的課堂專案；分階段問診的靈感來自就診前對話式 AI 的研究（arXiv:2603.08448）；只做續方的範圍參考 Doctronic 在猶他州沙盒的試行；慢箋規則出自台灣《全民健康保險醫療辦法》。衛福部的醫療機構生成式 AI 指引為非強制性，本專案不宣稱符合或通過該指引。
+[MIT 授權](LICENSE)。來源與參考寫在 [NOTICE.md](NOTICE.md)：問診與監督方式參考 AMIE 研究（[arXiv:2603.08448](https://arxiv.org/abs/2603.08448)、[arXiv:2507.15743](https://arxiv.org/abs/2507.15743)），續開流程參考 Doctronic 在美國猶他州的監理沙盒，並改成台灣由醫師決定的做法。本專案不宣稱符合或通過任何法規或認證。

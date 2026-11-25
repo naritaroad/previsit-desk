@@ -1,0 +1,380 @@
+<!doctype html>
+<!--
+  README banner and social preview. Rendered by scripts/render-banner.mjs, which injects window.BANNER: the copy, the
+  theme, and a refill strip worked out from data/seed/refill_rules.csv. Colours and faces come from the product.
+
+  One ruled form: the headline is written on the same two rules that close the sentence row and open the refill strip.
+-->
+<html lang="zh-TW" data-ws="public">
+  <head>
+    <meta charset="utf-8" />
+    <title>PreVisit Desk banner</title>
+    <link rel="stylesheet" href="../../../web/node_modules/@fontsource-variable/noto-sans-tc/wght.css" />
+    <link rel="stylesheet" href="../../../web/node_modules/@fontsource-variable/noto-serif-tc/wght.css" />
+    <link rel="stylesheet" href="../../../web/src/styles/tokens.css" />
+    <style>
+      :root {
+        --w: 1600px;
+        --h: 640px;
+        --pad: 64px;
+        --head: 108px;
+        --r1: 296px; /* closes the sentence row, carries the first line of the headline */
+        --pitch: 108px; /* to the rule that opens the strip and carries the second line */
+        --cell: 154px;
+        --say: 98px;
+        --line: 2.5px; /* the app's 1.5px rule, sized for a banner shown at about half width */
+      }
+      *,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html,
+      body {
+        overflow: clip;
+      }
+      body {
+        position: relative;
+        width: var(--w);
+        height: var(--h);
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-variant-numeric: tabular-nums;
+        text-spacing-trim: space-all;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ---- letterhead ---- */
+      .head {
+        position: absolute;
+        inset: 0 0 auto;
+        height: var(--head);
+        padding: 0 var(--pad);
+        display: flex;
+        align-items: center;
+        background: var(--surface);
+      }
+      .head::after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0;
+        height: 12px;
+        border-top: 4px solid var(--ink);
+        border-bottom: 2px solid var(--ink);
+      }
+      .mark {
+        width: 66px;
+        height: 66px;
+        margin: -8px 20px 0 -5px;
+        color: var(--ink);
+      }
+      .name {
+        margin-top: -10px;
+        display: flex;
+        align-items: baseline;
+        gap: 18px;
+        font-size: 46px;
+        font-weight: 800;
+        line-height: 1;
+        white-space: nowrap;
+      }
+      .name span {
+        font-size: 37px;
+        font-weight: 500;
+        color: var(--fg-2);
+      }
+      /* the four copies of the form, each in its own ink, standing on the letterhead rule */
+      .copies {
+        position: absolute;
+        right: var(--pad);
+        bottom: 12px;
+        display: flex;
+        gap: 8px;
+        padding: 0;
+        list-style: none;
+      }
+      .copies li {
+        padding: 0 20px;
+        border: var(--line) solid var(--ink);
+        border-bottom: 0;
+        border-radius: 3px 3px 0 0;
+        background: var(--ink-soft);
+        color: var(--ink-text);
+        font-size: 33px;
+        font-weight: 700;
+        line-height: 56px;
+      }
+      /* the sheet on top */
+      .copies li:first-child {
+        background: var(--ink);
+        color: var(--on-ink);
+      }
+
+      /* ---- the form ---- */
+      .rule {
+        position: absolute;
+        left: var(--pad);
+        right: var(--pad);
+        height: var(--line);
+        background: var(--ink-line);
+      }
+      .r1 {
+        top: var(--r1);
+      }
+      .r2 {
+        top: calc(var(--r1) + var(--pitch));
+      }
+      h1 {
+        position: absolute;
+        left: calc(var(--pad) - 2px);
+        top: calc(var(--r1) - var(--pitch));
+        font-family: var(--font-read);
+        font-size: 86px;
+        font-weight: 700;
+        line-height: var(--pitch);
+        white-space: nowrap;
+      }
+      .lede {
+        position: absolute;
+        left: var(--pad);
+        top: calc(var(--r1) + var(--pitch) + 28px);
+        font-size: 41px;
+        font-weight: 500;
+        line-height: 64px;
+        white-space: nowrap;
+      }
+      .form {
+        position: absolute;
+        left: 712px;
+        right: var(--pad);
+      }
+      .say {
+        bottom: calc(var(--h) - var(--r1) - var(--line));
+        display: grid;
+        grid-template-columns: auto auto auto 1fr;
+        border: var(--line) solid var(--ink-line);
+        border-radius: 3px;
+        background: var(--surface);
+      }
+      .say > div + div {
+        border-inline-start: var(--line) solid var(--ink-line);
+      }
+      .say dt {
+        height: 52px;
+        padding: 0 15px;
+        border-bottom: var(--line) solid var(--ink-line);
+        background: var(--ink-soft);
+        color: var(--ink-text);
+        font-size: 32px;
+        font-weight: 600;
+        line-height: 48px;
+        white-space: nowrap;
+      }
+      .say dd {
+        height: var(--say);
+        padding: 0 15px;
+        font-size: 46px;
+        font-weight: 500;
+        line-height: calc(var(--say) - 4px);
+        white-space: nowrap;
+      }
+      .say i {
+        font-style: normal;
+        font-feature-settings: "halt";
+        color: var(--ink-text);
+      }
+      .say [data-missing] dd {
+        font-size: 32px;
+        line-height: 1.2;
+        align-content: center;
+        color: var(--fg-3);
+      }
+
+      /* ---- refill strip, as web/src/ui/refill-strip.tsx draws it ---- */
+      .refill {
+        top: var(--r1);
+      }
+      .big {
+        position: absolute;
+        left: 0;
+        top: calc(var(--pitch) - 70px);
+        font-size: 37px;
+        font-weight: 800;
+        line-height: 48px;
+        color: var(--ink-text);
+      }
+      .cells {
+        position: absolute;
+        inset: var(--pitch) 0 auto;
+        height: var(--cell);
+        border: var(--line) solid var(--ink-line);
+        border-radius: 3px;
+        background: var(--sunken);
+        overflow: hidden;
+      }
+      .cell {
+        position: absolute;
+        inset-block: 0;
+        border-inline-end: var(--line) solid var(--ink-line);
+        background: var(--surface);
+      }
+      .cell:nth-child(3) {
+        border: 0;
+      }
+      .cell[data-done] {
+        background: var(--ink-soft);
+      }
+      .cell b {
+        position: absolute;
+        left: 18px;
+        top: calc((var(--cell) - 120px) / 2);
+        font-size: 84px;
+        font-weight: 800;
+        line-height: 1;
+        color: var(--ink-text);
+      }
+      .cell em {
+        position: absolute;
+        inset: 0 12px 20px 86px;
+        align-content: center;
+        font-style: normal;
+        font-size: 40px;
+        font-weight: 700;
+        line-height: 1.15;
+      }
+      .stamp {
+        position: absolute;
+        left: 84px;
+        top: calc((var(--cell) - 25px - 116px) / 2);
+        width: 116px;
+        height: 116px;
+        color: var(--ink-text);
+      }
+      .window {
+        position: absolute;
+        bottom: 0;
+        height: 20px;
+        background: var(--ink);
+      }
+      .today {
+        position: absolute;
+        top: calc(var(--pitch) - 70px);
+        height: calc(var(--cell) + 70px);
+        border-inline-start: 4px solid var(--fg);
+      }
+      .today span {
+        position: absolute;
+        left: -4px;
+        top: 0;
+        padding: 0 14px;
+        border-radius: 3px 3px 3px 0;
+        background: var(--fg);
+        color: var(--bg);
+        font-size: 31px;
+        font-weight: 700;
+        line-height: 48px;
+        white-space: nowrap;
+      }
+      .axis {
+        position: absolute;
+        top: calc(var(--pitch) + var(--cell) + 6px);
+        font-size: 33px;
+        line-height: 46px;
+        color: var(--fg-2);
+        white-space: nowrap;
+      }
+      .axis b {
+        font-weight: 700;
+        color: var(--fg);
+      }
+
+      /* ---- English: longer words, three lines ---- */
+      h1:lang(en) {
+        top: calc(var(--r1) - var(--pitch) - 5px);
+        font-size: 74px;
+      }
+      .lede:lang(en) {
+        top: calc(var(--r1) + var(--pitch) + 20px);
+        font-size: 37px;
+        line-height: 57px;
+      }
+      .say:lang(en) dt {
+        padding: 0 13px;
+        font-size: 28px;
+      }
+      .say:lang(en) dd {
+        padding: 0 13px;
+        font-size: 38px;
+      }
+      .say:lang(en) [data-missing] dd {
+        font-size: 28px;
+        white-space: normal;
+      }
+      .cell em:lang(en) {
+        font-size: 34px;
+      }
+
+      /* ---- social preview: the same form on a taller sheet ---- */
+      .english {
+        display: none;
+      }
+      [data-variant="social"] {
+        --h: 800px;
+        --head: 124px;
+        --r1: 366px;
+        --pitch: 126px;
+        --say: 116px;
+        --cell: 172px;
+      }
+      [data-variant="social"] .english {
+        display: block;
+        position: absolute;
+        left: var(--pad);
+        top: calc(var(--r1) + var(--pitch) + var(--cell) + 6px);
+        font-size: 37px;
+        line-height: 46px;
+        color: var(--fg-2);
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const B = window.BANNER;
+      const el = (html) => document.body.insertAdjacentHTML("beforeend", html);
+      if (!B) {
+        el("<p>Run <code>node scripts/render-banner.mjs</code>; it supplies the copy and the dates.</p>");
+      } else {
+        const { copy: c, strip: s } = B;
+        document.documentElement.lang = c.lang;
+        Object.assign(document.documentElement.dataset, { theme: B.theme, variant: B.variant });
+        const pct = (n) => `${(n * 100).toFixed(3)}%`;
+        const stamp = (d) => `<svg class="stamp" viewBox="0 0 64 64">
+          <g fill="none" stroke="currentColor"><circle cx="32" cy="32" r="30.6" stroke-width="2"/><circle cx="32" cy="32" r="27.4" stroke-width="1"/>
+          <path d="M5.2 23.6h53.6M5.2 42.4h53.6" stroke-width="1.2"/></g>
+          <g fill="currentColor" text-anchor="middle"><text x="32" y="19.2" font-size="${c.stamp.length > 2 ? 9.2 : 11}" font-weight="700">${c.stamp}</text>
+          <text x="32" y="39" font-size="16.6" font-weight="800">${d.slice(5).replace("-", ".")}</text>
+          <text x="32" y="53.6" font-size="10.5" font-weight="700">${d.slice(0, 4)}</text></g></svg>`;
+        const field = (f, i) => `<div${f.missing ? " data-missing" : ""}><dt>${f.label}</dt><dd>${i === 0 ? `<i>${c.quotes[0]}</i>` : ""}${f.value}${c.fields[i + 1]?.missing ? `<i>${c.quotes[1]}</i>` : ""}</dd></div>`;
+        const cell = (x) => `<div class="cell" ${x.filled ? "data-done" : ""} style="left:${pct(x.from)};width:${pct(x.to - x.from)}"><b>${x.n}</b>${x.filled ? stamp(x.filled) : x.next ? `<em>${c.cellOpen}</em>` : ""}</div>`;
+        el(`
+          <header class="head">
+            <svg class="mark" viewBox="0 0 32 32"><rect x="3.5" y="2.5" width="25" height="27" rx="2" fill="none" stroke="currentColor" stroke-width="3"/><path d="M3.5 13h25M12 13v16.5M20 13v16.5" stroke="currentColor" stroke-width="2.5"/><path d="M4 13h8v16H4z" fill="currentColor"/><path d="M9 7.75h14" stroke="currentColor" stroke-width="2.5"/></svg>
+            <p class="name">${c.name}<span>${c.sub}</span></p>
+            <ul class="copies">${c.copies.map(([ws, t]) => `<li data-ws="${ws}">${t}</li>`).join("")}</ul>
+          </header>
+          <div class="rule r1"></div><div class="rule r2"></div>
+          <h1>${c.title.join("<br>")}</h1>
+          <p class="english" lang="en">${c.english ?? ""}</p>
+          <p class="lede">${c.lede.join("<br>")}</p>
+          <dl class="form say">${c.fields.map(field).join("")}</dl>
+          <section class="form refill">
+            <p class="big">${c.refill}</p>
+            <div class="cells">${s.cells.map(cell).join("")}<div class="window" style="left:${pct(s.window.from)};width:${pct(s.window.to - s.window.from)}"></div></div>
+            <div class="today" style="left:${pct(s.today)}"><span>${c.today} ${s.labels.today}</span></div>
+            <p class="axis" style="left:${pct(s.window.from)}">${c.window} <b>${s.labels.from}${c.to}${s.labels.to}</b></p>
+          </section>`);
+      }
+    </script>
+  </body>
+</html>

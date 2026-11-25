@@ -6,6 +6,15 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+### Changed
+
+- README (English and Traditional Chinese) rewritten for 0.2.0, with new screenshots and a list of evaluation cases that did not pass.
+- The README evaluation table is generated with the failing case IDs (`scripts/update-readme-eval.mjs`).
+
+### Added
+
+- README banners in two languages and two themes, plus a social preview, drawn from the product's own tokens (`scripts/render-banner.mjs`).
+
 ## [0.2.0] - 2026-11-25
 
 ### Added

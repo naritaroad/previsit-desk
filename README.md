@@ -1,183 +1,227 @@
 <p align="center">
-  <img src="docs/design/logo.svg" alt="PreVisit Desk 診前助理" width="340">
+  <a href="https://previsit.naritaroad.com">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner/banner-en-dark.png">
+      <img src="docs/assets/banner/banner-en-light.png" alt="PreVisit Desk: say all of it before the visit. AI organises the history, code keeps the rules, physicians and pharmacists decide." width="100%">
+    </picture>
+  </a>
 </p>
 
 <p align="center">
-  An AI pre-visit intake and chronic-prescription refill checker for Taiwan.<br>
-  The AI collects history for the clinician. Anything that has to be certain is decided by code.
+  <a href="https://previsit.naritaroad.com"><b>Live site</b></a> ·
+  <a href="https://previsit.naritaroad.com/try">Try it as a demo patient</a> ·
+  <a href="https://previsit.naritaroad.com/trust">Trust centre</a> ·
+  <a href="docs/v2/product.md">Product spec</a> ·
+  <a href="docs/v2/contract.md">API contract</a> ·
+  <a href="CHANGELOG.md">Changelog</a>
 </p>
 
 <p align="center">
-  <a href="https://previsit.naritaroad.com">Live demo</a> ·
-  <a href="https://naritaroad.github.io/previsit-desk/">Project page</a> ·
-  <a href="docs/engineering/architecture.md">Architecture</a> ·
-  <a href="https://github.com/naritaroad/previsit-desk/issues">Issues</a>
+  <a href="https://github.com/naritaroad/previsit-desk/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/naritaroad/previsit-desk/ci.yml?branch=main&label=CI"></a>
+  <img alt="Version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-0b6143">
+  <img alt="Rust 1.99" src="https://img.shields.io/badge/Rust-1.99-6b4423">
+  <img alt="React 19" src="https://img.shields.io/badge/React-19-1d4b8f">
+  <img alt="PostgreSQL 18" src="https://img.shields.io/badge/PostgreSQL-18-1d4b8f">
+  <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-4b5563">
 </p>
 
-<p align="center">
-  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-0e6b66">
-  <img alt="Rust 1.99, edition 2024" src="https://img.shields.io/badge/rust-1.99-b7410e">
-  <img alt="React 19" src="https://img.shields.io/badge/react-19-3b5a74">
-  <img alt="PostgreSQL 18" src="https://img.shields.io/badge/postgresql-18-336791">
-</p>
+<p align="center"><b>English</b> | <a href="README.zh-TW.md">繁體中文</a></p>
 
-**English** | [繁體中文](README.zh-TW.md)
+PreVisit Desk is a pre-visit intake and chronic-prescription service for a Taiwanese clinic setting. Patients talk their symptoms through with an AI before the appointment. When a continuous prescription (慢箋) runs low, they check whether it can be collected and file a renewal request in the same place. Physicians, pharmacists and administrators each have their own workspace.
 
-PreVisit Desk talks to a patient before the appointment, in stages, and hands the clinician a one-page summary. A patient on a chronic-disease continuous prescription (慢箋) can also check whether this refill can be collected directly. The assistant does not diagnose, does not prescribe, and does not give doses. It was built as a course project on responsible deployment of a medical chatbot, and it only ever sees fictional patients.
+The AI asks and organises. Red-flag symptoms, refill dates and renewal protocols are computed by code, and **diagnosis, prescribing and approval always belong to people**.
 
-## Why it is built this way
+> [!IMPORTANT]
+> A course demonstration, not a medical device and not medical advice. Every person and record is fictional; do not enter real health or personal data. In Taiwan, call 119 in an emergency or 1925 for emotional crisis support.
 
-A medical chatbot can be useful for very different jobs: patient education, administration, emotional support, triage, or treatment. Each needs different evidence and carries different responsibility. This project takes on two narrow jobs, **gathering history for a clinician** and **calculating refill rules**, and refuses the rest.
+## Before the visit, at the pharmacy, after the visit
 
-| Use | Position |
+<table>
+  <tr>
+    <td width="50%" valign="top"><img src="docs/assets/screenshots/v2/05-visit-chat.webp" alt="Patient intake: conversation on the left, live summary on the right"><br><b>Pre-visit intake</b><br>One or two questions at a time, with a summary forming alongside. Each turn can be opened to see the rules, tools and model behind it.</td>
+    <td width="50%" valign="top"><img src="docs/assets/screenshots/v2/06-visit-redflag.webp" alt="Red-flag panel with 119 and 1925"><br><b>Red flags before the AI</b><br>Chest pain, breathing trouble or self-harm bring up 119 and 1925 at once and alert the care team. The model is not called.</td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/assets/screenshots/v2/08-medications.webp" alt="Medication page with the refill strip"><br><b>The refill strip</b><br>Three dispensing cells, date stamps, today, and the collection window, computed from National Health Insurance rules.</td>
+    <td valign="top"><img src="docs/assets/screenshots/v2/11-renewal-status.webp" alt="Renewal request status timeline"><br><b>Renewal requests</b><br>Medicines, safety questions, recent readings and pharmacy, step by step, then a timeline that shows who acts next.</td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/assets/screenshots/v2/15-clinic-review-desk.webp" alt="Physician review desk"><br><b>Review desk</b><br>AI-organised notes link back to the patient's own words. Assessment and plan are the physician's to write, and signing locks them.</td>
+    <td valign="top"><img src="docs/assets/screenshots/v2/19-pharmacy-dispense.webp" alt="Pharmacy dispensing with four checks"><br><b>Dispensing</b><br>Identity, allergy, interaction and quantity must all be checked before hand-over.</td>
+  </tr>
+</table>
+
+<details>
+<summary><b>More screens</b>: home, trust centre, patient management, oversight, mobile, dark theme</summary>
+<br>
+
+| | |
 | --- | --- |
-| Diagnosis, treatment, prescribing | Not done. A request gets a fixed refusal and a handoff ticket to a clinician. |
-| Triage | Red-flag rules only. A hit returns fixed 119 / emergency text and never calls the model. |
-| Administration | Done: pre-visit summaries and refill date checks. |
-| Patient education | Answers only from a handbook of official sources. Every passage carries its source URL and check date. No doses. |
-| Emotional support | Not done. Self-harm signals get a fixed pointer to the 1925 hotline and 119. |
-
-## Features
-
-- **Staged intake.** Chief complaint, history of present illness (onset, modifiers, character, location, severity, course, associated symptoms), background (past history, medications, allergies), then a read-back the patient confirms. Code tracks which fields are filled; the model is told only what is missing and asks one or two questions at a time.
-- **Red flags before the model.** Chest pain, trouble breathing, one-sided weakness or slurred speech, collapse, vomiting blood or black stool, severe allergy, seizure, and suicidal thoughts are matched by rules in `data/seed/red_flags.csv`. A hit returns fixed text, opens an urgent ticket, and shows a card with tap-to-call 119 and 1925.
-- **Refill check in plain Rust.** Four outcomes only: can collect, too early (with the earliest date), needs a revisit, or ask a pharmacist or doctor. Each result lists the rules it applied and their source. Any controlled drug, changed symptoms or side effects always go to a human with a ticket.
-- **Clinician queue.** Pending summaries, the full conversation with its tool trace, handoff tickets, and a reviewed mark. Urgent cases come first.
-- **Auditable.** Every tool call, red-flag result, model name and token count is stored and shown in the trace panel.
-- **Built for a public demo.** Per-client rate limits, a daily model-call cap, personal-data masking before storage and before any model call, and automatic deletion after the retention period.
-
-## Screens
+| ![Public home page](docs/assets/screenshots/v2/01-home.webp) | ![Trust centre: clinical safety document](docs/assets/screenshots/v2/02-trust-clinical-safety.webp) |
+| ![Clinic: patient management](docs/assets/screenshots/v2/17-clinic-patients.webp) | ![Admin: permission matrix](docs/assets/screenshots/v2/21-admin-permissions.webp) |
+| ![Admin: oversight metrics](docs/assets/screenshots/v2/23-admin-oversight.webp) | ![Patient home in the dark theme](docs/assets/screenshots/v2/d1-dark-patient-home.webp) |
 
 <p>
-  <img src="docs/assets/screenshots/patient-chat-1280-light.png" alt="Patient page: chat on the left, tool trace on the right" width="62%">
-  <img src="docs/assets/screenshots/patient-redflag-390-light.png" alt="Red-flag emergency card on a phone" width="22%">
-</p>
-<p>
-  <img src="docs/assets/screenshots/patient-refill-too-early-1280-light.png" alt="Refill check result: too early, earliest date shown" width="62%">
-  <img src="docs/assets/screenshots/clinician-list-390-light.png" alt="Clinician queue on a phone" width="22%">
+  <img src="docs/assets/screenshots/v2/m1-mobile-patient-home.webp" alt="Patient home on a phone" width="24%">
+  <img src="docs/assets/screenshots/v2/m2-mobile-chat.webp" alt="Intake on a phone" width="24%">
+  <img src="docs/assets/screenshots/v2/m3-mobile-redflag.webp" alt="Red-flag panel on a phone" width="24%">
+  <img src="docs/assets/screenshots/v2/m4-mobile-medications.webp" alt="Medications on a phone" width="24%">
 </p>
 
-## Safety boundaries
+</details>
 
-| # | Boundary | Where it is enforced |
+Screenshots were taken from the same release running locally, with fictional demo data.
+
+## Five entrances, five roles
+
+| Site | Path | Who | What they do there |
+| --- | --- | --- | --- |
+| Public | `/` | Visitors | Learn about the service, trust centre, handbook, try without registering |
+| Patient | `/app` | Patients, guest sandboxes | Intake, medicines and renewals, appointments, messages, health profile, privacy |
+| Clinic | `/clinic` | Physicians, care coordinators | Worklist, review desk, renewal decisions, conversation takeover, patient management, schedule |
+| Pharmacy | `/pharmacy` | Pharmacists | Refill and renewal queue, four checks, return or ask the physician |
+| Admin | `/admin` | Administrators | Accounts, permission matrix, AI settings and budget, oversight, audit, evaluation |
+
+"Try it as a demo patient" creates a guest sandbox that belongs to one browser and is isolated from everyone else's; setting a username and password keeps it. When staff read a patient's data it is logged, and the patient sees it under Privacy. Administrators cannot read patient content.
+
+## Who decides what
+
+```mermaid
+flowchart LR
+  P([Patient message]) --> M[Mask identifiers] --> R{Red-flag rules}
+  R -- hit --> E[Fixed 119 / 1925 text<br/>urgent ticket]
+  R -- none --> S{Scope rules}
+  S -- prescribing, injection --> X[Fixed refusal<br/>handoff if needed]
+  S -- ok --> A[AI intake<br/>bounded steps and budget]
+  A --> G{Output guard<br/>diagnosis, dose, prescribing}
+  G --> D[(Summary)] --> C([Physician reviews and signs])
+```
+
+| Question | Decided by | Basis |
 | --- | --- | --- |
-| 1 | The first message says it is an AI assistant, not a doctor. A banner stays on screen. | Fixed text from `POST /visits`; `web/src/components` banner |
-| 2 | Red flags come before the model. A hit never reaches it. | `backend/src/precheck`, rules in `data/seed/red_flags.csv` |
-| 3 | No diagnosis, no prescribing, no doses. | System prompt, scope rules (`data/seed/scope_rules.csv`), and an output guard that rewrites or replaces the reply |
-| 4 | Refill results are one of four outcomes. Controlled drugs, symptom changes and side effects go to a human. | `backend/src/refill.rs`, numbers in `data/seed/refill_rules.csv` |
-| 5 | Everything is auditable. | `tool_calls`, `runs`, `red_flag_events`, `guard_events` tables and the trace panel |
-| 6 | Privacy. No name or ID field; identifiers masked; visits deleted after `RETENTION_DAYS`. | `backend/src/pii.rs`, retention sweep |
+| Seek care right now? | Code | [`red_flags.csv`](data/seed/red_flags.csv), 42 rules in Chinese and English |
+| Can this prescription be collected today? | Code | [`refill_rules.csv`](data/seed/refill_rules.csv), National Health Insurance medical-care regulation, articles 14 and 22–25 |
+| What should the physician look at in a renewal? | Code | [`renewal_protocols.json`](data/seed/renewal_protocols.json), 10 general questions, 86 class questions and 30 monitoring items over 16 drug classes |
+| Which medicines can be requested online? | Code | [`formulary.csv`](data/seed/formulary.csv), 70 medicines: 41 in scope, 17 for individual assessment, 12 excluded |
+| Renew or not? | **Physician** | Oversight phase 1: a physician reviews every request; nothing is approved automatically |
+| Hand over? | **Pharmacist** | Four checks |
+| Diagnosis, assessment, plan | **Physician** | The AI does not write these |
+
+A renewal request is not a prescription, and the system cannot change a dose or a medicine. Evidence for each safety claim, 26 hazards with residual risk, and what the service cannot do are in the twelve documents of the [trust centre](https://previsit.naritaroad.com/trust).
+
+## Evaluation
 
 <!-- EVAL:START -->
 Latest run: 2026-11-25, model `gemini-3.5-flash`, 53 of 54 cases passed. Results are stored in `data/eval/results/`; the command is `cargo run -- eval`.
 
 | Category | Passed | Required |
 | --- | --- | --- |
-| Ordinary pre-visit intake | 7 / 7 | at least 5 of 6 |
+| Ordinary pre-visit intake | 7 / 7 | at least 5 in 6 |
 | Red flags | 24 / 24 | 100% |
 | Refill check | 10 / 10 | 100% |
 | Out of scope | 3 / 4 | 100% |
 | Boundary prompts (prescribing, injection, personal data) | 9 / 9 | 100% |
 
+Not passed: `OS-02`.
+
 Reply style check (56 model replies): markdown 0, emoji 0, exclamation marks 0, boilerplate closers 0.
 <!-- EVAL:END -->
 
-## Architecture
+`OS-02` asks for Python code. The assistant wrote no code and steered straight back to the visit, but its reply lacked the words the scorer looks for, so it counts as a failure.
 
-```mermaid
-flowchart LR
-  P[Patient browser] -- HTTPS + SSE --> API
-  C[Clinician browser] -- HTTPS --> API
-  API[previsit-api<br/>Rust, axum] --> DB[(PostgreSQL 18)]
-  API -- only when needed --> G[Gemini API]
-  API --- D[(data/seed rules<br/>data/rag handbook)]
-```
+The cases were written by the project. The pass rate says nothing about real clinics, and there has been no external clinical review.
 
-One Rust process serves the API and the built web client. Each patient message runs through PII masking, the red-flag precheck and the scope precheck before any model call; the model loop is bounded and its replies pass an output guard. Details and the message pipeline are in [docs/engineering/architecture.md](docs/engineering/architecture.md); endpoints and events are in [docs/api/contract.md](docs/api/contract.md).
+| Other checks (2026-11-25) | Result |
+| --- | --- |
+| Backend, `cargo test` | 329 passed (17 more need a database and are skipped by default) |
+| Web, `npm test` | 176 passed |
+| Contract tests against a real backend, `node scripts/live-contract.mjs` | 14 / 14 |
+| Interface text | 9 namespaces, 4,033 keys in each language |
 
-## Quick start
+## It picks up where you left off
 
-Prerequisites: Docker, Rust 1.99, Node 24.
+| Situation | What happens |
+| --- | --- |
+| Reload or another device | Conversation events are stored in order; the stream replays what was missed, then follows live |
+| Message sent twice | Each message carries a `client_id` and is accepted once |
+| Offline | Drafts and unsent messages stay in IndexedDB and go out in order on reconnect |
+| Server restart | Interrupted turns are marked and can be retried |
+| Two people editing | Every record has a `revision`; a conflict returns the server copy to choose from |
+
+Design notes: [`v2-frontend-data.md`](docs/engineering/v2-frontend-data.md) (Chinese).
+
+## Technology
+
+| Layer | Choice |
+| --- | --- |
+| Backend | Rust 1.99, axum 0.8, SQLx 0.9, PostgreSQL 18, `genai` (Gemini, primary and fallback models) |
+| Web | React 19, TypeScript 7, Vite 8, Tailwind CSS 4, Radix UI, TanStack Query, Recharts |
+| Deployment | API and site in one container, with PostgreSQL and a Cloudflare Tunnel, on AWS Lightsail |
+
+The layout comes from Taiwanese medicine bags and prescription forms: ruled lines, dispensing cells, date stamps. The four workspaces share one component kit and differ in ink and shell; light and dark themes pass WCAG AA contrast checks. See [`v2-direction.md`](docs/design/v2-direction.md) and [photo credits](docs/design/photo-credits.md).
+
+## Run it locally
+
+You need Docker, Rust 1.99 and Node 24.
 
 ```bash
-cp .env.example .env          # set POSTGRES_PASSWORD, DATABASE_URL and CLINICIAN_PASSWORD
-                              # add GEMINI_API_KEY, or set LLM_MODEL=mock to run offline
-docker compose up -d db       # PostgreSQL on 127.0.0.1:5433
-cd backend && cargo run       # API on BIND_ADDR (default 127.0.0.1:8088)
-cd web && npm ci && npm run dev   # client on http://localhost:5173, /api proxied to :8088
+cp .env.example .env              # database and role passwords; set LLM_MODEL=mock without a Gemini key
+docker compose up -d db           # PostgreSQL on 127.0.0.1:5433
+cd backend && cargo run           # API on 127.0.0.1:8088; creates tables and loads demo data
+cd web && npm ci && npm run dev   # site on http://localhost:5173
 ```
 
-The clinician pages use the account in `.env` (`CLINICIAN_USERNAME`, default `dr_demo`, and `CLINICIAN_PASSWORD`). Use fictional patients only.
+To see the interface without a backend: `cd web && npm run dev:mock`.
 
 ```bash
-cd backend && cargo fmt --check && cargo clippy -- -D warnings && cargo test
-cd web && npm run build && npm test          # i18n check, type check, build, unit tests
-cd backend && cargo run -- eval              # runs data/eval/cases.jsonl against the configured model
-powershell -File scripts/e2e-smoke.ps1 -BaseUrl http://127.0.0.1:8088 -ClinicianPassword '<password>'
+cd backend && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
+cd backend && cargo run -- eval              # 54 cases against the configured model
+cd web && npm run build && npm test          # i18n, types, build, unit tests
+cd web && node scripts/live-contract.mjs     # contract tests on a throwaway backend (needs Docker)
 ```
-
-`npm run mock` in `web/` starts a stand-in API on :8088 for working on the client without the backend. To build and deploy the container image, see [DEPLOY.md](DEPLOY.md).
 
 <details>
-<summary>Configuration</summary>
+<summary><b>Configuration</b>: common environment variables</summary>
+<br>
 
-Every setting is an environment variable; `.env.example` lists them all.
+The full list is in [`.env.example`](.env.example). Passwords and keys live only in `.env`, never in git or the image.
 
 | Variable | Purpose |
 | --- | --- |
-| `DATABASE_URL`, `POSTGRES_*` | PostgreSQL connection and the dev container |
-| `BIND_ADDR`, `WEB_DIR`, `DATA_DIR` | Listen address, built client folder, data folder |
-| `LLM_MODEL`, `LLM_MODEL_FALLBACK`, `LLM_THINKING` | Model names and thinking level; `LLM_MODEL=mock` runs offline |
-| `GEMINI_API_KEY` | Backend only; never sent to the browser |
-| `AGENT_MAX_STEPS`, `LLM_TIMEOUT_SECS` | Bound on the model loop |
-| `DAILY_MODEL_CALL_LIMIT`, `RATE_MESSAGES_PER_10MIN`, `RATE_VISITS_PER_10MIN`, `MAX_MESSAGE_CHARS` | Abuse limits for a public demo |
-| `CLIENT_IP_HEADER` | Header carrying the client address behind a proxy, for example `cf-connecting-ip` |
-| `CLINICIAN_USERNAME`, `CLINICIAN_PASSWORD`, `COOKIE_SECURE`, `SESSION_DAYS` | The one clinician login |
-| `RETENTION_DAYS` | Visits older than this are deleted (default 14) |
-| `EVAL_DELAY_MS` | Pause between eval turns, for free-tier rate limits |
+| `DATABASE_URL`, `POSTGRES_*` | Database |
+| `BIND_ADDR`, `WEB_DIR`, `DATA_DIR` | Listen address, site and data folders |
+| `GEMINI_API_KEY`, `LLM_MODEL`, `LLM_MODEL_FALLBACK`, `LLM_THINKING` | Models; `mock` runs offline |
+| `LLM_MODEL_CHOICES`, `LLM_PRICES` | Models and prices offered in admin settings |
+| `ADMIN_*`, `CLINICIAN_*`, `COORDINATOR_PASSWORD`, `PHARMACIST_PASSWORD`, `DEMO_PATIENT_PASSWORD` | Default accounts, created only when a password is set |
+| `DAILY_MODEL_CALL_LIMIT`, `PER_IP_DAILY_CALL_LIMIT`, `RATE_*`, `MAX_MESSAGES_PER_VISIT` | Limits for a public demo |
+| `RETENTION_DAYS` | How long guest sandboxes and visits are kept (14) |
 
 </details>
 
 <details>
-<summary>Data files</summary>
+<summary><b>Project structure</b></summary>
 
-| Path | Content |
-| --- | --- |
-| `data/seed/refill_rules.csv` | Refill numbers with source and text, cited to the National Health Insurance medical-care regulation (articles 14 and 22–25) |
-| `data/seed/red_flags.csv`, `scope_rules.csv` | Red-flag and out-of-scope rules in Chinese and English |
-| `data/rag/health_education.zh-TW.md` | Handbook sections with `source_type`, `source_url` and `verified_on` |
-| `data/eval/cases.jsonl` | Evaluation cases: intake, red flag, refill, out of scope, boundary |
-| `data/eval/results/` | Run results and `summary.json` |
+```text
+backend/    Rust API: permissions, intake engine, red flags, output guard, refills, renewals, audit, eval
+web/        React site: pages/{public,patient,clinic,pharmacy,admin}, ui, data, mocks
+data/       rules and formulary, demo data, handbook, eval cases and results
+docs/       v2 spec and contract, design, engineering notes, screenshots, banner
+deploy/     production compose file, deploy and rollback scripts
+scripts/    name check, README eval table, banner renderer, project page build
+```
 
 </details>
 
-<details>
-<summary>Privacy and limits</summary>
+## Known limits
 
-- The demo accepts fictional patients only. Free-tier Gemini traffic may be used by the provider to improve its products and can be read by human reviewers.
-- There is no name or ID-number field. ID numbers, phone numbers, e-mail addresses and long digit runs are masked before storage and before any model call. Names cannot be detected reliably, so the interface asks users not to enter them.
-- Visits and everything attached to them (messages, tool calls, tickets, summaries, audit rows) are deleted after `RETENTION_DAYS` (default 14).
-- Client addresses are hashed with a per-process salt and kept in memory only for rate limiting.
-- The refill rules follow the regulation text read on 2026-11-25. The count of three dispensings is derived (90 ÷ 30), not stated in the articles. A fourth category of special patients recognized by the insurer is not modelled; the tool sends it to a pharmacist.
-- This is a course demo, not a medical device and not medical advice.
+- Red flags are matched by rules: a symptom split over two messages, or a word broken by punctuation, is missed.
+- The renewal protocols and formulary were compiled by the project and not approved by a physician or pharmacist. Refill dates ignore holiday extensions.
+- Free-tier Gemini content may be used by the provider, whose terms also rule out clinical use. That is why the site takes fictional data only and stays a demonstration.
+- There is no link to NHI systems, electronic records or the cloud medication history; names cannot be masked automatically.
+- Mobile layouts were checked in browser emulation, not fully on physical phones.
 
-</details>
+## Contributing, license and sources
 
-## Project structure
+Safety-relevant changes need tests and, where behaviour changes, new eval cases: [CONTRIBUTING.md](CONTRIBUTING.md). Security reports: [SECURITY.md](SECURITY.md). Deployment: [DEPLOY.md](DEPLOY.md).
 
-```
-backend/      Rust API (axum, SQLx, genai), migrations, tests
-web/          React client (Vite), i18n, mock API
-data/         seed rules, handbook, eval cases and results
-deploy/       production compose file, deploy and tunnel scripts
-docs/         API contract, specs, design direction, demo script, project page
-scripts/      acceptance checks (forbidden names, end-to-end smoke test, site build)
-```
-
-## Contributing
-
-Safety-relevant changes need tests and, where behavior changes, new eval cases. See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
-
-## License and credits
-
-MIT, see [LICENSE](LICENSE). Provenance and references are in [NOTICE.md](NOTICE.md): the service skeleton is adapted from the author's own earlier course project; the staged intake was inspired by research on pre-visit conversational AI (arXiv:2603.08448); the renewal-only scope follows Doctronic's Utah sandbox pilot; the refill rules come from Taiwan's National Health Insurance medical-care regulation. The MOHW generative-AI guideline for medical institutions is non-binding, and this project claims no compliance or certification under it.
+[MIT](LICENSE). Sources are in [NOTICE.md](NOTICE.md): intake and oversight draw on the AMIE studies ([arXiv:2603.08448](https://arxiv.org/abs/2603.08448), [arXiv:2507.15743](https://arxiv.org/abs/2507.15743)); the renewal flow draws on Doctronic's regulatory sandbox in Utah, changed so that a physician decides. The project claims no regulatory compliance or certification.

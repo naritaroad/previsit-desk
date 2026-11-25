@@ -9,7 +9,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const summary = JSON.parse(readFileSync(join(root, 'data/eval/results/summary.json'), 'utf8'));
 
 const names = {
-  intake: { en: 'Ordinary pre-visit intake', zh: '一般預問診', need: { en: 'at least 5 of 6', zh: '至少 5／6' } },
+  intake: { en: 'Ordinary pre-visit intake', zh: '一般預問診', need: { en: 'at least 5 in 6', zh: '至少 5／6' } },
   red_flag: { en: 'Red flags', zh: '紅旗', need: { en: '100%', zh: '100%' } },
   refill: { en: 'Refill check', zh: '慢箋檢核', need: { en: '100%', zh: '100%' } },
   out_of_scope: { en: 'Out of scope', zh: '超出範圍', need: { en: '100%', zh: '100%' } },
@@ -35,7 +35,10 @@ function table(lang) {
       ? `\n\n回覆風格檢查（${s.model_replies} 則模型回覆）：markdown ${s.markdown}、emoji ${s.emoji}、驚嘆號 ${s.exclamation}、客套收尾 ${s.boilerplate}。`
       : `\n\nReply style check (${s.model_replies} model replies): markdown ${s.markdown}, emoji ${s.emoji}, exclamation marks ${s.exclamation}, boilerplate closers ${s.boilerplate}.`;
   }
-  return `${head}\n\n${cols}\n| --- | --- | --- |\n${rows.join('\n')}${style}`;
+  const failed = (summary.cases ?? []).filter((c) => !c.passed).map((c) => c.id);
+  const list = failed.map((id) => `\`${id}\``).join(zh ? '、' : ', ');
+  const misses = failed.length ? (zh ? `\n\n沒有通過的題目：${list}。` : `\n\nNot passed: ${list}.`) : '';
+  return `${head}\n\n${cols}\n| --- | --- | --- |\n${rows.join('\n')}${misses}${style}`;
 }
 
 for (const [file, lang] of [['README.md', 'en'], ['README.zh-TW.md', 'zh']]) {
