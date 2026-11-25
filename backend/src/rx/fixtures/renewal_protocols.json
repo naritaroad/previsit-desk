@@ -1,0 +1,48 @@
+{
+  "version": "fixture-1",
+  "approved_by_note": "測試用",
+  "general": {
+    "questions": [
+      { "id": "chest_pain_now", "kind": "boolean", "label_zh": "現在有胸痛或胸悶嗎？", "label_en": "Do you have chest pain or tightness right now?", "required": true,
+        "rules": [ { "when": { "op": "eq", "value": true }, "disposition": "urgent", "reason_zh": "現在胸痛，需要立即就醫。", "reason_en": "Chest pain now needs immediate care.", "source_url": null } ] },
+      { "id": "symptom_change", "kind": "choice", "label_zh": "最近症狀有變化嗎？", "label_en": "Have your symptoms changed recently?", "required": true,
+        "options": [ { "value": "same", "label_zh": "差不多", "label_en": "About the same" }, { "value": "better", "label_zh": "好轉", "label_en": "Better" }, { "value": "worse", "label_zh": "變差", "label_en": "Worse" } ],
+        "rules": [ { "when": { "op": "eq", "value": "worse" }, "disposition": "in_person", "reason_zh": "症狀變差，需要當面評估。", "reason_en": "Worse symptoms need an in-person assessment.", "source_url": "https://example.org/general" } ] },
+      { "id": "new_drug", "kind": "boolean", "label_zh": "最近有開始吃別的藥嗎？", "label_en": "Have you started any other medicine recently?", "required": true,
+        "rules": [ { "when": { "op": "eq", "value": true }, "disposition": "review", "reason_zh": "有新的用藥，請醫師確認交互作用。", "reason_en": "A new medicine: the physician checks for interactions.", "source_url": null } ] },
+      { "id": "note", "kind": "text", "label_zh": "還有要告訴醫師的事嗎？", "label_en": "Anything else for the physician?", "required": false, "rules": [] }
+    ]
+  },
+  "classes": [
+    { "class_id": "ccb", "title_zh": "鈣離子阻斷劑", "title_en": "Calcium channel blocker", "summary_zh": "看水腫和血壓。", "summary_en": "Looks at swelling and blood pressure.",
+      "questions": [
+        { "id": "leg_swelling", "kind": "boolean", "label_zh": "腳有水腫嗎？", "label_en": "Any leg swelling?", "required": true,
+          "rules": [ { "when": { "op": "eq", "value": true }, "disposition": "review", "reason_zh": "水腫可能和藥有關。", "reason_en": "Swelling may be related to the medicine.", "source_url": "https://example.org/ccb" } ] } ],
+      "monitoring": [
+        { "id": "bp_systolic", "label_zh": "收縮壓", "label_en": "Systolic pressure", "max_age_days": 30, "value_kind": "number", "unit": "mmHg",
+          "rules": [ { "when": { "op": "gte", "value": 180 }, "disposition": "urgent", "reason_zh": "血壓很高。", "reason_en": "Very high blood pressure.", "source_url": null },
+                     { "when": { "op": "gte", "value": 150 }, "disposition": "in_person", "reason_zh": "血壓偏高。", "reason_en": "High blood pressure.", "source_url": null } ],
+          "stale_disposition": "review", "reason_zh": "沒有近 30 天的血壓。", "reason_en": "No blood pressure within 30 days.", "source_type": "project", "source_url": "https://example.org/bp", "verified_on": "2026-11-25" } ] },
+    { "class_id": "arb", "title_zh": "血管張力素受體阻斷劑", "title_en": "Angiotensin receptor blocker", "summary_zh": "看懷孕和腎功能。", "summary_en": "Looks at pregnancy and kidney function.",
+      "questions": [
+        { "id": "pregnant", "kind": "choice", "label_zh": "可能懷孕嗎？", "label_en": "Could you be pregnant?", "required": true,
+          "options": [ { "value": "no", "label_zh": "不可能", "label_en": "No" }, { "value": "yes", "label_zh": "是", "label_en": "Yes" }, { "value": "unsure", "label_zh": "不確定", "label_en": "Not sure" } ],
+          "rules": [ { "when": { "op": "in", "value": ["yes", "unsure"] }, "disposition": "in_person", "reason_zh": "可能懷孕，需要當面評估。", "reason_en": "Possible pregnancy needs an in-person assessment.", "source_url": null } ] } ],
+      "monitoring": [
+        { "id": "bp_systolic", "label_zh": "收縮壓", "label_en": "Systolic pressure", "max_age_days": 30, "value_kind": "number", "unit": "mmHg", "rules": [],
+          "stale_disposition": "review", "reason_zh": "沒有近 30 天的血壓。", "reason_en": "No blood pressure within 30 days.", "source_type": "project", "source_url": "https://example.org/bp", "verified_on": "" },
+        { "id": "kidney_test", "label_zh": "腎功能抽血日期", "label_en": "Date of kidney blood test", "max_age_days": 365, "value_kind": "date_only", "unit": null, "rules": [],
+          "stale_disposition": "in_person", "reason_zh": "一年內沒有腎功能檢查。", "reason_en": "No kidney test within a year.", "source_type": "project", "source_url": null, "verified_on": null } ] },
+    { "class_id": "statin", "title_zh": "他汀類降血脂藥", "title_en": "Statin", "summary_zh": "看肌肉症狀。", "summary_en": "Looks at muscle symptoms.",
+      "questions": [
+        { "id": "muscle_pain", "kind": "number", "label_zh": "肌肉痠痛幾分？", "label_en": "How bad is any muscle pain?", "unit": "0-10", "min": 0, "max": 10, "required": true,
+          "rules": [ { "when": { "op": "gte", "value": 7 }, "disposition": "in_person", "reason_zh": "肌肉痛明顯。", "reason_en": "Marked muscle pain.", "source_url": null },
+                     { "when": { "op": "gt", "value": 2 }, "disposition": "review", "reason_zh": "有肌肉痠痛。", "reason_en": "Some muscle pain.", "source_url": null } ] } ],
+      "monitoring": [] },
+    { "class_id": "biguanide", "title_zh": "雙胍類降血糖藥", "title_en": "Biguanide", "summary_zh": "看血糖。", "summary_en": "Looks at blood glucose.",
+      "questions": [
+        { "id": "last_meal_note", "kind": "text", "label_zh": "最近吃飯的狀況", "label_en": "How you have been eating", "required": false,
+          "rules": [ { "when": { "op": "missing" }, "disposition": "review", "reason_zh": "沒有填飲食狀況。", "reason_en": "Eating was not described.", "source_url": null } ] } ],
+      "monitoring": [] }
+  ]
+}

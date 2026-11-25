@@ -22,6 +22,8 @@ mod precheck;
 mod prompt;
 mod refill;
 mod routes;
+#[allow(dead_code)]
+mod rx;
 mod state;
 mod style;
 mod summary;

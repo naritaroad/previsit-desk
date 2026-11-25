@@ -1,0 +1,8 @@
+drug_id,name_zh,name_en,class_id,class_zh,class_en,form,strengths,renewal_scope,controlled_level,reason_zh,reason_en,source_type,source_url,verified_on
+amlodipine,氨氯地平,Amlodipine,ccb,鈣離子阻斷劑,Calcium channel blocker,tablet,5 mg|10 mg,in_scope,0,,,project,,
+losartan,洛沙坦,Losartan,arb,血管張力素受體阻斷劑,Angiotensin receptor blocker,tablet,50 mg,in_scope,0,,,project,,
+atorvastatin,阿托伐他汀,Atorvastatin,statin,他汀類降血脂藥,Statin,tablet,10 mg|20 mg,in_scope,0,,,project,,
+metformin,二甲雙胍,Metformin,biguanide,雙胍類降血糖藥,Biguanide,tablet,500 mg,in_scope,0,,,project,,
+warfarin,華法林,Warfarin,anticoagulant,口服抗凝血藥,Oral anticoagulant,tablet,5 mg,physician_only,0,需要定期抽血，由醫師個別評估。,It needs regular blood tests so a physician assesses each case.,project,,
+insulin_glargine,甘精胰島素,Insulin glargine,insulin,胰島素,Insulin,injection,300 U,excluded,0,針劑不接受線上申請。,Injections are not accepted online.,project,,
+zolpidem,佐沛眠,Zolpidem,hypnotic,安眠藥,Hypnotic,tablet,10 mg,excluded,4,第四級管制藥品，不接受線上申請。,A Schedule 4 controlled drug is not accepted online.,official,https://www.fda.gov.tw/,2026-11-25
