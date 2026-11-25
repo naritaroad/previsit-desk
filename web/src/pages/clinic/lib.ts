@@ -107,7 +107,7 @@ export function useClinicDensity(): [ClinicDensity, (d: ClinicDensity) => void] 
   return [v.density === "comfortable" ? "comfortable" : "compact", (density) => set({ density })];
 }
 
-export const personLabel = (p: PersonRef | null | undefined): string => (p ? [p.display_name, p.title].filter(Boolean).join(" ") : "");
+export const personLabel = (p: Pick<PersonRef, "display_name" | "title"> | null | undefined): string => (p ? [p.display_name, p.title].filter(Boolean).join(" ") : "");
 export const samePerson = (a: { id: string } | null | undefined, b: { id: string } | null | undefined): boolean => !!a && !!b && a.id === b.id;
 
 /** Items whose clock has stopped are never overdue. */

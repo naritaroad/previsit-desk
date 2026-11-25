@@ -67,7 +67,8 @@ export function describeRunFailure(code: RunFailureCode | "interrupted" | (strin
   }
 }
 
-type Translate = (key: string, params?: Record<string, unknown>) => string;
+/** i18next's t, whatever namespaces it was made for. */
+type Translate = (key: string) => string;
 
 /** Text under an input: a zod message key ("field.required") becomes words, a server sentence stays as it is. */
 export function fieldMessage(t: Translate, message: string | undefined): string | undefined {

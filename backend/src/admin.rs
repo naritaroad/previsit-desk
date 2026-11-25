@@ -243,13 +243,19 @@ pub async fn accounts(
     if status.is_some_and(|s| !["active", "disabled"].contains(&s)) {
         return Err(AppError::field("status", t(T::FieldErrChoice, user.locale)));
     }
+    let guest = match page::param(&params, "guest") {
+        None => None,
+        Some("true") => Some(true),
+        Some("false") => Some(false),
+        Some(_) => return Err(AppError::field("guest", t(T::FieldErrChoice, user.locale))),
+    };
     let limit = page::limit(&params)?;
     let cursor = page::cursor(&params)?;
     let rows: Vec<AccountRow> = sqlx::query_as(concat!(
         account_cols!(),
         "WHERE ($1::text IS NULL OR a.role = $1) AND ($2::text IS NULL OR a.status = $2)
            AND ($3::text IS NULL OR a.username ILIKE $3 ESCAPE '\\' OR a.display_name ILIKE $3 ESCAPE '\\')
-           AND ($4::timestamptz IS NULL OR (a.created_at, a.id) < ($4, $5))
+           AND ($4::timestamptz IS NULL OR (a.created_at, a.id) < ($4, $5)) AND ($7::boolean IS NULL OR a.is_guest = $7)
          ORDER BY a.created_at DESC, a.id DESC LIMIT $6"
     ))
     .bind(role)
@@ -258,15 +264,17 @@ pub async fn accounts(
     .bind(cursor.map(|c| c.at))
     .bind(cursor.map(|c| c.id))
     .bind(limit + 1)
+    .bind(guest)
     .fetch_all(&state.db)
     .await?;
     let total: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM accounts a WHERE ($1::text IS NULL OR a.role = $1) AND ($2::text IS NULL OR a.status = $2)
-           AND ($3::text IS NULL OR a.username ILIKE $3 ESCAPE '\\' OR a.display_name ILIKE $3 ESCAPE '\\')",
+           AND ($3::text IS NULL OR a.username ILIKE $3 ESCAPE '\\' OR a.display_name ILIKE $3 ESCAPE '\\') AND ($4::boolean IS NULL OR a.is_guest = $4)",
     )
     .bind(role)
     .bind(status)
     .bind(page::like(&params))
+    .bind(guest)
     .fetch_one(&state.db)
     .await?;
     let mut page = page::cut(rows, limit, |a| Cursor {
@@ -822,7 +830,7 @@ pub async fn audit_list(
             SELECT id, at, actor_id, actor_name, actor_role, 'access', action, resource || ':' || resource_id, '{}'::jsonb FROM access_log
          ) l
          WHERE at >= $1 AND at < $2 AND ($3::uuid IS NULL OR actor_id = $3) AND ($4::text IS NULL OR action = $4) AND ($5::text IS NULL OR kind = $5)
-           AND ($6::timestamptz IS NULL OR (at, id) < ($6, $7))
+           AND ($6::timestamptz IS NULL OR (at, id) < ($6, $7)) AND ($9::text IS NULL OR target LIKE $9 ESCAPE '\\')
          ORDER BY at DESC, id DESC LIMIT $8",
     )
     .bind(from)
@@ -833,6 +841,15 @@ pub async fn audit_list(
     .bind(cursor.map(|c| c.at))
     .bind(cursor.map(|c| c.id))
     .bind(limit + 1)
+    // `account:…` matches one target, `account` every target of that kind.
+    .bind(page::param(&params, "target").map(|target| {
+        let escaped = page::escape_like(target);
+        if target.contains(':') {
+            escaped
+        } else {
+            format!("{escaped}:%")
+        }
+    }))
     .fetch_all(&state.db)
     .await?;
     let cut = page::cut(rows, limit, |r| Cursor { at: r.at, id: r.id });
@@ -921,7 +938,7 @@ pub fn eval_history(data_dir: &FsPath) -> Vec<Value> {
 pub async fn eval(State(state): State<AppState>, user: CurrentUser) -> AppResult<Json<Value>> {
     user.require(Permission::RulesRead)?;
     Ok(Json(json!({
-        "latest": crate::public::eval_summary(&state.config.data_dir),
+        "latest": crate::public::eval_latest(&state.config.data_dir),
         "history": eval_history(&state.config.data_dir),
     })))
 }

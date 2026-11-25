@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { ClinicalNoteSections, NoteSection, PrevisitSummary } from "@/api/types";
-import type { NoteEditor } from "@/data";
-import { Badge, Banner, Button, Field, Popover, SkeletonRows, Textarea, cn, toast } from "@/ui";
+import { useMe, type NoteEditor } from "@/data";
+import { Badge, Banner, Button, Field, NoteField, NoteSheet, Popover, SkeletonRows, StatusTag, Textarea, cn, toast } from "@/ui";
 
 import { changed, diffText } from "../diff";
 import { NOTE_MAX, personLabel, useErrorText, useFmt, type Fmt } from "../lib";
@@ -46,6 +46,7 @@ export interface NotePaneProps {
 /** Right pane: the note. S and O start from the AI's draft, A, P and the message are a blank page for the physician. */
 export function NotePane({ visitId, ed, summary, canSign, canEdit, errors, children }: NotePaneProps) {
   const { t } = useTranslation("clinic");
+  const me = useMe();
   const draft = useAiDraft(visitId, ed, summary);
   if (ed.loading || !ed.sections) return <div className="min-h-full bg-surface p-pane">{ed.error ? <NoteError error={ed.error} /> : <SkeletonRows rows={6} />}</div>;
   if (ed.note?.status === "signed") return <SignedNote ed={ed} canSign={canSign} />;
@@ -57,11 +58,26 @@ export function NotePane({ visitId, ed, summary, canSign, canEdit, errors, child
           <DraftSection key={k} section={k} value={s[k]} draft={draft[k]} readOnly={!canEdit} onChange={(v) => ed.set(k, v)} />
         ))}
         {canSign ? (
-          (["assessment", "plan", "patient_message"] as const).map((k) => (
-            <Field key={k} label={t(`note.${k}`)} hint={t(`note.hint.${k}`)} error={errors[k] ?? (over(s[k]) ? t("note.tooLong", { max: NOTE_MAX }) : undefined)}>
-              <Textarea rows={k === "patient_message" ? 4 : 5} value={s[k]} onChange={(e) => ed.set(k, e.target.value)} id={`note-${k}`} />
-            </Field>
-          ))
+          <div className="sheet-frame">
+            <NoteSheet title={t("note.sheet")} author={t("note.writtenBy", { name: personLabel(me) })} status={<StatusTag family="note" status="draft" />}>
+              {(["assessment", "plan", "patient_message"] as const).map((k) => {
+                const error = errors[k] ?? (over(s[k]) ? t("note.tooLong", { max: NOTE_MAX }) : undefined);
+                return (
+                  <div key={k} id={`note-${k}`}>
+                    <NoteField
+                      mark={k === "assessment" ? "A" : k === "plan" ? "P" : undefined}
+                      tone={k === "patient_message" ? "patient" : "clinical"}
+                      label={t(`note.${k}`)}
+                      hint={error ? <span className="font-semibold text-warn">{error}</span> : t(`note.hint.${k}`)}
+                      rows={k === "patient_message" ? 3 : 4}
+                      value={s[k]}
+                      onValueChange={(v) => ed.set(k, v)}
+                    />
+                  </div>
+                );
+              })}
+            </NoteSheet>
+          </div>
         ) : (
           <>
             <RoleNote>{t("note.physicianOnly")}</RoleNote>

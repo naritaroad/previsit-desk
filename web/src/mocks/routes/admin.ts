@@ -100,7 +100,6 @@ function oversightClass(c: UserCtx, classId: string, i: number): OversightClass 
 
 export const adminRoutes: Route[] = [
   route("GET /admin/overview", ["oversight.read"], (c) => {
-    if (c.account.role !== "admin") fail("forbidden");
     const days = Math.min(90, Math.max(1, Number(c.q("days")) || 14));
     const rows = series(c, days);
     const sum = (k: Exclude<keyof UsageDay, "day">) => Number(rows.reduce((n, r) => n + r[k], 0).toFixed(4));
@@ -110,8 +109,8 @@ export const adminRoutes: Route[] = [
       queues: {
         visits_pending: c.db.visits.filter((v) => v.status === "submitted").length,
         red_flag: c.db.visits.filter((v) => v.status === "red_flag").length,
-        rx_review: c.db.rx.filter((r) => r.status === "in_review").length,
-        rx_overdue: c.db.rx.filter((r) => r.status === "in_review" && r.sla_due_at !== null && r.sla_due_at < c.now).length,
+        rx_review: c.db.rx.filter((r) => r.status === "submitted" || r.status === "in_review").length,
+        rx_overdue: c.db.rx.filter((r) => (r.status === "submitted" || r.status === "in_review") && r.sla_due_at !== null && r.sla_due_at < c.now).length,
         rx_more_info: c.db.rx.filter((r) => r.status === "more_info").length,
         rx_pharmacy: c.db.rx.filter((r) => ["at_pharmacy", "ready"].includes(r.status)).length,
         tickets_open: c.db.tickets.filter((t) => t.status === "open").length,
@@ -246,7 +245,7 @@ export const adminRoutes: Route[] = [
       formulary: formulary(c.locale),
     }),
   ),
-  route("GET /admin/eval", ["oversight.read"], (c) => ok({ latest: evalSummary(c.now, 0), history: [0, 2, 5, 9].map((d) => evalSummary(c.now, d)) })),
+  route("GET /admin/eval", ["rules.read"], (c) => ok({ latest: evalSummary(c.now, 0), history: [0, 2, 5, 9].map((d) => evalSummary(c.now, d)) })),
   route("POST /admin/demo/reset", ["demo.reset"], (c) => {
     if (c.body.confirm !== "RESET") badField("confirm", L(c.locale, "請輸入 RESET 確認。", "Type RESET to confirm."));
     for (const g of c.db.accounts.filter((a) => a.is_guest)) removeAccount(c.db, g.id);

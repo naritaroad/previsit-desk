@@ -52,7 +52,7 @@ function Pick({ kind, items, initial }: { kind: RxKind; items: MedicationCard[];
   const rx = useRxList();
   // Reasons per drug come from the formulary, the same text the request will show.
   const formulary = useFormulary();
-  const reasonOf = (m: MedicationCard) => formulary.items.find((d) => d.drug_id === m.drug.drug_id)?.scope_reason ?? t(`rx:scopeHint.${m.renewal_scope}`);
+  const reasonOf = (m: MedicationCard) => formulary.items.find((d) => d.drug_id === m.drug.drug_id)?.reason ?? t(`rx:scopeHint.${m.renewal_scope}`);
 
   const blocked = (m: MedicationCard): string | null => {
     const request = rx.items.find((r) => r.id === m.open_request_id);

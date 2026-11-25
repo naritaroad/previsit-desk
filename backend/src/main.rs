@@ -367,6 +367,10 @@ async fn serve() -> Result<()> {
             .await
             .map_err(|e| anyhow::anyhow!("screen interrupted turns: {e}"))?;
     }
+    // Guests refer to the pharmacies, so the data is there before the first request.
+    if let Err(e) = demo::ensure(&state).await {
+        tracing::warn!(error = %e, "could not load the demo data");
+    }
     let config = state.config.clone();
     tracing::info!(addr = %config.bind, model = %config.model, fallback = ?config.model_fallback, thinking = ?config.thinking, model_ready = config.model_ready(&config.model), handbook_sections = state.handbook.section_count(), "listening");
 

@@ -78,7 +78,7 @@ const SCRIPTS: readonly RxScript[] = [
     key: "chang-inhaler",
     patient: "chang",
     kind: "renewal",
-    status: "in_review",
+    status: "submitted",
     items: ["chang-bud"],
     created: 7,
     submitted: 6,

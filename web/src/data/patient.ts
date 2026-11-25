@@ -146,9 +146,14 @@ export function consentStatus(state: ConsentState | undefined, doc: ConsentDoc):
   const currentVersion = state?.current_versions[doc] ?? null;
   return { latest, currentVersion, valid: !!latest?.granted && (currentVersion === null || latest.version === currentVersion) };
 }
-/** Whole history (newest first) and the versions in force; consentStatus(data, doc) reads one document. */
+const consentQuery = { queryKey: qk.consents, queryFn: ({ signal }: { signal: AbortSignal }) => patientApi.consents(signal) };
+/** The whole history, newest first; the first entry of a document is the one that counts. */
 export function useConsents() {
-  return useQuery({ queryKey: qk.consents, queryFn: ({ signal }) => patientApi.consents(signal) });
+  return useQuery({ ...consentQuery, select: (s) => s.items });
+}
+/** History plus the versions in force; consentStatus(data, doc) reads one document. */
+export function useConsentState() {
+  return useQuery(consentQuery);
 }
 export function useSetConsent() {
   const qc = useQueryClient();

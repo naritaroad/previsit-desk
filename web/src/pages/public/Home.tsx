@@ -5,14 +5,15 @@ import { homePath } from "@/lib/permissions";
 import { ButtonLink, Photo, Phrases, TextLink } from "@/ui";
 
 import { usePageSeo } from "./lib/seo";
-import { CallRow, PhotoNote, SplitRow, useCopy } from "./parts/common";
+import { CallRow, PhotoNote, SplitRow, useList } from "./parts/common";
 import { Excerpt } from "./parts/Excerpt";
 import { FactsTable } from "./parts/FactsTable";
 import { RefillDemo } from "./parts/RefillDemo";
 import { RenewalPath } from "./parts/RenewalPath";
 
 export default function Home() {
-  const { t, ts } = useCopy();
+  const { t } = useTranslation("public");
+  const ts = useList();
   const { t: shell } = useTranslation("shell");
   const { me } = useSession();
   usePageSeo("home");

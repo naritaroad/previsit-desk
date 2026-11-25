@@ -1,9 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { IconBuildingStore, IconListCheck, IconStethoscope, IconUser, type Icon } from "@tabler/icons-react";
 import { useState } from "react";
 
 import { Segmented } from "@/ui";
 
-import { useCopy } from "./common";
+import { useList } from "./common";
 
 interface Stop {
   ws: "patient" | "program" | "clinic" | "pharmacy";
@@ -25,7 +26,8 @@ const ICON: Record<Stop["ws"], Icon> = { patient: IconUser, program: IconListChe
 const INK = { patient: "patient", program: "admin", clinic: "clinic", pharmacy: "pharmacy" } as const;
 
 export function RenewalPath() {
-  const { t, ts } = useCopy();
+  const { t } = useTranslation("public");
+  const ts = useList();
   const scenarios = ts<Scenario[]>("home.renewal.scenarios");
   const [id, setId] = useState(scenarios[0].id);
   const current = scenarios.find((s) => s.id === id) ?? scenarios[0];

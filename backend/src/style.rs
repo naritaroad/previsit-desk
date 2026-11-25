@@ -31,6 +31,12 @@ static LEADING_FILLER: LazyLock<Regex> = LazyLock::new(|| {
         r"(?i)^(?:感謝您的分享|謝謝您的分享|謝謝您告訴我這些|感謝您提供這些資訊|好的，我了解了|我了解了|了解了|了解|明白了|thank you for sharing(?: that)?|i understand(?: your concern)?|great|certainly|sure|of course|absolutely)[，。,.!！\s]+",
     )
 });
+/// Excuses before a question: "請體諒我問一下，", "不好意思，想跟您確認一下：". The question itself stays.
+static LEADING_EXCUSE: LazyLock<Regex> = LazyLock::new(|| {
+    re(
+        r"^(?:(?:請體諒|請容|容|請允許|請讓|讓)我[^，。：！？\n]{0,6}(?:問|請教|確認|了解|說明)(?:一下|幾個問題|一些問題)?|(?:不好意思|抱歉|打擾您|冒昧)[，,]?[^，。：！？\n]{0,8}(?:請問|問|請教|確認|了解)(?:一下|您一下)?)[，。：,:]\s*",
+    )
+});
 static CLOSERS: LazyLock<Vec<Regex>> = LazyLock::new(|| {
     vec![
         re(r"^希望(這些|以上|這樣|這)[^。！？]{0,14}有(所)?幫助"),
@@ -174,6 +180,11 @@ pub fn style_cleanup(text: &str, locale: Locale) -> String {
     {
         s = s[m.end()..].to_string();
     }
+    if let Some(m) = LEADING_EXCUSE.find(&s)
+        && s[m.end()..].trim().chars().count() >= 4
+    {
+        s = s[m.end()..].to_string();
+    }
     s = drop_closers(&s);
     s = s.lines().map(str::trim_end).collect::<Vec<_>>().join("\n");
     s = BLANK_RUNS.replace_all(&s, "\n\n").into_owned();
@@ -198,6 +209,10 @@ const BOILERPLATE: &[&str] = &[
     "如果還有其他問題",
     "如果您還有其他問題",
     "請隨時告訴我",
+    "請體諒我",
+    "請容我",
+    "容我請問",
+    "不好意思",
     "i understand your concern",
     "i hope this helps",
     "feel free to ask",
@@ -369,6 +384,27 @@ mod tests {
     #[test]
     fn literal_backslash_n_becomes_a_line_break() {
         assert_eq!(zh(r"第一行\n第二行"), "第一行\n第二行");
+    }
+
+    #[test]
+    fn excuses_before_a_question_are_dropped() {
+        assert_eq!(zh("請體諒我問一下，咳嗽幾天了？"), "咳嗽幾天了？");
+        assert_eq!(
+            zh("請容我確認一下：檔案上有高血壓，現在還是一樣嗎？"),
+            "檔案上有高血壓，現在還是一樣嗎？"
+        );
+        assert_eq!(zh("不好意思，想請問一下，有發燒嗎？"), "有發燒嗎？");
+        assert_eq!(
+            zh("讓我們從頭說起，咳嗽是哪一天開始的？"),
+            "讓我們從頭說起，咳嗽是哪一天開始的？",
+            "only excuses go"
+        );
+        assert_eq!(zh("咳嗽三天，有發燒嗎？"), "咳嗽三天，有發燒嗎？");
+        assert!(
+            !style_report("請體諒我問一下，有發燒嗎？")
+                .boilerplate
+                .is_empty()
+        );
     }
 
     #[test]

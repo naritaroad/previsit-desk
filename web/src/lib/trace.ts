@@ -79,7 +79,7 @@ export function groupTrace(trace: readonly TraceRow[], runs: readonly RunView[])
 export interface TraceBrief {
   /** Full i18next key. */
   key: string;
-  params?: Record<string, string | number>;
+  params: Record<string, string | number>;
 }
 type Obj = Record<string, unknown>;
 const isObj = (v: unknown): v is Obj => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -105,27 +105,27 @@ export function traceBrief(name: ToolName | (string & {}), result: unknown): Tra
   if (!isObj(result)) return null;
   switch (name) {
     case "red_flag_precheck":
-      return result.hit === true ? { key: K("redFlagHit"), params: { label: str(result.label) } } : { key: K("redFlagNone") };
+      return result.hit === true ? { key: K("redFlagHit"), params: { label: str(result.label) } } : { key: K("redFlagNone"), params: {} };
     case "scope_precheck": {
       const key = SCOPE_KEYS[str(result.verdict)];
-      return key ? { key } : null;
+      return key ? { key, params: {} } : null;
     }
     case "pii_filter":
       return { key: K("pii"), params: { count: Number(result.masked) || 0, kinds: list(result.kinds) } };
     case "record_intake":
       return { key: K("intake"), params: { applied: len(result.applied), rejected: len(result.rejected) } };
     case "search_health_education":
-      return len(result.hits) ? { key: K("searchHits"), params: { count: len(result.hits) } } : { key: K("searchNone") };
+      return len(result.hits) ? { key: K("searchHits"), params: { count: len(result.hits) } } : { key: K("searchNone"), params: {} };
     case "check_chronic_refill": {
       const key = REFILL_KEYS[str(result.outcome)];
-      return key ? { key } : null;
+      return key ? { key, params: {} } : null;
     }
     case "transfer_to_clinician":
       return { key: K(result.deduped === true ? "transferDeduped" : "transfer"), params: { ticket: str(result.ticket_no) } };
     case "save_previsit_summary":
       return result.saved === true ? { key: K("saved"), params: { count: len(result.not_collected) } } : null;
     case "output_guard":
-      if (result.passed === true) return { key: K("guardPass") };
+      if (result.passed === true) return { key: K("guardPass"), params: {} };
       return { key: K(result.action === "replaced" ? "guardReplaced" : "guardRewritten"), params: { violations: list(result.violations) } };
     default:
       return null;

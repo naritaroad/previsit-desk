@@ -20,19 +20,25 @@ pub async fn health(State(state): State<AppState>) -> Response {
     }
 }
 
-/// `data/eval/results/summary.json` without the per-case rows; `null` when there is none.
-pub fn eval_summary(data_dir: &FsPath) -> Value {
+/// `data/eval/results/summary.json` with one `{id, category, passed}` row per case; `null` when there is none.
+pub fn eval_latest(data_dir: &FsPath) -> Value {
     let path = data_dir.join("eval").join("results").join("summary.json");
     let Ok(raw) = std::fs::read_to_string(path) else {
         return Value::Null;
     };
     match serde_json::from_str::<Value>(raw.trim_start_matches('\u{feff}')) {
-        Ok(Value::Object(mut map)) => {
-            map.remove("cases");
-            Value::Object(map)
-        }
+        Ok(value @ Value::Object(_)) => value,
         _ => Value::Null,
     }
+}
+
+/// The same without the per-case rows.
+pub fn eval_summary(data_dir: &FsPath) -> Value {
+    let mut value = eval_latest(data_dir);
+    if let Some(map) = value.as_object_mut() {
+        map.remove("cases");
+    }
+    value
 }
 
 pub async fn meta(State(state): State<AppState>) -> Json<Value> {
@@ -103,6 +109,7 @@ mod tests {
         let value = eval_summary(&dir);
         assert_eq!(value["total"], 2);
         assert!(value.get("cases").is_none());
+        assert_eq!(eval_latest(&dir)["cases"][0]["id"], "A");
         std::fs::write(
             dir.join("eval").join("results").join("summary.json"),
             "not json",

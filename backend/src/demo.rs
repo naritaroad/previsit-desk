@@ -1157,6 +1157,19 @@ pub async fn create_guest(
 
 const KEY: &str = "demo";
 
+/// Pharmacies and the physician's schedule alone: what a guest record refers to. The eval runner uses it.
+pub async fn ensure_reference(state: &AppState) -> AppResult<()> {
+    let loader = Loader {
+        state,
+        staff: staff(state).await?,
+        today: state.clock.today(),
+        now: state.clock.now(),
+        locale: Locale::ZhTw,
+        guest: true,
+    };
+    load_reference(state, &loader).await
+}
+
 async fn load_reference(state: &AppState, loader: &Loader<'_>) -> AppResult<()> {
     for (i, p) in state.demo.pharmacies.iter().enumerate() {
         sqlx::query(

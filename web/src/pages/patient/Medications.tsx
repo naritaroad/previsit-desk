@@ -255,10 +255,10 @@ function FormularySearch() {
                   <span className="row-main">
                     <span className="row-title">{f.drug(d)}</span>
                     <span className="row-sub">{[f.drugAlt(d), f.drugClass(d)].filter(Boolean).join(t("patient:common.sep"))}</span>
-                    {d.scope !== "in_scope" && <span className="row-sub">{d.scope_reason}</span>}
+                    {d.renewal_scope !== "in_scope" && <span className="row-sub">{d.reason}</span>}
                   </span>
                   <span className="row-end">
-                    <StatusTag family="scope" status={d.scope} />
+                    <StatusTag family="scope" status={d.renewal_scope} />
                   </span>
                 </div>
               </li>

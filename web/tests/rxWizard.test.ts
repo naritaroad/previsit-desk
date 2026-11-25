@@ -180,8 +180,8 @@ describe("submit", () => {
     const { w, s } = await wizard();
     await complete(w);
     const rx = await w.submit("2026-11");
-    expect(rx).toMatchObject({ status: "in_review" });
-    expect(s()).toMatchObject({ submitting: false, rx: { status: "in_review" } });
+    expect(rx).toMatchObject({ status: "submitted" });
+    expect(s()).toMatchObject({ submitting: false, rx: { status: "submitted" } });
     expect(record().answers.kidney_liver_change).toBe(false);
     expect(await b.kv.keys("pv:rx:")).toEqual([]);
   });

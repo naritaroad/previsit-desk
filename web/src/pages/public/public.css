@@ -38,6 +38,10 @@
     padding-block: clamp(3.5rem, 2.5rem + 4vw, 6rem);
     scroll-margin-top: var(--header-h);
   }
+  .pub-split.tight {
+    padding-block: clamp(2.25rem, 1.75rem + 1.5vw, 3.25rem);
+    border-top: 1px solid var(--rule);
+  }
   .pub-split-head > p,
   .pub-intro > p {
     margin-top: 0.75rem;
@@ -240,14 +244,13 @@
   .excerpt-say {
     font-size: 1.0625rem;
     line-height: 2;
-    text-wrap: balance;
   }
   .excerpt-chat > [data-who="ai"] .excerpt-say {
     color: var(--fg-2);
   }
   .excerpt-chat > [data-who="patient"] {
     justify-self: end;
-    max-width: 92%;
+    max-width: min(92%, 25em);
   }
   .excerpt-chat > [data-who="patient"] .excerpt-who {
     text-align: end;
@@ -633,14 +636,18 @@
     border-top: 1px solid var(--ink-line);
     scroll-margin-top: var(--header-h);
   }
-  .situ:first-of-type {
-    border-top: 2px solid var(--ink);
+  .situ-band {
+    margin-top: 0;
   }
-  .situ-when {
-    font-size: 1.0625rem;
-    font-weight: 700;
+  .situ:first-of-type {
+    border-top: 0;
+  }
+  .situ-body > .situ-lead {
+    margin-top: 0.2rem;
+    font-family: var(--font-read);
+    font-size: 1.3125rem;
+    font-weight: 600;
     line-height: 1.7;
-    color: var(--ink-text);
   }
   .situ-body > p {
     max-width: 38em;
@@ -650,18 +657,24 @@
   }
   .situ-stop {
     display: grid;
-    gap: 0.15rem;
-    max-width: 38em;
-    margin-top: 1.75rem;
-    padding: 0.9rem 1.1rem;
-    border: 1px solid var(--rule-strong);
-    border-radius: var(--r-cell);
+    gap: 0.1rem 2rem;
+    margin-top: 2rem !important;
+    padding-top: 0.9rem;
+    border-top: 1.5px solid var(--fg);
     line-height: 1.8;
   }
   .situ-stop > strong {
-    font-size: 0.875rem;
     font-weight: 700;
-    color: var(--fg-2);
+  }
+  @media (min-width: 40rem) {
+    .situ-stop {
+      grid-template-columns: 8rem minmax(0, 1fr);
+    }
+  }
+  .situ-status {
+    padding: clamp(1rem, 0.5rem + 2vw, 1.75rem);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-panel);
   }
   .situ-exhibit {
     margin-top: 2rem;
@@ -749,11 +762,16 @@
     margin-top: 0.9rem;
     padding: 0.7rem 0.9rem;
     min-height: 4.75rem;
-    border: 1px solid var(--warn-line);
+    border: 1px dashed var(--rule-strong);
     border-radius: var(--r-cell);
-    background: var(--warn-soft);
     font-size: 0.9375rem;
     line-height: 1.7;
+    color: var(--fg-2);
+  }
+  .desk-quote[data-open="true"] {
+    border: 1px solid var(--warn-line);
+    background: var(--warn-soft);
+    color: var(--fg);
   }
   .desk-quote > strong {
     display: block;
@@ -787,6 +805,7 @@
   }
   .rx-fig {
     display: grid;
+    align-items: start;
     gap: 1.5rem;
     padding: 1.25rem;
   }
@@ -796,7 +815,83 @@
     }
   }
 
+  .clin-doc .doc-body {
+    grid-column: 2 / -1;
+    max-width: 52rem;
+  }
+  .clin-doc {
+    padding-bottom: 5rem;
+  }
+  .clin-sec {
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+  .clin-sec + .clin-sec {
+    margin-top: clamp(3rem, 2rem + 3vw, 4.5rem);
+  }
+  .clin-sec > .pub-prose,
+  .clin-sec > .pub-list {
+    margin-top: 1rem;
+  }
+  @media (max-width: 64rem) {
+    .clin-sec {
+      scroll-margin-top: calc(var(--header-h) + 4.5rem);
+    }
+  }
+
   /* ===== trust centre ===== */
+  .trust-meta {
+    max-width: 52rem;
+  }
+  .trust-meta .doc-meta {
+    margin-bottom: 1.25rem;
+  }
+  .start-list {
+    padding-top: 1rem;
+    border-top: 1.5px solid var(--ink);
+  }
+  .start-list h2 {
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+  .start-list ul {
+    margin-top: 0.5rem;
+  }
+  .start-list li {
+    border-top: 1px solid var(--rule);
+  }
+  .start-list a {
+    display: grid;
+    padding-block: 0.7rem;
+    color: inherit;
+    text-decoration: none;
+    line-height: 1.65;
+  }
+  .start-list b {
+    font-weight: 600;
+    color: var(--ink-text);
+    text-decoration: underline;
+    text-decoration-color: var(--ink-line);
+    text-underline-offset: 0.25em;
+  }
+  .start-list span {
+    font-size: 0.9375rem;
+    color: var(--fg-2);
+  }
+  .pub-docs {
+    display: grid;
+    gap: 1.5rem 4rem;
+    padding-bottom: clamp(3rem, 2rem + 3vw, 5rem);
+  }
+  @media (min-width: 64rem) {
+    .pub-docs {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    }
+    .pub-docs > h2 {
+      position: sticky;
+      top: calc(var(--header-h) + 2rem);
+      align-self: start;
+    }
+  }
   .doc-list > li {
     border-bottom: 1px solid var(--rule);
   }
@@ -867,9 +962,8 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem 1.25rem;
-    margin-top: -1.25rem;
-    margin-bottom: 2.5rem;
+    gap: 0.5rem;
+    margin: -1.5rem 0 1.5rem -0.8rem;
   }
   .doc-live {
     margin-bottom: 2.5rem;
@@ -1009,13 +1103,7 @@
     }
   }
   /* Without that room a wide table becomes a list of records, each cell with its column name. */
-  .records {
-    container: records / inline-size;
-  }
   @media (max-width: 79.99rem) {
-    .ruled-table-wrap[data-wide="true"] {
-      --stack: 1;
-    }
     .ruled-table-wrap[data-wide="true"] :is(table, tbody, tr, td, tbody th) {
       display: block;
     }
@@ -1107,8 +1195,10 @@
       grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
     }
   }
-  .hb-article {
-    max-width: 42rem;
+  @media (max-width: 64rem) {
+    .hb-toc {
+      display: none;
+    }
   }
   .hb-text {
     margin-top: 1.75rem;
@@ -1165,6 +1255,14 @@
   @media (min-width: 64rem) {
     .entry {
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+  }
+  .try-entry {
+    gap: 2.5rem 4rem;
+  }
+  @media (min-width: 64rem) {
+    .try-entry {
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
     }
   }
   .demo-accounts {
@@ -1241,19 +1339,21 @@
     gap: 0.75rem 2.5rem;
     margin-top: 0.75rem;
   }
-  .persona-detail dt {
+  .persona-detail .dt {
+    display: block;
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--ink-text);
   }
-  .persona-detail dd {
+  .persona-detail .dd {
+    display: block;
     line-height: 1.75;
   }
-  .persona-detail li {
+  .persona-detail .item {
     position: relative;
     padding-inline-start: 1.1em;
   }
-  .persona-detail li::before {
+  .persona-detail .item::before {
     content: "";
     position: absolute;
     left: 0;

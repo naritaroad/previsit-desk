@@ -1,5 +1,6 @@
 //! The staff site (contract §5): overview, worklist, patients, internal notes, contact, schedule and tickets.
-//! Every handler names its permission; every read of one patient's record is written to `access_log`.
+//! Every handler names its permission. A read of one patient's record is written to `access_log` under that patient; a
+//! list is one entry without a patient.
 
 use std::collections::{BTreeMap, HashSet};
 
@@ -292,6 +293,7 @@ pub async fn worklist(
     Query(params): Query<Params>,
 ) -> AppResult<Json<Value>> {
     user.require(Permission::VisitRead)?;
+    audit::log_access(&state.db, &user, None, "list", "worklist", "").await?;
     let bucket = match page::param(&params, "bucket") {
         None => None,
         Some(name) => Some(
@@ -390,6 +392,7 @@ async fn appointment_rows(
 
 pub async fn overview(State(state): State<AppState>, user: CurrentUser) -> AppResult<Json<Value>> {
     user.require(Permission::VisitRead)?;
+    audit::log_access(&state.db, &user, None, "list", "overview", "").await?;
     let items = work_items(&state, &user).await?;
     let open = |kind: &str, bucket: Bucket| {
         items
@@ -650,6 +653,7 @@ pub async fn patients(
     Query(params): Query<Params>,
 ) -> AppResult<Json<Page<PatientRow>>> {
     user.require(Permission::PatientRead)?;
+    audit::log_access(&state.db, &user, None, "list", "patients", "").await?;
     let limited = limited_view(&user);
     let limit = page::limit(&params)?;
     let cursor = page::cursor(&params)?;
@@ -1393,6 +1397,7 @@ pub async fn schedule(
     Query(params): Query<Params>,
 ) -> AppResult<Json<Value>> {
     user.require(Permission::ApptManage)?;
+    audit::log_access(&state.db, &user, None, "list", "schedule", "").await?;
     let locale = user.locale;
     let date = match page::param(&params, "date") {
         None => state.clock.today(),
@@ -1514,6 +1519,7 @@ pub async fn ticket_list(
     Query(params): Query<Params>,
 ) -> AppResult<Json<Page<Ticket>>> {
     user.require(Permission::TicketHandle)?;
+    audit::log_access(&state.db, &user, None, "list", "tickets", "").await?;
     let status = page::param(&params, "status").unwrap_or("open");
     if !["open", "resolved", "all"].contains(&status) {
         return Err(AppError::field("status", t(T::FieldErrChoice, user.locale)));

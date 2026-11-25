@@ -31,7 +31,7 @@ const MESSAGES: Record<ServerErrorCode, [string, string]> = {
   invalid_credentials: ["帳號或密碼不正確。", "Wrong username or password."],
   forbidden: ["這個帳號沒有權限。", "This account has no permission."],
   not_found: ["找不到這筆資料。", "Not found."],
-  conflict: ["這筆資料剛被更新過。", "This was just updated."],
+  conflict: ["這筆資料剛更新過。", "This was just updated."],
   visit_closed: ["這次預問診已送出，不能再補充。", "This previsit has been sent."],
   invalid_state: ["目前的狀態不能做這個動作。", "That is not possible in the current state."],
   rate_limited: ["操作太頻繁，請稍候再試。", "Too many requests. Try again later."],

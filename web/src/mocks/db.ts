@@ -75,6 +75,8 @@ export interface PrescriptionRec {
   days_per_fill: number;
   fills_allowed: number;
   fills: Fill[];
+  /** Made by a handed-over renewal. */
+  is_demo?: boolean;
 }
 export interface MessageRec extends Omit<Message, "author"> {
   author_id: string | null;
@@ -244,7 +246,7 @@ export interface Db {
   counters: { rx: number; ticket: number };
 }
 /** Raise when the shape or the fixtures change: old stores are thrown away. */
-export const DB_VERSION = 4;
+export const DB_VERSION = 5;
 
 export interface TextStorage {
   getItem(key: string): string | null;

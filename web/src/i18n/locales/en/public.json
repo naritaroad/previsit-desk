@@ -266,7 +266,14 @@
       "title": "The second fill: which day?",
       "p1": "Each refillable prescription is drawn as three cells. A stamp is a fill already collected, the vertical line is today. Whether she can collect is worked out by code from the prescription dates, without AI.",
       "p2": "When she can, she picks a pharmacy and a time. The pharmacist checks and prepares it and she collects it; every step shows on the request.",
-      "stop": "If a controlled drug is involved, symptoms changed, or she suspects a side effect, the code gives no date and sends her to a pharmacist or doctor."
+      "stop": "If a controlled drug is involved, symptoms changed, or she suspects a side effect, the code gives no date and sends her to a pharmacist or doctor.",
+      "stepsLabel": "Progress of the refill",
+      "steps": [
+        { "time": "09:12", "what": "Refill request sent", "who": "Hsiu-Chin Lin" },
+        { "time": "09:40", "what": "Checked by the pharmacist, being prepared", "who": "Szu-Ying Wu, pharmacist" },
+        { "time": "10:25", "what": "Ready to collect", "who": "Anhe Demo Pharmacy" },
+        { "time": "Not yet", "what": "Collect it with the health card", "who": "Hsiu-Chin Lin", "pending": true }
+      ]
     },
     "renewal": {
       "when": "All three fills used",

@@ -272,30 +272,35 @@ export function medications(db: Db, patientId: string, today: string, locale: Lo
     });
 }
 
+/** Mirrors backend/src/rx/machine.rs. */
 export function allowedActions(r: RxRec, a: AccountRec): RxAction[] {
   const out: RxAction[] = [];
-  const mine = a.id === r.patient_id;
-  if (mine) {
-    if (r.status === "draft") out.push("edit", "evaluate", "submit");
-    if (r.status === "more_info") out.push("edit", "evaluate", "reply");
-    if (["draft", "submitted", "in_review", "more_info", "returned"].includes(r.status)) out.push("cancel");
-    if (r.status !== "draft" && r.status !== "cancelled") out.push("message");
+  const renewal = r.kind === "renewal";
+  const at = (...statuses: RxRec["status"][]) => statuses.includes(r.status);
+  const messages = !at("draft", "cancelled");
+  if (a.id === r.patient_id) {
+    if (at("draft", "more_info")) out.push("edit", "evaluate");
+    if (at("draft")) out.push("submit");
+    if (at("more_info")) out.push("reply");
+    if (isOpenRx(r.status)) out.push("cancel");
+    if (messages) out.push("message");
     return out;
   }
-  if (can(a, "rx.read") && r.status !== "draft") {
-    out.push("message", "staff_message");
-    if (isOpenRx(r.status)) out.push("assign");
-  }
-  if (can(a, "rx.decide") && (r.status === "in_review" || (r.kind === "refill" && r.status === "returned"))) out.push("decide");
+  if (!can(a, "rx.read") || at("draft")) return out;
+  if (messages) out.push("message");
+  out.push("staff_message");
+  if (isOpenRx(r.status)) out.push("assign");
+  if (can(a, "rx.decide") && (at("in_review") || (renewal && at("submitted", "returned")))) out.push("decide");
   if (can(a, "rx.dispense")) {
-    if (r.status === "submitted" && r.kind === "refill") out.push("accept", "return", "ask_physician");
-    if (r.status === "approved" || r.status === "partially_approved") out.push("accept", "return");
-    if (r.status === "at_pharmacy") out.push("ready", "return", "ask_physician");
-    if (r.status === "ready") out.push("dispense", "return");
+    if (!renewal && at("submitted", "returned")) out.push("accept");
+    if (at("at_pharmacy")) out.push("ready");
+    if (at("ready")) out.push("dispense");
+    if (at("at_pharmacy", "ready") || (!renewal && at("submitted"))) out.push("return");
+    if (at("at_pharmacy", "ready") || (!renewal && at("submitted", "returned"))) out.push("ask_physician");
   }
   return out;
 }
-const isOverdue = (r: RxRec, now: string) => r.status === "in_review" && r.sla_due_at !== null && r.sla_due_at < now;
+const isOverdue = (r: RxRec, now: string) => (r.status === "submitted" || r.status === "in_review") && r.sla_due_at !== null && r.sla_due_at < now;
 
 export function rxView(c: View & { now: string }, r: RxRec): RxRequest {
   const { db, locale, account } = c;

@@ -96,7 +96,7 @@ export const clinicRoutes: Route[] = [
     const { db, locale, now } = c;
     const empty = c.server.config.empty;
     const items = workItems(c);
-    const review = db.rx.filter((r) => r.status === "in_review");
+    const review = db.rx.filter((r) => r.kind === "renewal" && (r.status === "submitted" || r.status === "in_review"));
     return ok({
       counts: empty
         ? { urgent: 0, pending: 0, rx_review: 0, overdue: 0, waiting_patient: 0, tickets: 0 }

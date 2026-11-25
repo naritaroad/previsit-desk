@@ -82,6 +82,7 @@ export function medicationCard(p: PrescriptionRec, today: string, locale: Locale
     drug: { drug_id: ref.drug_id, name_zh: ref.name_zh, name_en: ref.name_en, class_id: ref.class_id, class_zh: ref.class_zh, class_en: ref.class_en, controlled_level: ref.controlled_level },
     dose_text: L(locale, p.dose_zh, p.dose_en),
     source: p.source,
+    is_demo: p.is_demo ?? false,
     issued_on: p.issued_on,
     total_days: p.total_days,
     days_per_fill: p.days_per_fill,

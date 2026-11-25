@@ -236,7 +236,7 @@ describe("flows", () => {
     rx = await rxApi.evaluate(rx.id);
     expect(rx.engine?.disposition).toBe("ready");
     rx = await rxApi.submit(rx.id, rx.revision, "2026-11");
-    expect(rx).toMatchObject({ status: "in_review", overdue: false });
+    expect(rx).toMatchObject({ status: "submitted", overdue: false });
     expect(rx.allowed_actions).not.toContain("edit");
 
     as("dr_demo");

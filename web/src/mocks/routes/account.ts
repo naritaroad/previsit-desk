@@ -13,7 +13,9 @@ const VERSION = "0.2.0-mock";
 const str = (v: unknown) => (typeof v === "string" ? v : "");
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 
-/** Password rule of the mock: any 8+ characters sign in a known username; shorter ones are "wrong". */
+/** Any 8+ characters are the right password; shorter ones, or ones starting with "wrong" or "not-", are not. */
+const rightPassword = (v: unknown) => str(v).length >= 8 && !/^(wrong|not-)/.test(str(v));
+
 function checkNewPassword(c: Ctx, field: string, value: unknown): void {
   const n = [...str(value)].length;
   if (n < 8 || n > 128) badField(field, L(c.locale, "密碼要 8 到 128 個字元。", "Passwords have 8 to 128 characters."));
@@ -115,7 +117,7 @@ export const accountRoutes: Route[] = [
   }),
   open("POST /auth/login", (c) => {
     const a = c.db.accounts.find((x) => x.username !== null && x.username === str(c.body.username).trim().toLowerCase());
-    if (!a || a.status !== "active" || str(c.body.password).length < 8) return fail("invalid_credentials");
+    if (!a || a.status !== "active" || !rightPassword(c.body.password)) return fail("invalid_credentials");
     c.server.signIn(a);
     audit({ ...c, account: a }, "auth", "login", "session", {});
     return ok({ me: meView(c.db, a) });
@@ -146,7 +148,7 @@ export const accountRoutes: Route[] = [
     return created({ me: meView(c.db, a) });
   }),
   route("POST /auth/password", "any", (c) => {
-    if (str(c.body.current).length < 8) badField("current", L(c.locale, "目前的密碼不正確。", "The current password is wrong."));
+    if (!rightPassword(c.body.current)) badField("current", L(c.locale, "目前的密碼不正確。", "The current password is wrong."));
     checkNewPassword(c, "next", c.body.next);
     c.account.must_change_password = false;
     return DONE;

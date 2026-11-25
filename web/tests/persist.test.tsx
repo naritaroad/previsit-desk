@@ -20,6 +20,7 @@ import {
   useLogin,
   useMarkRead,
   useMedications,
+  useMeta,
   useNoteEditor,
   useNotifications,
   useOutbox,
@@ -159,6 +160,14 @@ describe("query cache per account", () => {
     expect(await make().cache.restoreOffline()).toBeNull();
   });
 
+  it("public queries that are loading survive a signed-out start", async () => {
+    const { qc, cache } = make();
+    const meta = qc.fetchQuery({ queryKey: qk.meta, queryFn: () => tick(30).then(() => ({ app: "x" })) });
+    await cache.deactivate("expired");
+    expect(await meta).toEqual({ app: "x" });
+    expect(qc.getQueryState(qk.meta)).toMatchObject({ status: "success", fetchStatus: "idle" });
+  });
+
   it("an answer that arrives after logout does not come back", async () => {
     const { qc, cache } = make();
     await cache.activate(me("a"));
@@ -274,6 +283,13 @@ describe("hooks in the provider", () => {
     await act(() => result.current.auth.logout());
     expect(result.current.auth).toMatchObject({ status: "anonymous", me: null, expired: false });
     expect(await b.kv.keys("pv:cache")).toEqual([]);
+  });
+
+  it("a visitor's first page gets its public data", async () => {
+    m.server.config.latency = 20;
+    const { result } = hook(() => ({ auth: useAuth(), meta: useMeta() }));
+    await waitFor(() => expect(result.current.auth.status).toBe("anonymous"));
+    await waitFor(() => expect(result.current.meta.data?.app).toBe("PreVisit Desk"));
   });
 
   it("a one-time password: no streams until it is changed, then everything opens", async () => {

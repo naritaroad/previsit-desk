@@ -171,7 +171,8 @@ export class AccountCache {
     this.persister?.dispose();
     this.persister = null;
     // Cancel first: an answer on its way must not land in the next account's cache.
-    await this.qc.cancelQueries();
+    // Public queries stay: a cancelled one would be left pending and idle on a signed-out page.
+    await this.qc.cancelQueries({ predicate: (q) => q.queryKey[0] !== "public" });
     this.qc.getMutationCache().clear();
     this.qc.removeQueries({ predicate: (q) => q.queryKey[0] !== "public" });
     if (active) {

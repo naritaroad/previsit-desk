@@ -96,7 +96,7 @@ function Loaded({ id, v }: { id: string; v: VisitStreamHandle }) {
         }
         setErrors(found);
         const first = NOTE_SECTIONS.find((s) => found[s]);
-        if (first) document.getElementById(`note-${first}`)?.focus();
+        if (first) document.querySelector<HTMLElement>(`#note-${first} textarea`)?.focus();
         else toast.warn(errorText(e));
       } else if (!isApiError(e, "conflict")) toast.warn(errorText(e));
     }
@@ -107,7 +107,7 @@ function Loaded({ id, v }: { id: string; v: VisitStreamHandle }) {
     for (const k of ["assessment", "plan"] as const) if (!s?.[k].trim()) missing[k] = t("note.needed");
     setErrors(missing);
     const first = (["assessment", "plan"] as const).find((k) => missing[k]);
-    if (first) document.getElementById(`note-${first}`)?.focus();
+    if (first) document.querySelector<HTMLElement>(`#note-${first} textarea`)?.focus();
     else setDialog("sign");
   };
 

@@ -138,14 +138,14 @@ pub async fn list(
         (None, Some(text)) => Some(parse_id(text)?),
         (None, None) => None,
     };
-    if let (None, Some(patient)) = (own, patient) {
+    if own.is_none() {
         audit::log_access(
             &state.db,
             &user,
-            Some(patient),
+            patient,
             "list",
             "visits",
-            &patient.to_string(),
+            &patient.map(|p| p.to_string()).unwrap_or_default(),
         )
         .await?;
     }

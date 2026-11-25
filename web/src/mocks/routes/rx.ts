@@ -55,11 +55,11 @@ const tell = (c: UserCtx, r: RxRec, kind: "rx.status" | "rx.more_info" | "rx.rea
 
 const BUCKETS: Record<RxBucket, (c: UserCtx, r: RxRec) => boolean> = {
   mine: (c, r) => r.assigned_to === c.account.id && isOpenRx(r.status),
-  unassigned: (_c, r) => r.assigned_to === null && ["submitted", "in_review"].includes(r.status),
+  unassigned: (_c, r) => r.assigned_to === null && ["submitted", "in_review", "returned"].includes(r.status),
   urgent: (_c, r) => r.priority === "urgent" && isOpenRx(r.status),
-  overdue: (c, r) => r.status === "in_review" && r.sla_due_at !== null && r.sla_due_at < c.now,
+  overdue: (c, r) => (r.status === "submitted" || r.status === "in_review") && r.sla_due_at !== null && r.sla_due_at < c.now,
   more_info: (_c, r) => r.status === "more_info",
-  pharmacy: (_c, r) => ["approved", "partially_approved", "at_pharmacy", "ready", "returned"].includes(r.status) || (r.kind === "refill" && r.status === "submitted"),
+  pharmacy: (_c, r) => r.status === "at_pharmacy" || r.status === "ready" || (r.kind === "refill" && (r.status === "submitted" || r.status === "returned")),
   done: (_c, r) => !isOpenRx(r.status),
 };
 const RANK = { urgent: 0, soon: 1, routine: 2 } as const;
@@ -172,7 +172,7 @@ export const rxRoutes: Route[] = [
       rxEvent(r, c.now, "submitted", c.account.id, "送出領藥預約", "Refill pickup sent");
       notifyStaff(c.server, c.db, "rx.dispense", "rx.new", ["新的領藥預約", "New refill pickup", `${c.account.display_name}：${r.no}`, `${c.account.display_name_en}: ${r.no}`], `/pharmacy/rx/${r.id}`);
     } else {
-      r.status = "in_review";
+      r.status = r.engine?.disposition === "urgent" ? "in_review" : "submitted";
       r.priority = r.engine?.disposition === "urgent" ? "urgent" : r.engine?.disposition === "in_person" ? "soon" : "routine";
       r.sla_due_at = new Date(Date.parse(c.now) + slaHours(c, r) * 3_600_000).toISOString();
       rxEvent(r, c.now, "submitted", c.account.id, "送出續開申請", "Renewal request sent");
@@ -187,7 +187,7 @@ export const rxRoutes: Route[] = [
   }),
   route("POST /rx/:id/cancel", ["rx.own"], (c) => {
     const r = ownRx(c);
-    if (!["draft", "submitted", "in_review", "more_info", "returned"].includes(r.status)) fail("invalid_state");
+    if (!isOpenRx(r.status)) fail("invalid_state");
     lock(c, r);
     r.status = "cancelled";
     rxEvent(r, c.now, "cancelled", c.account.id, "病人取消申請", "Cancelled by the patient");
@@ -237,13 +237,15 @@ export const rxRoutes: Route[] = [
     const id = c.body.account_id === null ? null : str(c.body.account_id);
     const a = id ? must(c.db.accounts.find((x) => x.id === id && x.role !== "patient")) : null;
     r.assigned_to = a?.id ?? null;
+    // Giving it to a physician starts the review.
+    if (a && can(a, "rx.decide") && r.kind === "renewal" && r.status === "submitted") r.status = "in_review";
     rxEvent(r, c.now, "assigned", c.account.id, a ? `指派給${a.display_name}` : "取消指派", a ? `Assigned to ${a.display_name_en}` : "Unassigned", "staff");
     rxChanged(c.server, r);
     return ok(rxView(c, r));
   }),
   route("POST /rx/:id/decide", ["rx.decide"], (c) => {
     const r = rxFor(c);
-    if (r.status !== "in_review" && !(r.kind === "refill" && r.status === "returned")) fail("invalid_state");
+    if (!rxView(c, r).allowed_actions.includes("decide")) fail("invalid_state");
     lock(c, r);
     const rows = Array.isArray(c.body.items) ? (c.body.items as { item_id: string; outcome: RxOutcome; note: string | null }[]) : [];
     const fields: Record<string, string> = {};
@@ -270,7 +272,7 @@ export const rxRoutes: Route[] = [
       : approved === outcomes.length
         ? ["at_pharmacy", "醫師同意，已轉到藥局", "Approved and sent to the pharmacy"]
         : approved > 0
-          ? ["partially_approved", "部分項目同意，其他需要回診", "Some items approved, others need a visit"]
+          ? ["at_pharmacy", "部分項目同意並轉到藥局，其他需要回診", "Some items approved and sent to the pharmacy, others need a visit"]
           : outcomes.every((o) => o === "decline")
             ? ["declined", "醫師沒有同意續開", "Not approved by the doctor"]
             : ["visit_required", "醫師請您回診", "The doctor asked for a visit"];
@@ -313,7 +315,7 @@ export const rxRoutes: Route[] = [
         if (!p) continue;
         const pharmacy_name = PHARMACY_SEED.find((x) => x.id === r.pharmacy_id)?.zh.name ?? "";
         if (r.kind === "refill") p.fills.push({ n: p.fills.length + 1, filled_on: today, pharmacy_name });
-        else if (i.decision?.outcome === "approve") c.db.prescriptions.push({ ...structuredClone(p), id: uuid(), issued_on: today, fills: [{ n: 1, filled_on: today, pharmacy_name }], dose_zh: `${p.dose_zh}（示範）`, dose_en: `${p.dose_en} (demo)` });
+        else if (i.decision?.outcome === "approve") c.db.prescriptions.push({ ...structuredClone(p), id: uuid(), issued_on: today, fills: [{ n: 1, filled_on: today, pharmacy_name }], is_demo: true });
       }
     }
     rxEvent(r, c.now, action === "dispense" ? "dispensed" : action, c.account.id, zh, en);

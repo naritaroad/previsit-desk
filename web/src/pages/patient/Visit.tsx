@@ -1,5 +1,5 @@
 import { IconFileText, IconHeadset, IconPhoneCall, IconPlugConnectedX, IconRefresh, IconSend, IconUserHeart } from "@tabler/icons-react";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useSearchParams } from "react-router";
 
@@ -405,11 +405,11 @@ function RetryError({ error }: { error: Error }) {
 function OutboxBubble({ item, outbox, online, onTakeBack }: { item: OutboxItem; outbox: OutboxHandle; online: boolean; onTakeBack: (text: string) => void }) {
   const { t } = useTranslation(["patient", "errors"]);
   const errorText = useErrorTextByCode();
-  const state = item.status === "failed" ? "failed" : item.status === "queued" ? (online && item.attempts === 0 ? "sending" : "queued") : "sending";
-  const waitingTurn = item.status === "queued" && online && item.attempts === 0;
+  // Online and never tried: it waits for the running turn, not for the network.
+  const state = item.status === "failed" ? "failed" : item.status === "queued" && (!online || item.attempts > 0) ? "queued" : "sending";
   return (
     <div className="grid justify-items-end gap-1">
-      <PatientBubble state={waitingTurn ? "sending" : state} onRetry={() => outbox.retry(item.client_id)}>
+      <PatientBubble state={state} onRetry={() => outbox.retry(item.client_id)}>
         {item.content}
       </PatientBubble>
       {item.status === "failed" && (
@@ -552,13 +552,9 @@ function DraftConflict({ draft }: { draft: ReturnType<typeof useDraft<string>> }
   const { t } = useTranslation("patient");
   const f = useFmt();
   const c = draft.conflict;
-  const open = useRef(true);
   const [later, setLater] = useState(false);
   useEffect(() => {
-    if (!c) {
-      open.current = true;
-      setLater(false);
-    }
+    if (!c) setLater(false);
   }, [c]);
   if (!c || later) return null;
   return (

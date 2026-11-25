@@ -2,11 +2,11 @@ import { IconArrowLeft, IconChevronDown, IconChevronUp, IconPhoneCall, IconQuote
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { Measurement, Message } from "@/api/types";
+import type { Measurement } from "@/api/types";
 import { usePatient, type VisitStreamHandle } from "@/data";
 import { formatDuration, prettyJson } from "@/lib/format";
 import { groupTrace, traceBrief } from "@/lib/trace";
-import { Badge, Banner, Button, EmptyState, IconButton, SearchInput, Section, StatusTag, TextLink, cn } from "@/ui";
+import { Badge, Banner, Button, EmptyState, EvidenceLine, EvidenceList, IconButton, SearchInput, Section, StatusTag, TextLink, cn } from "@/ui";
 
 import { useFmt } from "../lib";
 import { SourceLink, useKey } from "../parts";
@@ -67,19 +67,6 @@ export function SourcePane({ v, tab, onTab, trail, onTrail, canReply, onAsk }: {
 
 // ------------------------------------------------------------------------------------------------ summary
 
-function Evidence({ ids, messages, line, onJump }: { ids: string[]; messages: Message[]; line: string; onJump: (line: string, ids: string[]) => void }) {
-  const { t } = useTranslation("clinic");
-  const fmt = useFmt();
-  const found = evidenceMessages(ids, messages);
-  if (found.length === 0) return <span className="text-sm text-fg-3">{t("desk.noEvidence")}</span>;
-  return (
-    <button type="button" className="link num" aria-label={t("desk.showSource", { line })} onClick={() => onJump(line, found.map((m) => m.id))}>
-      <IconQuote size={15} aria-hidden /> {fmt.time(found[0].created_at)}
-      {found.length > 1 && ` +${found.length - 1}`}
-    </button>
-  );
-}
-
 function Summary({ v, onJump, onAsk, canReply }: { v: VisitStreamHandle; onJump: (line: string, ids: string[]) => void; onAsk: (q: string[]) => void; canReply: boolean }) {
   const { t } = useTranslation(["clinic", "common", "rx"]);
   const fmt = useFmt();
@@ -101,21 +88,21 @@ function Summary({ v, onJump, onAsk, canReply }: { v: VisitStreamHandle; onJump:
             {groups.map((g) => (
               <div key={g.id} className="mb-3">
                 <h3 className="line-group">{t(`desk.group.${g.id}`)}</h3>
-                <ul className="evidence-list">
+                <EvidenceList label={t(`desk.group.${g.id}`)}>
                   {g.rows.map((r) => {
                     const value = r.status === "none" ? t("field.none") : r.value;
                     const label = t(`field.${r.key}`);
+                    const found = evidenceMessages(r.evidence, v.messages);
+                    const at = found.length ? `${fmt.time(found[0].created_at)}${found.length > 1 ? ` +${found.length - 1}` : ""}` : undefined;
                     return (
-                      <li key={r.key}>
-                        <span className="min-w-0">
-                          {g.rows.length > 1 && <span className="me-2 text-fg-2">{label}</span>}
-                          <span className={cn("wrap-any", g.id === "complaint" && "text-md font-semibold")}>{value}</span>
-                        </span>
-                        <Evidence ids={r.evidence} messages={v.messages} line={t("desk.lineOf", { label, value })} onJump={onJump} />
-                      </li>
+                      <EvidenceLine key={r.key} at={at} onJump={() => onJump(t("desk.lineOf", { label, value }), found.map((m) => m.id))}>
+                        {g.rows.length > 1 && <span className="me-2 text-fg-2">{label}</span>}
+                        <span className={cn("wrap-any", g.id === "complaint" && "text-md font-semibold")}>{value}</span>
+                        {found.length === 0 && <span className="ms-2 text-sm text-fg-3">{t("desk.noEvidence")}</span>}
+                      </EvidenceLine>
                     );
                   })}
-                </ul>
+                </EvidenceList>
               </div>
             ))}
             {s.not_collected.length > 0 && (

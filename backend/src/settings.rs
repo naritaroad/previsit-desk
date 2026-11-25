@@ -105,7 +105,19 @@ impl Settings {
                 per_client_daily_limit: config.per_ip_daily_call_limit,
                 monthly_budget_usd: None,
                 on_budget: OnBudget::Fallback,
-                prices: BTreeMap::new(),
+                prices: config
+                    .prices
+                    .iter()
+                    .map(|(model, input, output)| {
+                        (
+                            model.clone(),
+                            Price {
+                                input: *input,
+                                output: *output,
+                            },
+                        )
+                    })
+                    .collect(),
             },
             limits: LimitSettings {
                 messages_per_10min: i64::from(config.rate_messages_per_10min),

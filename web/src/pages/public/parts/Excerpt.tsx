@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useLocale, useMediaQuery } from "@/ui";
 
-import { useCopy } from "./common";
+import { useList } from "./common";
 
 interface Part {
   t: string;
@@ -29,7 +30,8 @@ interface Line {
  * screen the two are stacked and the numbers carry the link; choosing a field marks its sentence either way.
  */
 export function Excerpt() {
-  const { t, ts } = useCopy();
+  const { t } = useTranslation("public");
+  const ts = useList();
   const turns = ts<Turn[]>("home.excerpt.turns");
   const fields = ts<FieldRow[]>("home.excerpt.fields");
   const locale = useLocale();

@@ -16,6 +16,7 @@ use serde_json::{Value, json};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::demo;
 use crate::engine::{self, StreamEvent};
 use crate::intake::IntakeState;
 use crate::refill::{self, RefillInput};
@@ -49,8 +50,11 @@ pub struct Expect {
     red_flag: Option<String>,
     model_called: Option<bool>,
     reply_contains_any: Option<OneOrMany>,
+    /// Like `reply_contains_any`, over every reply of the case.
+    any_reply_contains: Option<OneOrMany>,
     reply_forbid_regex: Option<OneOrMany>,
     tools_include: Option<OneOrMany>,
+    tools_include_any: Option<OneOrMany>,
     tools_forbid: Option<OneOrMany>,
     ticket_reason_any: Option<OneOrMany>,
     refill_outcome: Option<String>,
@@ -59,6 +63,16 @@ pub struct Expect {
     intake_collected: Option<OneOrMany>,
     summary_saved: Option<bool>,
     guard_rewrites_max: Option<i64>,
+}
+
+/// A visit that does not start from nothing: a fictional patient's record behind it, or a person in the thread.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Setup {
+    /// A guest persona; the account is deleted after the case.
+    persona: Option<String>,
+    /// `human`: someone took the conversation over.
+    mode: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -71,6 +85,8 @@ pub struct Case {
     turns: Vec<String>,
     #[serde(default)]
     form: Option<Value>,
+    #[serde(default)]
+    setup: Setup,
     #[serde(default)]
     expect: Expect,
 }
@@ -168,6 +184,22 @@ pub fn judge(expect: &Expect, obs: &Observed) -> Vec<String> {
             ));
         }
     }
+    if let Some(words) = expect.any_reply_contains.clone().map(OneOrMany::into_vec) {
+        let found = obs
+            .turns
+            .iter()
+            .flat_map(|t| t.replies.iter())
+            .any(|(_, c)| {
+                words
+                    .iter()
+                    .any(|w| c.to_lowercase().contains(&w.to_lowercase()))
+            });
+        if !found {
+            failures.push(format!(
+                "any_reply_contains: none of {words:?} in any reply"
+            ));
+        }
+    }
     if let Some(patterns) = expect.reply_forbid_regex.clone().map(OneOrMany::into_vec) {
         for pattern in patterns {
             match RegexBuilder::new(&pattern).case_insensitive(true).build() {
@@ -195,6 +227,14 @@ pub fn judge(expect: &Expect, obs: &Observed) -> Vec<String> {
                 obs.tool_names
             ));
         }
+    }
+    if let Some(any) = expect.tools_include_any.clone().map(OneOrMany::into_vec)
+        && !obs.tool_names.iter().any(|t| any.contains(t))
+    {
+        failures.push(format!(
+            "tools_include_any: none of {any:?} was called (called: {:?})",
+            obs.tool_names
+        ));
     }
     if let Some(forbid) = expect.tools_forbid.clone().map(OneOrMany::into_vec) {
         for tool in forbid.iter().filter(|t| obs.tool_names.contains(t)) {
@@ -339,7 +379,28 @@ async fn observe(
     Ok((observed, input, output))
 }
 
+/// Runs a case, with the account its setup asks for; the account and everything it did are deleted afterwards.
 async fn run_case(state: &AppState, case: &Case) -> Result<CaseRun> {
+    let Some(persona) = &case.setup.persona else {
+        return run_case_as(state, case, None).await;
+    };
+    let locale = case
+        .locale
+        .as_deref()
+        .and_then(Locale::parse)
+        .unwrap_or(Locale::ZhTw);
+    let (account, _) = demo::create_guest(state, persona, locale)
+        .await
+        .map_err(|e| anyhow::anyhow!("create the case's patient: {e}"))?;
+    let run = run_case_as(state, case, Some(account)).await;
+    sqlx::query("DELETE FROM accounts WHERE id = $1 AND is_guest")
+        .bind(account)
+        .execute(&state.db)
+        .await?;
+    run
+}
+
+async fn run_case_as(state: &AppState, case: &Case, patient_id: Option<Uuid>) -> Result<CaseRun> {
     let started = Instant::now();
     let locale = case
         .locale
@@ -388,11 +449,17 @@ async fn run_case(state: &AppState, case: &Case) -> Result<CaseRun> {
         state,
         NewVisit {
             locale,
-            patient_id: None,
+            patient_id,
             appointment_id: None,
         },
     )
     .await?;
+    if case.setup.mode.as_deref() == Some("human") {
+        sqlx::query("UPDATE visits SET mode = 'human' WHERE id = $1")
+            .bind(visit.id)
+            .execute(&state.db)
+            .await?;
+    }
     if let Some(form) = &case.form {
         match RefillInput::from_json(form, true, locale) {
             Err(fields) => observed.turns.push(TurnObs {
@@ -523,6 +590,11 @@ pub async fn run(state: &AppState, args: EvalArgs) -> Result<()> {
     }
     if cases.is_empty() {
         bail!("no cases to run");
+    }
+    if cases.iter().any(|c| c.setup.persona.is_some()) {
+        demo::ensure_reference(state)
+            .await
+            .map_err(|e| anyhow::anyhow!("load the pharmacies: {e}"))?;
     }
     let model = if args.offline {
         "mock".to_string()

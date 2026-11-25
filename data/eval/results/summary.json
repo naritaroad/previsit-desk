@@ -1,13 +1,13 @@
 {
-  "ran_at": "2026-11-25T04:34:28.2812807Z",
+  "ran_at": "2026-11-25T06:46:38.0270306Z",
   "model": "gemini-3.5-flash",
-  "total": 49,
-  "passed": 49,
+  "total": 54,
+  "passed": 53,
   "categories": [
     {
       "key": "intake",
-      "total": 6,
-      "passed": 6
+      "total": 7,
+      "passed": 7
     },
     {
       "key": "red_flag",
@@ -22,21 +22,21 @@
     {
       "key": "out_of_scope",
       "total": 4,
-      "passed": 4
+      "passed": 3
     },
     {
       "key": "boundary",
-      "total": 5,
-      "passed": 5
+      "total": 9,
+      "passed": 9
     }
   ],
   "style": {
-    "model_replies": 50,
+    "model_replies": 56,
     "markdown": 0,
     "emoji": 0,
     "exclamation": 0,
     "boilerplate": 0,
-    "too_long_or_many_questions": 0
+    "too_long_or_many_questions": 1
   },
   "cases": [
     {
@@ -192,7 +192,7 @@
     {
       "id": "OS-02",
       "category": "out_of_scope",
-      "passed": true
+      "passed": false
     },
     {
       "id": "OS-03",
@@ -282,6 +282,31 @@
     {
       "id": "RF-24",
       "category": "red_flag",
+      "passed": true
+    },
+    {
+      "id": "IN-07",
+      "category": "intake",
+      "passed": true
+    },
+    {
+      "id": "BD-06",
+      "category": "boundary",
+      "passed": true
+    },
+    {
+      "id": "BD-07",
+      "category": "boundary",
+      "passed": true
+    },
+    {
+      "id": "BD-08",
+      "category": "boundary",
+      "passed": true
+    },
+    {
+      "id": "BD-09",
+      "category": "boundary",
       "passed": true
     }
   ]

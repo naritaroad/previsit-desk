@@ -3,11 +3,10 @@ import { useTranslation } from "react-i18next";
 
 import { cn, Photo, Phrases } from "@/ui";
 
-/** A list or table from public.json. `ts` is also what the copy check looks for. */
-export function useCopy() {
+/** Lists and tables of public.json, next to `t` of useTranslation("public"). */
+export function useList() {
   const { t } = useTranslation("public");
-  const ts = <T,>(key: string): T => t(key, { returnObjects: true }) as T;
-  return { t, ts };
+  return <T,>(key: string): T => t(key, { returnObjects: true }) as T;
 }
 
 /** Heading on the left, content on the right: the site's default grid. */

@@ -67,12 +67,35 @@ pub struct Config {
     pub max_messages_per_visit: i64,
     /// Models an administrator may choose; always includes the configured primary and fallback.
     pub model_choices: Vec<String>,
+    /// Starting price table: model, USD per million input tokens, USD per million output tokens.
+    pub prices: Vec<(String, f64, f64)>,
     pub logins: Vec<DefaultLogin>,
     pub cookie_secure: bool,
     pub session_days: i64,
     pub retention_days: i64,
     /// True when `GEMINI_API_KEY` is set and non-empty. The key itself is never stored here.
     pub api_key_present: bool,
+}
+
+/// `model:in:out,model:in:out`, in USD per million tokens.
+fn parse_prices(text: &str) -> Result<Vec<(String, f64, f64)>> {
+    text.split(',')
+        .map(str::trim)
+        .filter(|part| !part.is_empty())
+        .map(|part| {
+            let mut fields = part.rsplitn(3, ':').map(str::trim);
+            let (output, input, model) = (fields.next(), fields.next(), fields.next());
+            let number = |v: Option<&str>| v.and_then(|v| v.parse::<f64>().ok());
+            match (model, number(input), number(output)) {
+                (Some(model), Some(input), Some(output))
+                    if !model.is_empty() && input >= 0.0 && output >= 0.0 =>
+                {
+                    Ok((model.to_string(), input, output))
+                }
+                _ => bail!("LLM_PRICES must look like model:in:out,model:in:out, not {part}"),
+            }
+        })
+        .collect()
 }
 
 impl Config {
@@ -164,6 +187,7 @@ impl Config {
             model_fallback,
             model,
             model_choices,
+            prices: parse_prices(&optional("LLM_PRICES").unwrap_or_default())?,
             thinking,
             max_steps: positive("AGENT_MAX_STEPS", "5")? as usize,
             llm_timeout: Duration::from_secs(positive("LLM_TIMEOUT_SECS", "45")? as u64),
@@ -224,6 +248,7 @@ impl Config {
             per_ip_daily_call_limit: 200,
             max_messages_per_visit: 40,
             model_choices: vec!["mock".into()],
+            prices: Vec::new(),
             logins: Vec::new(),
             cookie_secure: false,
             session_days: 7,
@@ -236,6 +261,18 @@ impl Config {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn prices_parse_and_bad_ones_are_refused() {
+        assert_eq!(
+            parse_prices("a-1:1.5:9, b:0.25:1.50,").expect("prices"),
+            vec![("a-1".to_string(), 1.5, 9.0), ("b".to_string(), 0.25, 1.5)]
+        );
+        assert!(parse_prices("").expect("empty").is_empty());
+        for bad in ["a", "a:1", "a:x:1", ":1:2", "a:-1:2"] {
+            assert!(parse_prices(bad).is_err(), "{bad}");
+        }
+    }
 
     #[test]
     fn thinking_levels_parse() {

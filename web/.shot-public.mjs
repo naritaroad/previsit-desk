@@ -7,7 +7,8 @@ const browser = await chromium.launch({ channel: "msedge" });
 for (const theme of themes.split(",")) for (const w of widths.split(",").map(Number)) {
   const ctx = await browser.newContext({ viewport: { width: w, height: w < 500 ? 844 : 900 }, hasTouch: w < 500, isMobile: w < 500, colorScheme: theme, locale });
   await ctx.addInitScript(([t, l]) => { localStorage.setItem("pv-theme", t); localStorage.setItem("pv-locale", l); }, [theme, locale]);
-  for (const p of paths) {
+  for (const p of paths) for (let attempt = 0; attempt < 4; attempt++) {
+    try {
     const page = await ctx.newPage();
     const errs = [];
     page.on("console", (m) => m.type() === "error" && errs.push(m.text().slice(0, 300)));
@@ -32,6 +33,8 @@ for (const theme of themes.split(",")) for (const w of widths.split(",").map(Num
     await page.screenshot({ path: `${out}/${name}`, fullPage: true });
     console.log(name, ...errs, ...issues);
     await page.close();
+    break;
+    } catch (e) { if (attempt === 3) console.log(p, String(e).slice(0, 200)); await new Promise((r) => setTimeout(r, 1500)); }
   }
   await ctx.close();
 }
