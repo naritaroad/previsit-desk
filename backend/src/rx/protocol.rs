@@ -4,8 +4,10 @@
 
 use std::collections::{BTreeMap, HashSet};
 use std::path::Path;
+use std::sync::LazyLock;
 
 use anyhow::{Context, Result, bail, ensure};
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use time::Date;
@@ -165,6 +167,33 @@ fn both(owner: &str, what: &str, zh: &str, en: &str) -> Result<()> {
     Ok(())
 }
 
+/// Whether a reason tells the patient to change their medicine ("請立刻停藥"). Saying that a change should be discussed
+/// with the physician, or must not be made, is fine.
+fn tells_to_change_medicine(zh: &str, en: &str) -> bool {
+    static ZH: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new("(請|立刻|立即|馬上|應|先|需要).{0,6}(停藥|停用|換藥|加藥|減藥|加量|減量|停止服用|停止吃)")
+            .expect("regex")
+    });
+    static EN: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r"(?i)(^|[.;!?]\s+)(please\s+)?(stop|increase|reduce|lower|raise|switch|change|double|halve)\b")
+            .expect("regex")
+    });
+    let zh_hit = zh
+        .split(['。', '，', '；', '、'])
+        .filter(|clause| !["醫師", "不", "勿", "別"].iter().any(|w| clause.contains(w)))
+        .any(|clause| ZH.is_match(clause));
+    zh_hit || EN.is_match(en.trim())
+}
+
+fn check_reason(owner: &str, zh: &str, en: &str) -> Result<()> {
+    both(owner, "reason", zh, en)?;
+    ensure!(
+        !tells_to_change_medicine(zh, en),
+        "{owner}: a reason may not tell the patient to stop or change a medicine"
+    );
+    Ok(())
+}
+
 fn blank(text: &Option<String>) -> bool {
     text.as_deref().is_none_or(|s| s.trim().is_empty())
 }
@@ -189,7 +218,7 @@ enum Answers<'a> {
 }
 
 fn check_rule(owner: &str, rule: &Rule, answers: &Answers<'_>) -> Result<()> {
-    both(owner, "reason", &rule.reason_zh, &rule.reason_en)?;
+    check_reason(owner, &rule.reason_zh, &rule.reason_en)?;
     check_url(owner, &rule.source_url)?;
     ensure!(
         matches!(
@@ -320,7 +349,7 @@ fn check_question(owner: &str, q: &Question) -> Result<()> {
 fn check_monitoring(owner: &str, m: &Monitoring) -> Result<()> {
     ensure!(is_identifier(&m.id), "{owner}: bad monitoring id {}", m.id);
     both(owner, "label", &m.label_zh, &m.label_en)?;
-    both(owner, "reason", &m.reason_zh, &m.reason_en)?;
+    check_reason(owner, &m.reason_zh, &m.reason_en)?;
     ensure!(
         m.max_age_days.is_none_or(|d| (1..=3650).contains(&d)),
         "{owner}: max_age_days must be 1 to 3650 or null"
@@ -1200,6 +1229,30 @@ mod tests {
             assert!(load(&v).is_err(), "should refuse: {why}");
         }
         assert!(Protocols::parse("{").is_err());
+    }
+
+    #[test]
+    fn a_reason_never_tells_the_patient_to_change_a_medicine() {
+        for (zh, en) in [
+            ("請立刻停藥並就醫。", "This may be serious. Seek care now."),
+            ("先減量再觀察。", "Seek care."),
+            ("請就醫。", "Stop the medicine and seek care now."),
+            ("請就醫。", "This is serious. Please reduce the dose."),
+        ] {
+            assert!(tells_to_change_medicine(zh, en), "{zh} / {en}");
+            let mut v = fixture();
+            v["general"]["questions"][0]["rules"][0]["reason_zh"] = json!(zh);
+            v["general"]["questions"][0]["rules"][0]["reason_en"] = json!(en);
+            assert!(load(&v).is_err());
+        }
+        for (zh, en) in [
+            ("不可自行突然停藥，請醫師確認。", "Do not stop it on your own."),
+            ("請醫師確認是否需要減量。", "The doctor should check the dose."),
+            ("最近有突然停藥的情形。", "It was stopped suddenly."),
+            ("請勿自行停藥。", "Do not stop taking it."),
+        ] {
+            assert!(!tells_to_change_medicine(zh, en), "{zh} / {en}");
+        }
     }
 
     #[test]
