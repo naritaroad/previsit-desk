@@ -41,3 +41,5 @@ Thumbs.db
 
 # Pages build output
 _site/
+
+web/.shot.mjs

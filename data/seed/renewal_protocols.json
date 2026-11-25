@@ -1492,7 +1492,7 @@
                 "value": true
               },
               "disposition": "urgent",
-              "reason_zh": "這可能是血糖的緊急狀況，請立刻撥 119 或到急診。",
+              "reason_zh": "請立刻撥 119 或到急診。",
               "reason_en": "This may be a blood sugar emergency. Call 119 or go to the emergency room now.",
               "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
             }
@@ -1730,7 +1730,7 @@
                 "value": true
               },
               "disposition": "urgent",
-              "reason_zh": "這可能是血糖的緊急狀況，請立刻撥 119 或到急診。",
+              "reason_zh": "請立刻撥 119 或到急診。",
               "reason_en": "This may be a blood sugar emergency. Call 119 or go to the emergency room now.",
               "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
             }
@@ -1932,7 +1932,7 @@
                 "value": true
               },
               "disposition": "urgent",
-              "reason_zh": "這可能是血糖的緊急狀況，請立刻撥 119 或到急診。",
+              "reason_zh": "請立刻撥 119 或到急診。",
               "reason_en": "This may be a blood sugar emergency. Call 119 or go to the emergency room now.",
               "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
             }
@@ -2134,7 +2134,7 @@
                 "value": true
               },
               "disposition": "urgent",
-              "reason_zh": "這可能是血糖的緊急狀況，請立刻撥 119 或到急診。",
+              "reason_zh": "請立刻撥 119 或到急診。",
               "reason_en": "This may be a blood sugar emergency. Call 119 or go to the emergency room now.",
               "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
             }
