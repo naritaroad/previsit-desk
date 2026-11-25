@@ -24,7 +24,7 @@ use crate::clock::format_date;
 use crate::error::{AppError, AppResult};
 use crate::people::{self, PersonRef};
 use crate::perm::Permission;
-use crate::refill::{self, RefillInput, RefillResult};
+use crate::refill::{self, RefillInput, RefillResult, RefillRules};
 use crate::state::AppState;
 use crate::types::{Locale, RedFlagCategory, Urgency};
 
@@ -169,7 +169,8 @@ impl Request {
 pub fn viewer_of(user: &CurrentUser, request: &Request) -> Viewer {
     Viewer {
         owner: request.patient_id == user.id && user.can(Permission::RxOwn),
-        read: user.can(Permission::RxRead),
+        // What was never submitted stays the patient's own, also after they cancel it.
+        read: user.can(Permission::RxRead) && request.submitted_at.is_some(),
         decide: user.can(Permission::RxDecide),
         dispense: user.can(Permission::RxDispense),
     }
@@ -345,6 +346,7 @@ pub async fn cards(
 }
 
 /// `MedicationCard[]` of one patient for other modules, already localised. The caller has checked who may see them.
+#[allow(dead_code)]
 pub async fn medications_for(
     state: &AppState,
     patient: Uuid,
@@ -946,18 +948,26 @@ pub async fn next_prescription(
     old: Uuid,
     request: &Request,
     on: Date,
-) -> sqlx::Result<Uuid> {
+    rules: &RefillRules,
+) -> AppResult<Uuid> {
+    let mut copy = prescriptions_by_id(&mut *db, &[old])
+        .await?
+        .pop()
+        .ok_or(AppError::NotFound)?;
+    copy.issued_on = on;
+    let valid_until = copy.valid_until(rules);
     let id: Uuid = sqlx::query_scalar(
         "INSERT INTO prescriptions (patient_id, source, drug_id, name_zh, name_en, class_id, class_zh, class_en, controlled_level, dose_text, dose_text_en,
                                     issued_on, total_days, days_per_fill, fills_allowed, valid_until, prescriber_id, renewed_from, rx_request_id, is_demo)
          SELECT patient_id, source, drug_id, name_zh, name_en, class_id, class_zh, class_en, controlled_level, dose_text, dose_text_en,
-                $2, total_days, days_per_fill, fills_allowed, $2 + total_days, $3, id, $4, true
+                $2, total_days, days_per_fill, fills_allowed, $5, $3, id, $4, true
          FROM prescriptions WHERE id = $1 RETURNING id",
     )
     .bind(old)
     .bind(on)
     .bind(request.decided_by)
     .bind(request.id)
+    .bind(valid_until)
     .fetch_one(&mut *db)
     .await?;
     sqlx::query("UPDATE prescriptions SET active = false WHERE id = $1")
@@ -1430,7 +1440,7 @@ pub async fn briefs_for(
     let own = reader.id == patient;
     let rows: Vec<BriefRow> = sqlx::query_as(concat!(
         brief_select!(),
-        "WHERE r.patient_id = $3 AND ($4 OR r.status <> 'draft') AND (NOT $5 OR r.status NOT IN ('declined', 'visit_required', 'dispensed', 'cancelled')) ORDER BY r.updated_at DESC, r.id DESC LIMIT 100"
+        "WHERE r.patient_id = $3 AND ($4 OR r.submitted_at IS NOT NULL) AND (NOT $5 OR r.status NOT IN ('declined', 'visit_required', 'dispensed', 'cancelled')) ORDER BY r.updated_at DESC, r.id DESC LIMIT 100"
     ))
     .bind(reader.id)
     .bind(!own)
@@ -1459,7 +1469,7 @@ pub async fn list(
     let staff = user.can(Permission::RxRead);
     sqlx::query_as(concat!(
         brief_select!(),
-        "WHERE (($2 AND r.status <> 'draft') OR (NOT $2 AND r.patient_id = $1)) AND ($3::text[] IS NULL OR r.status = ANY($3)) AND ($4::text IS NULL OR r.kind = $4)
+        "WHERE (($2 AND r.submitted_at IS NOT NULL) OR (NOT $2 AND r.patient_id = $1)) AND ($3::text[] IS NULL OR r.status = ANY($3)) AND ($4::text IS NULL OR r.kind = $4)
            AND ($5::timestamptz IS NULL OR (r.updated_at, r.id) < ($5, $6)) AND ",
         brief_search!(8),
         " ORDER BY r.updated_at DESC, r.id DESC LIMIT $7"
@@ -1522,7 +1532,7 @@ pub async fn queue(
 ) -> sqlx::Result<Vec<BriefRow>> {
     sqlx::query_as(concat!(
         brief_select!(),
-        "WHERE $2 AND r.status <> 'draft' AND CASE $4::text WHEN 'mine' THEN ", in_bucket!("mine"),
+        "WHERE $2 AND r.submitted_at IS NOT NULL AND CASE $4::text WHEN 'mine' THEN ", in_bucket!("mine"),
         " WHEN 'unassigned' THEN ", in_bucket!("unassigned"),
         " WHEN 'urgent' THEN ", in_bucket!("urgent"),
         " WHEN 'overdue' THEN ", in_bucket!("overdue"),
@@ -1561,7 +1571,7 @@ pub async fn queue_counts(state: &AppState, user: &CurrentUser) -> sqlx::Result<
         in_bucket!("pharmacy"),
         "), COUNT(*) FILTER (WHERE ",
         in_bucket!("done"),
-        ") FROM rx_requests r WHERE $2 AND r.status <> 'draft'"
+        ") FROM rx_requests r WHERE $2 AND r.submitted_at IS NOT NULL"
     ))
     .bind(user.id)
     .bind(true)

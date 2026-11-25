@@ -273,6 +273,7 @@ struct DemoPatient {
 }
 
 /// Adds the panel's requests after the demo patients and their prescriptions were (re)built.
+#[allow(dead_code)]
 pub async fn seed_demo_requests(state: &AppState) -> Result<()> {
     sqlx::query("DELETE FROM rx_requests r USING accounts a WHERE a.id = r.patient_id AND r.is_demo AND a.is_demo")
         .execute(&state.db)
@@ -392,7 +393,7 @@ async fn build_in_tx(
             locale: crate::types::Locale::ZhTw,
             pharmacy_id: pharmacy_id.as_deref(),
             at: submitted - Duration::minutes(25),
-            day: state.clock.today(),
+            day: store::taipei_date(submitted),
             is_demo: true,
         },
     )
@@ -520,7 +521,15 @@ async fn build_in_tx(
         } => {
             to_pharmacy(&mut tx, &mut r, doctor, pharmacist, ago(decided)).await?;
             make_ready(&mut tx, &mut r, pharmacist, ago(ready)).await?;
-            hand_over(&mut tx, &mut r, prescription, pharmacist, ago(handed)).await?;
+            hand_over(
+                &mut tx,
+                &mut r,
+                prescription,
+                pharmacist,
+                ago(handed),
+                &state.rules.refill,
+            )
+            .await?;
         }
         Stage::Closed { decided, outcome } => {
             start_review(&mut tx, &mut r, doctor, ago(decided) - Duration::hours(1)).await?;
@@ -706,10 +715,11 @@ async fn hand_over(
     prescription: Uuid,
     pharmacist: Option<Uuid>,
     at: OffsetDateTime,
+    rules: &crate::refill::RefillRules,
 ) -> Done {
     let on = store::taipei_date(at);
     let shop = store::pharmacy(tx, r.pharmacy_id.as_deref()).await?;
-    let next = store::next_prescription(tx, prescription, r, on).await?;
+    let next = store::next_prescription(tx, prescription, r, on, rules).await?;
     store::add_fill(tx, next, 1, on, shop.as_ref(), pharmacist, r.id).await?;
     store::advance(
         tx,

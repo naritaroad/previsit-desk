@@ -192,7 +192,7 @@ fn announce(state: &AppState, r: &Request) {
     state
         .hub
         .to_account(r.patient_id, "rx.changed", data.clone());
-    if r.status != RxStatus::Draft {
+    if r.submitted_at.is_some() {
         state
             .hub
             .to_permission(Permission::RxRead, "rx.changed", data);
@@ -1066,6 +1066,7 @@ async fn submit_now(
         .execute(&mut *o.tx)
         .await?;
     o.request.priority = priority;
+    o.request.submitted_at = Some(o.now);
     if let Some(version) = &consent {
         sqlx::query("INSERT INTO consents (account_id, doc, version, granted) VALUES ($1, 'rx_review', $2, true)")
             .bind(user.id)
@@ -1123,7 +1124,6 @@ async fn cancel(
 ) -> AppResult<Json<Value>> {
     let revision = revision_of(&body, user.locale)?;
     let mut o = open(&state, &user, &id, Action::Cancel, Some(revision)).await?;
-    let before = o.request.status;
     store::advance(
         &mut o.tx,
         &mut o.request,
@@ -1134,7 +1134,7 @@ async fn cancel(
     .await?;
     o.tx.commit().await?;
     let r = &o.request;
-    if before != RxStatus::Draft
+    if r.submitted_at.is_some()
         && let Some(holder) = r.assigned_to.or(r.decided_by)
     {
         notify::notify(
@@ -1753,8 +1753,14 @@ async fn dispense(
             .iter()
             .filter(|i| i.outcome.as_deref() == Some(DecisionOutcome::Approve.as_str()))
         {
-            let id = store::next_prescription(&mut o.tx, item.prescription_id, &o.request, today)
-                .await?;
+            let id = store::next_prescription(
+                &mut o.tx,
+                item.prescription_id,
+                &o.request,
+                today,
+                &state.rules.refill,
+            )
+            .await?;
             store::add_fill(&mut o.tx, id, 1, today, shop.as_ref(), actor, o.request.id).await?;
             events.push(NewEvent::new(ev::NEXT_PRESCRIPTION, None));
         }

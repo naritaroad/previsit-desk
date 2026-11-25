@@ -106,8 +106,28 @@ impl Prescription {
             .min((self.total_days + self.days_per_fill - 1) / self.days_per_fill)
     }
 
-    pub fn valid_until(&self) -> Date {
-        plus(self.issued_on, self.total_days.max(0))
+    /// The last day a fill can be collected, as the refill check says. The day count is not repeated here; it is read
+    /// from a check of the same prescription on its first day.
+    pub fn valid_until(&self, rules: &RefillRules) -> Date {
+        let issued = format_date(self.issued_on);
+        let first_day = RefillInput {
+            prescription_date: issued.clone(),
+            total_days: self.total_days,
+            days_per_fill: self.days_per_fill,
+            fills_done: 1,
+            last_fill_date: issued,
+            today: None,
+            controlled: Controlled::No,
+            special_status: SpecialStatus::None,
+            symptom_changed: false,
+            side_effects: false,
+        };
+        refill::validate(&first_day, rules, self.issued_on, Locale::ZhTw)
+            .ok()
+            .and_then(|c| refill::check(&c, rules, Locale::ZhTw).result.latest_date)
+            .and_then(|d| crate::clock::parse_date(&d))
+            // Days outside the rules go to a person; the last covered day is the careful answer.
+            .unwrap_or_else(|| plus(self.issued_on, (self.total_days - 1).max(0)))
     }
 
     pub fn last_fill(&self) -> Option<&FillRecord> {
@@ -132,7 +152,7 @@ impl Prescription {
 
     /// Fills that can still be collected with this prescription.
     pub fn fills_left(&self, rules: &RefillRules, today: Date) -> i64 {
-        if self.self_reported || today > self.valid_until() {
+        if self.self_reported || today > self.valid_until(rules) {
             0
         } else {
             (self.fills_allowed(rules) - self.fills_done()).max(0)
@@ -227,7 +247,8 @@ pub fn card(
         .and_then(Result::ok)
         .map(|e| e.result);
     let supply_end = p.supply_ends_on();
-    let first_fill_open = !p.self_reported && p.fills.is_empty() && today <= p.valid_until();
+    let valid_until = p.valid_until(rules);
+    let first_fill_open = !p.self_reported && p.fills.is_empty() && today <= valid_until;
     let next_window = match &preview {
         Some(r) if matches!(r.outcome, RefillOutcome::Eligible | RefillOutcome::TooEarly) => r
             .earliest_date
@@ -236,7 +257,7 @@ pub fn card(
             .map(|(from, to)| Window { from, to }),
         _ if first_fill_open && p.total_days > 0 => Some(Window {
             from: format_date(p.issued_on),
-            to: format_date(p.valid_until()),
+            to: format_date(valid_until),
         }),
         _ => None,
     };
@@ -244,7 +265,7 @@ pub fn card(
         MedState::OnHand
     } else if p.fills_done() >= p.fills_allowed(rules) {
         MedState::Finished
-    } else if today > p.valid_until() {
+    } else if today > valid_until {
         MedState::Expired
     } else if first_fill_open {
         MedState::WindowOpen
@@ -297,7 +318,7 @@ pub fn card(
         fills_allowed: p.fills_allowed(rules),
         supply_ends_on: format_date(supply_end),
         next_window,
-        valid_until: format_date(p.valid_until()),
+        valid_until: format_date(valid_until),
         state,
         renewal_scope: scope,
         days_left: p.days_left(today),
@@ -395,6 +416,30 @@ mod tests {
         ] {
             assert_eq!(on(&p, day).state, state, "day {day}");
         }
+    }
+
+    /// The last day is whatever the refill check says, so a change there changes every card.
+    #[test]
+    fn validity_is_the_refill_checks_own_last_day() {
+        let rules = fixtures::refill_rules();
+        let p = rx(&[0]);
+        let last = p.valid_until(&rules);
+        let at = |day| {
+            check_refill(&p, RefillAnswers::default(), &rules, day, Locale::ZhTw)
+                .expect("a refill")
+                .expect("valid")
+                .result
+                .outcome
+        };
+        assert_eq!(at(last), RefillOutcome::Eligible);
+        assert_eq!(at(plus(last, 1)), RefillOutcome::Revisit);
+        let mut long = rx(&[0]);
+        long.total_days = 120;
+        assert_eq!(
+            long.valid_until(&rules),
+            plus(ISSUED, 119),
+            "days outside the rules: the last covered day"
+        );
     }
 
     #[test]

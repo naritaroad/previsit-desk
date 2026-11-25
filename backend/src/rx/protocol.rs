@@ -145,8 +145,12 @@ pub struct ClassProtocol {
 #[serde(deny_unknown_fields)]
 pub struct Protocols {
     pub version: String,
-    /// Who signed off, as written by the maintainer: a string, or an object with one text per language.
-    pub approved_by_note: Value,
+    /// Who signed off (or that nobody did), as written by the maintainer.
+    pub approved_by_note: String,
+    #[serde(default)]
+    pub approved_by_note_zh: Option<String>,
+    #[serde(default)]
+    pub approved_by_note_en: Option<String>,
     pub general: General,
     pub classes: Vec<ClassProtocol>,
 }
@@ -180,7 +184,11 @@ fn tells_to_change_medicine(zh: &str, en: &str) -> bool {
     });
     let zh_hit = zh
         .split(['。', '，', '；', '、'])
-        .filter(|clause| !["醫師", "不", "勿", "別"].iter().any(|w| clause.contains(w)))
+        .filter(|clause| {
+            !["醫師", "不", "勿", "別"]
+                .iter()
+                .any(|w| clause.contains(w))
+        })
         .any(|clause| ZH.is_match(clause));
     zh_hit || EN.is_match(en.trim())
 }
@@ -404,14 +412,14 @@ impl Protocols {
 
     fn validate(&self) -> Result<()> {
         ensure!(!self.version.trim().is_empty(), "version is empty");
-        match &self.approved_by_note {
-            Value::String(s) => ensure!(!s.trim().is_empty(), "approved_by_note is empty"),
-            Value::Object(o) => ensure!(
-                !o.is_empty() && o.values().all(Value::is_string),
-                "approved_by_note must hold texts"
-            ),
-            _ => bail!("approved_by_note must be a text"),
-        }
+        ensure!(
+            !self.approved_by_note.trim().is_empty(),
+            "approved_by_note is empty"
+        );
+        ensure!(
+            blank(&self.approved_by_note_zh) == blank(&self.approved_by_note_en),
+            "approved_by_note needs both languages"
+        );
         ensure!(
             !self.general.questions.is_empty(),
             "there are no general questions"
@@ -503,20 +511,15 @@ impl Protocols {
                 .sum::<usize>()
     }
 
-    pub fn approved_by(&self, locale: Locale) -> String {
-        match &self.approved_by_note {
-            Value::String(s) => s.clone(),
-            Value::Object(o) => {
-                let wanted = if locale.is_en() { "en" } else { "zh" };
-                o.iter()
-                    .find(|(k, _)| k.as_str() == wanted || k.ends_with(&format!("_{wanted}")))
-                    .or_else(|| o.iter().next())
-                    .and_then(|(_, v)| v.as_str())
-                    .unwrap_or("")
-                    .to_string()
-            }
-            _ => String::new(),
-        }
+    pub fn approved_by(&self, locale: Locale) -> &str {
+        let own = if locale.is_en() {
+            &self.approved_by_note_en
+        } else {
+            &self.approved_by_note_zh
+        };
+        own.as_deref()
+            .filter(|t| !t.trim().is_empty())
+            .unwrap_or(&self.approved_by_note)
     }
 
     /// Public `GET /rx/protocols`: everything a reader needs to see why a question is asked.
@@ -1246,8 +1249,14 @@ mod tests {
             assert!(load(&v).is_err());
         }
         for (zh, en) in [
-            ("不可自行突然停藥，請醫師確認。", "Do not stop it on your own."),
-            ("請醫師確認是否需要減量。", "The doctor should check the dose."),
+            (
+                "不可自行突然停藥，請醫師確認。",
+                "Do not stop it on your own.",
+            ),
+            (
+                "請醫師確認是否需要減量。",
+                "The doctor should check the dose.",
+            ),
             ("最近有突然停藥的情形。", "It was stopped suddenly."),
             ("請勿自行停藥。", "Do not stop taking it."),
         ] {
