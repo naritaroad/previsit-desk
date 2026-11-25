@@ -31,11 +31,11 @@ interface Run /* v1 + */ { status:'running'|'completed'|'failed'|'skipped'|'inte
 
 | 端點 | 說明 |
 |---|---|
-| `POST /auth/guest` `{locale, persona?:string}` | 建立訪客沙盒並登入 → `201 {me}`；persona 預設 `lin`；每 IP 10 分鐘 10 次 |
+| `POST /auth/guest` `{locale, persona?:string, adult:true}`（`adult` 必填 true：Gemini 條款要求 18 歲以上，缺→422） | 建立訪客沙盒並登入 → `201 {me}`；persona 預設 `lin`；每 IP 10 分鐘 10 次 |
 | `GET /auth/personas` | 公開：`{items:[{id,display_name,age_band,summary_zh,summary_en}]}` |
 | `POST /auth/login` `{username,password}` / `POST /auth/logout` / `GET /auth/me` | `{me}`；登入限速 |
 | `POST /auth/claim` `{username,password,display_name}` | 訪客→正式帳號，資料保留 |
-| `POST /auth/register` `{username,password,display_name,locale}` | 病人自助註冊（暱稱，不收真名與 email）|
+| `POST /auth/register` `{username,password,display_name,locale,adult:true}` | 病人自助註冊（暱稱，不收真名與 email）|
 | `POST /auth/password` `{current,next}` | |
 | `GET /me/sessions`、`DELETE /me/sessions/{id}` | `{id, device, created_at, last_seen_at, current}` |
 | `PATCH /me` `{display_name?,locale?,avatar?}`、`PUT /me/preferences` `{patch}` | |

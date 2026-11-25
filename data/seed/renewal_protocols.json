@@ -1,15 +1,17 @@
 {
-  "version": "2026.11.1",
+  "version": "2026.11.3",
+  "approved_by_note_zh": "僅供課堂展示，未經臨床驗證，也未經任何醫師或藥師核可。數字與間隔皆來自各題所附的公開來源（2026-11-25 查閱）；實際是否續開，一律由醫師決定。",
+  "approved_by_note_en": "Classroom demo only. Not clinically validated and not approved by any physician or pharmacist. Numbers and intervals come from the public sources attached to each item (checked 2026-11-25); a physician always decides on renewal.",
   "approved_by_note": "僅供課堂展示，未經臨床驗證，也未經任何醫師或藥師核可。數字與間隔皆來自文中所列公開來源（2026-11-25 查閱）；實際續開一律由醫師決定。 / Classroom demo only. Not clinically validated and not approved by any physician or pharmacist. Numbers and intervals come from the public sources cited (checked 2026-11-25); a physician always decides on renewal.",
   "general": {
     "questions": [
       {
         "id": "taking_as_prescribed",
         "kind": "choice",
-        "label_zh": "這顆藥，你最近都是照醫師交代的方式吃嗎？",
-        "label_en": "Have you been taking this medicine the way your doctor told you to?",
-        "help_zh": "漏吃、晚吃、自己調量或停藥，都請如實選，醫師看了才能判斷。",
-        "help_en": "Missed or late doses, changing the dose yourself or stopping all matter. Please answer honestly so the doctor can judge.",
+        "label_zh": "這些藥，您最近都是照醫師交代的方式吃嗎？",
+        "label_en": "Have you been taking these medicines the way your doctor told you to?",
+        "help_zh": "漏吃、晚吃、自己改變吃法，或已經沒在吃，都請如實選，醫師看了才能判斷。",
+        "help_en": "Missed or late doses, taking them differently from instructed, or not taking them at all: please answer honestly so the doctor can judge.",
         "options": [
           {
             "value": "all",
@@ -24,12 +26,12 @@
           {
             "value": "changed_myself",
             "label_zh": "我自己調整過劑量或次數",
-            "label_en": "I changed the dose or timing myself"
+            "label_en": "I changed a dose or timing myself"
           },
           {
             "value": "stopped",
-            "label_zh": "我已經停藥一陣子",
-            "label_en": "I stopped for a while"
+            "label_zh": "有藥已經停了一陣子",
+            "label_en": "I stopped one or more for a while"
           }
         ],
         "required": true,
@@ -41,7 +43,7 @@
             },
             "disposition": "review",
             "reason_zh": "偶爾漏吃或晚吃，請醫師確認目前的用法。",
-            "reason_en": "You sometimes miss or delay doses; the doctor should confirm how you are taking it.",
+            "reason_en": "You sometimes miss or delay doses; the doctor should confirm how you are taking them.",
             "source_url": ""
           },
           {
@@ -50,8 +52,8 @@
               "value": "changed_myself"
             },
             "disposition": "review",
-            "reason_zh": "你自己調整過劑量或次數，請醫師確認。",
-            "reason_en": "You changed the dose or timing yourself; the doctor should confirm.",
+            "reason_zh": "您的吃法和醫師交代的不同，請醫師確認。",
+            "reason_en": "You are taking them differently from instructed; the doctor should confirm.",
             "source_url": ""
           },
           {
@@ -60,8 +62,8 @@
               "value": "stopped"
             },
             "disposition": "in_person",
-            "reason_zh": "你已經停藥一陣子，重新開始前需要先回診評估。",
-            "reason_en": "You stopped the medicine for a while; a visit is needed before restarting.",
+            "reason_zh": "您有藥已經停了一陣子，需要先回診讓醫師評估。",
+            "reason_en": "You have not taken a medicine for a while; a visit is needed so the doctor can assess.",
             "source_url": ""
           }
         ]
@@ -69,10 +71,10 @@
       {
         "id": "urgent_symptoms_now",
         "kind": "boolean",
-        "label_zh": "你現在有沒有胸痛、呼吸很喘、快要昏倒、單側手腳無力或說話不清楚，或嘴唇、喉嚨腫起來？",
+        "label_zh": "您現在有沒有胸痛、呼吸很喘、快要昏倒、單側手腳無力或說話不清楚，或嘴唇、喉嚨腫起來？",
         "label_en": "Right now, do you have chest pain, severe breathlessness, near-fainting, one-sided weakness or slurred speech, or swelling of the lips or throat?",
         "help_zh": "只要有其中一項，請先不要填表。",
-        "help_en": "If any of these apply, please stop filling in this form.",
+        "help_en": "If any of these apply, please leave this form and get help first.",
         "required": true,
         "rules": [
           {
@@ -111,8 +113,8 @@
       {
         "id": "side_effects",
         "kind": "boolean",
-        "label_zh": "吃這顆藥之後，有沒有覺得不舒服、疑似是藥的副作用？",
-        "label_en": "Do you think this medicine is causing side effects?",
+        "label_zh": "吃了這些藥之後，有沒有覺得不舒服、疑似是藥的副作用？",
+        "label_en": "Do you think any of these medicines is causing side effects?",
         "help_zh": "例如頭暈、胃不舒服、起疹子、咳嗽、很想睡。",
         "help_en": "For example dizziness, stomach upset, rash, cough or drowsiness.",
         "required": true,
@@ -123,7 +125,7 @@
               "value": true
             },
             "disposition": "review",
-            "reason_zh": "你覺得可能有副作用，請醫師確認。",
+            "reason_zh": "您覺得可能有副作用，請醫師確認。",
             "reason_en": "You suspect a side effect; the doctor should look at it.",
             "source_url": ""
           }
@@ -144,8 +146,8 @@
               "value": true
             },
             "disposition": "review",
-            "reason_zh": "出現新的過敏反應，請醫師確認。",
-            "reason_en": "A new allergic reaction was reported; the doctor should look at it.",
+            "reason_zh": "出現新的過敏情形，請醫師確認。",
+            "reason_en": "A new reaction to a medicine or food was reported; the doctor should look at it.",
             "source_url": ""
           }
         ]
@@ -155,8 +157,8 @@
         "kind": "boolean",
         "label_zh": "上次看診之後，有沒有新增其他藥物、成藥、中藥或保健食品？",
         "label_en": "Since your last visit, have you started any other medicine, over-the-counter product, herbal remedy or supplement?",
-        "help_zh": "有些藥或保健食品會影響這顆藥的作用。",
-        "help_en": "Some products change how this medicine works.",
+        "help_zh": "有些藥或保健食品會影響這些藥的作用。",
+        "help_en": "Some products change how these medicines work.",
         "required": true,
         "rules": [
           {
@@ -195,7 +197,7 @@
       {
         "id": "pregnancy_status",
         "kind": "choice",
-        "label_zh": "你目前有懷孕、準備懷孕或正在哺乳嗎？",
+        "label_zh": "您目前有懷孕、準備懷孕或正在哺乳嗎？",
         "label_en": "Are you pregnant, planning a pregnancy or breastfeeding?",
         "help_zh": "不會懷孕的人請選「不適用」。",
         "help_en": "If pregnancy is not possible for you, choose Not applicable.",
@@ -265,9 +267,9 @@
         "kind": "number",
         "label_zh": "距離上次當面看診已經幾天？",
         "label_en": "How many days ago was your last in-person visit?",
-        "help_zh": "系統會依你的看診紀錄自動算出，不用自己填。",
+        "help_zh": "系統會依您的看診紀錄自動算出，不用自己填。",
         "help_en": "The system works this out from your visit record; you do not need to enter it.",
-        "unit": "天",
+        "unit": "days",
         "min": 0,
         "max": 3650,
         "required": true,
@@ -308,29 +310,8 @@
               "value": true
             },
             "disposition": "in_person",
-            "reason_zh": "腎臟或肝臟狀況有變，藥量可能要調整，請先回診。",
-            "reason_en": "Kidney or liver status changed and the dose may need adjusting; please visit first.",
-            "source_url": ""
-          }
-        ]
-      },
-      {
-        "id": "consent_physician_review",
-        "kind": "boolean",
-        "label_zh": "你同意這份申請由醫師審核，並由醫師決定是否續開嗎？",
-        "label_en": "Do you agree that a doctor will review this request and decide whether to renew?",
-        "help_zh": "本系統只做檢核，不會開藥。",
-        "help_en": "This tool only checks; it never prescribes.",
-        "required": true,
-        "rules": [
-          {
-            "when": {
-              "op": "eq",
-              "value": false
-            },
-            "disposition": "in_person",
-            "reason_zh": "需要你同意由醫師審核才能送出，否則請回診。",
-            "reason_en": "You must agree to doctor review to submit; otherwise please visit.",
+            "reason_zh": "腎臟或肝臟狀況有變，需要先回診讓醫師評估。",
+            "reason_en": "Kidney or liver status changed; a visit is needed so the doctor can assess.",
             "source_url": ""
           }
         ]
@@ -368,6 +349,26 @@
             },
             {
               "when": {
+                "op": "gt",
+                "value": 180
+              },
+              "disposition": "in_person",
+              "reason_zh": "收縮壓高於 180 mmHg 屬於危險的高血壓，續藥前請先就醫。",
+              "reason_en": "Systolic above 180 mmHg is dangerously high; please be seen before any renewal.",
+              "source_url": "https://www.nhlbi.nih.gov/health/high-blood-pressure/diagnosis"
+            },
+            {
+              "when": {
+                "op": "lt",
+                "value": 90
+              },
+              "disposition": "review",
+              "reason_zh": "收縮壓低於 90 mmHg 屬於低血壓，請醫師確認用藥。",
+              "reason_en": "Systolic below 90 mmHg counts as low blood pressure; the doctor should review the medicine.",
+              "source_url": "https://www.nhs.uk/conditions/low-blood-pressure-hypotension/"
+            },
+            {
+              "when": {
                 "op": "gte",
                 "value": 130
               },
@@ -401,6 +402,26 @@
             },
             {
               "when": {
+                "op": "gt",
+                "value": 120
+              },
+              "disposition": "in_person",
+              "reason_zh": "舒張壓高於 120 mmHg 屬於危險的高血壓，續藥前請先就醫。",
+              "reason_en": "Diastolic above 120 mmHg is dangerously high; please be seen before any renewal.",
+              "source_url": "https://www.nhlbi.nih.gov/health/high-blood-pressure/diagnosis"
+            },
+            {
+              "when": {
+                "op": "lt",
+                "value": 60
+              },
+              "disposition": "review",
+              "reason_zh": "舒張壓低於 60 mmHg 屬於低血壓，請醫師確認用藥。",
+              "reason_en": "Diastolic below 60 mmHg counts as low blood pressure; the doctor should review the medicine.",
+              "source_url": "https://www.nhs.uk/conditions/low-blood-pressure-hypotension/"
+            },
+            {
+              "when": {
                 "op": "gte",
                 "value": 80
               },
@@ -428,6 +449,48 @@
               "disposition": "review",
               "reason_zh": "可能是血壓太低或體位性低血壓，請醫師確認。",
               "reason_en": "Possible low blood pressure on standing; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bp_faint",
+          "kind": "boolean",
+          "label_zh": "最近有沒有昏倒過？",
+          "label_en": "Have you fainted recently?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "昏倒的原因要先查清楚，續藥前請先回診。",
+              "reason_en": "The cause of fainting needs to be found first; please visit before renewal.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bp_severe_symptoms",
+          "kind": "boolean",
+          "label_zh": "血壓很高的時候（超過 180/120），有沒有同時出現劇烈頭痛、胸痛、呼吸困難、視力改變、手腳無力或意識不清？",
+          "label_en": "When your blood pressure is very high (above 180/120), have you also had severe headache, chest pain, trouble breathing, vision changes, weakness or confusion?",
+          "help_zh": "沒有量到那麼高的話，請選「沒有」。",
+          "help_en": "If you have never measured that high, choose No.",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "血壓很高又有這些症狀，可能很危急，請立刻撥 119 或到急診。",
+              "reason_en": "Very high blood pressure with these symptoms can be an emergency. Call 119 or go to the emergency room now.",
               "source_url": ""
             }
           ]
@@ -468,8 +531,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "持續乾咳是 ACEI 常見的副作用，請醫師確認是否要換藥。",
-              "reason_en": "A persistent dry cough is a common ACE inhibitor side effect; the doctor should consider switching.",
+              "reason_zh": "持續乾咳可能和這類藥有關，請醫師確認。",
+              "reason_en": "A persistent dry cough may be related to this type of medicine; the doctor should review.",
               "source_url": ""
             }
           ]
@@ -477,10 +540,10 @@
         {
           "id": "raas_bloodtest_after_change",
           "kind": "boolean",
-          "label_zh": "最近 2 至 4 週內，你的劑量有調高或剛開始吃嗎？",
+          "label_zh": "最近 2 至 4 週內，您的劑量有調高或剛開始吃嗎？",
           "label_en": "In the past 2 to 4 weeks, was your dose raised or did you just start this medicine?",
-          "help_zh": "剛開始或調高劑量後，需要抽血看腎功能與血鉀。",
-          "help_en": "After starting or raising the dose, kidney function and potassium need checking by blood test.",
+          "help_zh": "剛開始吃或處方有變動之後，需要抽血檢查。",
+          "help_en": "After starting or after a prescription change, a blood test is needed.",
           "required": true,
           "rules": [
             {
@@ -489,8 +552,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "剛開始或調高劑量後 2 至 4 週內要檢查血壓、肌酸酐與血鉀，請醫師確認。",
-              "reason_en": "Blood pressure, creatinine and potassium should be checked within 2 to 4 weeks of starting or raising the dose; the doctor should confirm.",
+              "reason_zh": "剛開始吃或處方有變動後 2 至 4 週內，要檢查血壓、肌酸酐與血鉀，請醫師確認。",
+              "reason_en": "Blood pressure, creatinine and potassium should be checked within 2 to 4 weeks after starting or after a prescription change; the doctor should confirm.",
               "source_url": "https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf"
             }
           ]
@@ -559,6 +622,26 @@
             },
             {
               "when": {
+                "op": "gt",
+                "value": 180
+              },
+              "disposition": "in_person",
+              "reason_zh": "收縮壓高於 180 mmHg 屬於危險的高血壓，續藥前請先就醫。",
+              "reason_en": "Systolic above 180 mmHg is dangerously high; please be seen before any renewal.",
+              "source_url": "https://www.nhlbi.nih.gov/health/high-blood-pressure/diagnosis"
+            },
+            {
+              "when": {
+                "op": "lt",
+                "value": 90
+              },
+              "disposition": "review",
+              "reason_zh": "收縮壓低於 90 mmHg 屬於低血壓，請醫師確認用藥。",
+              "reason_en": "Systolic below 90 mmHg counts as low blood pressure; the doctor should review the medicine.",
+              "source_url": "https://www.nhs.uk/conditions/low-blood-pressure-hypotension/"
+            },
+            {
+              "when": {
                 "op": "gte",
                 "value": 130
               },
@@ -592,6 +675,26 @@
             },
             {
               "when": {
+                "op": "gt",
+                "value": 120
+              },
+              "disposition": "in_person",
+              "reason_zh": "舒張壓高於 120 mmHg 屬於危險的高血壓，續藥前請先就醫。",
+              "reason_en": "Diastolic above 120 mmHg is dangerously high; please be seen before any renewal.",
+              "source_url": "https://www.nhlbi.nih.gov/health/high-blood-pressure/diagnosis"
+            },
+            {
+              "when": {
+                "op": "lt",
+                "value": 60
+              },
+              "disposition": "review",
+              "reason_zh": "舒張壓低於 60 mmHg 屬於低血壓，請醫師確認用藥。",
+              "reason_en": "Diastolic below 60 mmHg counts as low blood pressure; the doctor should review the medicine.",
+              "source_url": "https://www.nhs.uk/conditions/low-blood-pressure-hypotension/"
+            },
+            {
+              "when": {
                 "op": "gte",
                 "value": 80
               },
@@ -619,6 +722,48 @@
               "disposition": "review",
               "reason_zh": "可能是血壓太低或體位性低血壓，請醫師確認。",
               "reason_en": "Possible low blood pressure on standing; the doctor should review.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bp_faint",
+          "kind": "boolean",
+          "label_zh": "最近有沒有昏倒過？",
+          "label_en": "Have you fainted recently?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "昏倒的原因要先查清楚，續藥前請先回診。",
+              "reason_en": "The cause of fainting needs to be found first; please visit before renewal.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bp_severe_symptoms",
+          "kind": "boolean",
+          "label_zh": "血壓很高的時候（超過 180/120），有沒有同時出現劇烈頭痛、胸痛、呼吸困難、視力改變、手腳無力或意識不清？",
+          "label_en": "When your blood pressure is very high (above 180/120), have you also had severe headache, chest pain, trouble breathing, vision changes, weakness or confusion?",
+          "help_zh": "沒有量到那麼高的話，請選「沒有」。",
+          "help_en": "If you have never measured that high, choose No.",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "血壓很高又有這些症狀，可能很危急，請立刻撥 119 或到急診。",
+              "reason_en": "Very high blood pressure with these symptoms can be an emergency. Call 119 or go to the emergency room now.",
               "source_url": ""
             }
           ]
@@ -688,8 +833,8 @@
       "class_id": "antihypertensive_bb",
       "title_zh": "降血壓藥：乙型阻斷劑",
       "title_en": "Blood pressure: beta blocker",
-      "summary_zh": "這類藥（名稱常以 -olol 結尾）可降低血壓與心跳；突然停藥有風險，氣喘患者與心跳過慢的人要特別留意。",
-      "summary_en": "These medicines (names often end in -olol) lower blood pressure and heart rate. Stopping suddenly is risky, and people with asthma or a very slow pulse need extra care.",
+      "summary_zh": "這類藥（名稱常以 -olol 結尾）可降低血壓與心跳；氣喘患者與心跳過慢的人要特別留意。",
+      "summary_en": "These medicines (names often end in -olol) lower blood pressure and heart rate. People with asthma or a very slow pulse need extra care.",
       "questions": [
         {
           "id": "home_sbp",
@@ -711,6 +856,26 @@
               "reason_zh": "沒有居家血壓數字，請醫師確認血壓控制情形。",
               "reason_en": "No home blood pressure was given; the doctor should check blood pressure control.",
               "source_url": ""
+            },
+            {
+              "when": {
+                "op": "gt",
+                "value": 180
+              },
+              "disposition": "in_person",
+              "reason_zh": "收縮壓高於 180 mmHg 屬於危險的高血壓，續藥前請先就醫。",
+              "reason_en": "Systolic above 180 mmHg is dangerously high; please be seen before any renewal.",
+              "source_url": "https://www.nhlbi.nih.gov/health/high-blood-pressure/diagnosis"
+            },
+            {
+              "when": {
+                "op": "lt",
+                "value": 90
+              },
+              "disposition": "review",
+              "reason_zh": "收縮壓低於 90 mmHg 屬於低血壓，請醫師確認用藥。",
+              "reason_en": "Systolic below 90 mmHg counts as low blood pressure; the doctor should review the medicine.",
+              "source_url": "https://www.nhs.uk/conditions/low-blood-pressure-hypotension/"
             },
             {
               "when": {
@@ -747,6 +912,26 @@
             },
             {
               "when": {
+                "op": "gt",
+                "value": 120
+              },
+              "disposition": "in_person",
+              "reason_zh": "舒張壓高於 120 mmHg 屬於危險的高血壓，續藥前請先就醫。",
+              "reason_en": "Diastolic above 120 mmHg is dangerously high; please be seen before any renewal.",
+              "source_url": "https://www.nhlbi.nih.gov/health/high-blood-pressure/diagnosis"
+            },
+            {
+              "when": {
+                "op": "lt",
+                "value": 60
+              },
+              "disposition": "review",
+              "reason_zh": "舒張壓低於 60 mmHg 屬於低血壓，請醫師確認用藥。",
+              "reason_en": "Diastolic below 60 mmHg counts as low blood pressure; the doctor should review the medicine.",
+              "source_url": "https://www.nhs.uk/conditions/low-blood-pressure-hypotension/"
+            },
+            {
+              "when": {
                 "op": "gte",
                 "value": 80
               },
@@ -779,6 +964,48 @@
           ]
         },
         {
+          "id": "bp_faint",
+          "kind": "boolean",
+          "label_zh": "最近有沒有昏倒過？",
+          "label_en": "Have you fainted recently?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "昏倒的原因要先查清楚，續藥前請先回診。",
+              "reason_en": "The cause of fainting needs to be found first; please visit before renewal.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bp_severe_symptoms",
+          "kind": "boolean",
+          "label_zh": "血壓很高的時候（超過 180/120），有沒有同時出現劇烈頭痛、胸痛、呼吸困難、視力改變、手腳無力或意識不清？",
+          "label_en": "When your blood pressure is very high (above 180/120), have you also had severe headache, chest pain, trouble breathing, vision changes, weakness or confusion?",
+          "help_zh": "沒有量到那麼高的話，請選「沒有」。",
+          "help_en": "If you have never measured that high, choose No.",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "血壓很高又有這些症狀，可能很危急，請立刻撥 119 或到急診。",
+              "reason_en": "Very high blood pressure with these symptoms can be an emergency. Call 119 or go to the emergency room now.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
           "id": "bb_stopped_suddenly",
           "kind": "boolean",
           "label_zh": "最近有沒有突然停過這類藥，或超過幾天沒吃？",
@@ -793,8 +1020,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "突然停用乙型阻斷劑可能讓心跳與血壓反彈，請醫師確認。",
-              "reason_en": "Stopping a beta blocker suddenly can cause a rebound in heart rate and blood pressure; the doctor should review.",
+              "reason_zh": "前陣子有一段時間沒吃這類藥，血壓與心跳可能受影響，請醫師確認。",
+              "reason_en": "You went without this medicine for a while, which can affect blood pressure and heart rate; the doctor should review.",
               "source_url": ""
             }
           ]
@@ -814,8 +1041,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "心跳過慢或容易喘，請醫師確認藥量。",
-              "reason_en": "A very slow pulse or easy breathlessness; the doctor should review the dose.",
+              "reason_zh": "心跳過慢或容易喘，請醫師確認。",
+              "reason_en": "A very slow pulse or easy breathlessness; the doctor should review.",
               "source_url": ""
             }
           ]
@@ -890,6 +1117,26 @@
             },
             {
               "when": {
+                "op": "gt",
+                "value": 180
+              },
+              "disposition": "in_person",
+              "reason_zh": "收縮壓高於 180 mmHg 屬於危險的高血壓，續藥前請先就醫。",
+              "reason_en": "Systolic above 180 mmHg is dangerously high; please be seen before any renewal.",
+              "source_url": "https://www.nhlbi.nih.gov/health/high-blood-pressure/diagnosis"
+            },
+            {
+              "when": {
+                "op": "lt",
+                "value": 90
+              },
+              "disposition": "review",
+              "reason_zh": "收縮壓低於 90 mmHg 屬於低血壓，請醫師確認用藥。",
+              "reason_en": "Systolic below 90 mmHg counts as low blood pressure; the doctor should review the medicine.",
+              "source_url": "https://www.nhs.uk/conditions/low-blood-pressure-hypotension/"
+            },
+            {
+              "when": {
                 "op": "gte",
                 "value": 130
               },
@@ -920,6 +1167,26 @@
               "reason_zh": "沒有居家血壓數字，請醫師確認血壓控制情形。",
               "reason_en": "No home blood pressure was given; the doctor should check blood pressure control.",
               "source_url": ""
+            },
+            {
+              "when": {
+                "op": "gt",
+                "value": 120
+              },
+              "disposition": "in_person",
+              "reason_zh": "舒張壓高於 120 mmHg 屬於危險的高血壓，續藥前請先就醫。",
+              "reason_en": "Diastolic above 120 mmHg is dangerously high; please be seen before any renewal.",
+              "source_url": "https://www.nhlbi.nih.gov/health/high-blood-pressure/diagnosis"
+            },
+            {
+              "when": {
+                "op": "lt",
+                "value": 60
+              },
+              "disposition": "review",
+              "reason_zh": "舒張壓低於 60 mmHg 屬於低血壓，請醫師確認用藥。",
+              "reason_en": "Diastolic below 60 mmHg counts as low blood pressure; the doctor should review the medicine.",
+              "source_url": "https://www.nhs.uk/conditions/low-blood-pressure-hypotension/"
             },
             {
               "when": {
@@ -955,6 +1222,48 @@
           ]
         },
         {
+          "id": "bp_faint",
+          "kind": "boolean",
+          "label_zh": "最近有沒有昏倒過？",
+          "label_en": "Have you fainted recently?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "in_person",
+              "reason_zh": "昏倒的原因要先查清楚，續藥前請先回診。",
+              "reason_en": "The cause of fainting needs to be found first; please visit before renewal.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
+          "id": "bp_severe_symptoms",
+          "kind": "boolean",
+          "label_zh": "血壓很高的時候（超過 180/120），有沒有同時出現劇烈頭痛、胸痛、呼吸困難、視力改變、手腳無力或意識不清？",
+          "label_en": "When your blood pressure is very high (above 180/120), have you also had severe headache, chest pain, trouble breathing, vision changes, weakness or confusion?",
+          "help_zh": "沒有量到那麼高的話，請選「沒有」。",
+          "help_en": "If you have never measured that high, choose No.",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "血壓很高又有這些症狀，可能很危急，請立刻撥 119 或到急診。",
+              "reason_en": "Very high blood pressure with these symptoms can be an emergency. Call 119 or go to the emergency room now.",
+              "source_url": ""
+            }
+          ]
+        },
+        {
           "id": "sick_day",
           "kind": "boolean",
           "label_zh": "最近有沒有嚴重嘔吐、拉肚子，或吃喝很少、脫水的情形？",
@@ -969,8 +1278,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "脫水或吃喝很少時，這類藥可能要暫停，請醫師確認。",
-              "reason_en": "When dehydrated or not eating or drinking, this medicine may need pausing; the doctor should review.",
+              "reason_zh": "嚴重嘔吐、拉肚子或吃喝很少時，身體容易缺水，請醫師確認。",
+              "reason_en": "With severe vomiting, diarrhoea or very little eating and drinking you can become dehydrated; the doctor should review.",
               "source_url": ""
             }
           ]
@@ -1056,8 +1365,29 @@
       "title_zh": "降血脂藥（statin 與 ezetimibe）",
       "title_en": "Lipid lowering (statin and ezetimibe)",
       "summary_zh": "這類藥幫助降低壞膽固醇、減少心血管事件；要留意肌肉痠痛無力、茶色尿與肝功能。",
-      "summary_en": "These medicines lower LDL cholesterol and reduce heart and vessel events. Watch for muscle pain or weakness, dark urine and liver problems.",
+      "summary_en": "These medicines lower LDL cholesterol and reduce heart and vessel events. Watch for muscle pain or weakness, dark urine and yellow skin or eyes.",
       "questions": [
+        {
+          "id": "statin_severe",
+          "kind": "boolean",
+          "label_zh": "肌肉痛或無力到走不動，或尿量變得非常少？",
+          "label_en": "Is your muscle pain or weakness so bad that you cannot walk, or is your urine output very low?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "肌肉嚴重疼痛或無力，加上尿量很少，需要馬上處理，請立刻就醫，並告訴醫師您在吃這個藥。",
+              "reason_en": "Severe muscle pain or weakness with very little urine needs immediate attention. Seek care now and tell the doctor which medicine you take.",
+              "source_url": ""
+            }
+          ]
+        },
         {
           "id": "statin_muscle",
           "kind": "boolean",
@@ -1094,8 +1424,8 @@
                 "value": true
               },
               "disposition": "in_person",
-              "reason_zh": "肌肉痠痛加上茶色尿，可能是肌肉受損，請先回診檢查。",
-              "reason_en": "Muscle pain with dark urine may mean muscle damage; please visit for tests.",
+              "reason_zh": "肌肉痠痛加上茶色尿，需要先回診檢查。",
+              "reason_en": "Muscle pain with dark urine needs tests; please visit first.",
               "source_url": ""
             }
           ]
@@ -1115,8 +1445,8 @@
                 "value": true
               },
               "disposition": "in_person",
-              "reason_zh": "可能是肝臟問題，請先回診檢查。",
-              "reason_en": "This may be a liver problem; please visit for tests.",
+              "reason_zh": "皮膚或眼白變黃、右上腹痛，需要先回診檢查。",
+              "reason_en": "Yellow skin or eyes or upper right belly pain needs tests; please visit first.",
               "source_url": ""
             }
           ]
@@ -1132,8 +1462,8 @@
           "unit": "",
           "rules": [],
           "stale_disposition": "review",
-          "reason_zh": "ACC/AHA 指引建議開始用藥或調藥後 4 至 12 週檢查血脂，之後依需要每 3 至 12 個月一次；超過 12 個月沒檢查就請醫師看。",
-          "reason_en": "ACC/AHA advise a lipid check 4 to 12 weeks after starting or adjusting a statin, then every 3 to 12 months as needed; no check in over 12 months goes to the doctor.",
+          "reason_zh": "ACC/AHA 指引建議開始用藥或處方改變後 4 至 12 週檢查血脂，之後依需要每 3 至 12 個月一次；超過 12 個月沒檢查就請醫師看。",
+          "reason_en": "ACC/AHA advise a lipid check 4 to 12 weeks after starting a statin or after a prescription change, then every 3 to 12 months as needed; no check in over 12 months goes to the doctor.",
           "source_type": "guideline",
           "source_url": "https://www.aafp.org/pubs/afp/issues/2019/0501/p589.html",
           "verified_on": "2026-11-25"
@@ -1144,14 +1474,35 @@
       "class_id": "antidiabetic_metformin",
       "title_zh": "降血糖藥：metformin",
       "title_en": "Diabetes: metformin",
-      "summary_zh": "Metformin 是常用的第一線口服降血糖藥；腎功能太差時不能用，要留意腸胃不適與罕見但嚴重的乳酸中毒。",
-      "summary_en": "Metformin is a common first-line oral diabetes medicine. It must not be used when kidney function is too low; watch for stomach upset and the rare but serious lactic acidosis.",
+      "summary_zh": "Metformin 是常用的第一線口服降血糖藥；腎功能不好的人有使用限制；要留意腸胃不適，以及突然很喘、肌肉痠痛、異常疲倦等警訊。",
+      "summary_en": "Metformin is a common first-line oral diabetes medicine. People with poor kidney function have limits on its use; watch for stomach upset and for warning signs such as sudden breathlessness, muscle pain or unusual tiredness.",
       "questions": [
+        {
+          "id": "dm_severe_now",
+          "kind": "boolean",
+          "label_zh": "現在有沒有意識模糊、抽搐，或血糖太高或太低，需要別人幫忙處理？",
+          "label_en": "Right now, are you confused, having a seizure, or with blood sugar so high or low that you need someone to help you?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "這可能是血糖的緊急狀況，請立刻撥 119 或到急診。",
+              "reason_en": "This may be a blood sugar emergency. Call 119 or go to the emergency room now.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
+            }
+          ]
+        },
         {
           "id": "met_gi",
           "kind": "boolean",
-          "label_zh": "有沒有持續的噁心、腹瀉或胃不舒服，是吃這個藥之後才有的？",
-          "label_en": "Do you have lasting nausea, diarrhoea or stomach upset since starting this medicine?",
+          "label_zh": "有沒有持續的噁心、腹瀉或胃不舒服，是開始吃這類藥之後才有的？",
+          "label_en": "Do you have lasting nausea, diarrhoea or stomach upset since starting this type of medicine?",
           "help_zh": "",
           "help_en": "",
           "required": true,
@@ -1162,8 +1513,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "腸胃不適是常見副作用，請醫師確認是否要調整。",
-              "reason_en": "Stomach upset is a common side effect; the doctor should consider adjusting.",
+              "reason_zh": "持續的腸胃不適，請醫師確認。",
+              "reason_en": "Lasting stomach upset; the doctor should review.",
               "source_url": ""
             }
           ]
@@ -1183,8 +1534,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "脫水或吃喝很少時，這類藥可能要暫停，請醫師確認。",
-              "reason_en": "When dehydrated or not eating or drinking, this medicine may need pausing; the doctor should review.",
+              "reason_zh": "嚴重嘔吐、拉肚子或吃喝很少時，身體容易缺水，請醫師確認。",
+              "reason_en": "With severe vomiting, diarrhoea or very little eating and drinking you can become dehydrated; the doctor should review.",
               "source_url": ""
             }
           ]
@@ -1204,8 +1555,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "做顯影劑檢查或手術前後，metformin 可能要暫停，請醫師確認。",
-              "reason_en": "Metformin may need pausing around contrast scans or surgery; the doctor should review.",
+              "reason_zh": "要做顯影劑檢查或手術，請醫師確認用藥安排。",
+              "reason_en": "A contrast scan or surgery is coming up; the doctor should review your medicine plan.",
               "source_url": "https://www.accessdata.fda.gov/spl/data/5768a8bd-9de5-4989-8780-4a180f2cc82e/5768a8bd-9de5-4989-8780-4a180f2cc82e.xml"
             }
           ]
@@ -1225,8 +1576,8 @@
                 "value": true
               },
               "disposition": "urgent",
-              "reason_zh": "這些可能是乳酸中毒的警訊，請立刻就醫。",
-              "reason_en": "These may be signs of lactic acidosis. Seek care now.",
+              "reason_zh": "突然很喘、肌肉痠痛、噁心、肚子痛或異常疲倦，需要馬上處理，請立刻就醫，並告訴醫師您在吃這個藥。",
+              "reason_en": "Sudden breathlessness, muscle pain, nausea, belly pain or unusual tiredness need immediate attention. Seek care now and tell the doctor you take this medicine.",
               "source_url": "https://www.accessdata.fda.gov/spl/data/5768a8bd-9de5-4989-8780-4a180f2cc82e/5768a8bd-9de5-4989-8780-4a180f2cc82e.xml"
             }
           ]
@@ -1239,7 +1590,7 @@
           "label_en": "Kidney function eGFR (latest value)",
           "max_age_days": 365,
           "value_kind": "number",
-          "unit": "mL/min/1.73 m²",
+          "unit": "mL/min/1.73m2",
           "rules": [
             {
               "when": {
@@ -1247,8 +1598,8 @@
                 "value": 30
               },
               "disposition": "in_person",
-              "reason_zh": "eGFR 低於 30，metformin 不建議使用，請先回診。",
-              "reason_en": "eGFR below 30: metformin is contraindicated; please visit first.",
+              "reason_zh": "eGFR 低於 30，需要先回診讓醫師評估用藥。",
+              "reason_en": "eGFR is below 30; a visit is needed so the doctor can assess your medicine.",
               "source_url": "https://www.accessdata.fda.gov/spl/data/5768a8bd-9de5-4989-8780-4a180f2cc82e/5768a8bd-9de5-4989-8780-4a180f2cc82e.xml"
             },
             {
@@ -1257,8 +1608,8 @@
                 "value": 45
               },
               "disposition": "review",
-              "reason_zh": "eGFR 低於 45，請醫師評估繼續使用的好處與風險。",
-              "reason_en": "eGFR below 45: the doctor should weigh the benefit and risk of continuing.",
+              "reason_zh": "eGFR 低於 45，請醫師評估用藥。",
+              "reason_en": "eGFR is below 45; the doctor should assess your medicine.",
               "source_url": "https://www.accessdata.fda.gov/spl/data/5768a8bd-9de5-4989-8780-4a180f2cc82e/5768a8bd-9de5-4989-8780-4a180f2cc82e.xml"
             }
           ],
@@ -1283,7 +1634,7 @@
                 "value": 7
               },
               "disposition": "review",
-              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值可依個人情況調整。",
+              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值會因人而異。",
               "reason_en": "HbA1c is 7% or higher, above the target for many adults (below 7%); the doctor should review. Targets can be individualised.",
               "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
             }
@@ -1361,9 +1712,30 @@
       "class_id": "antidiabetic_dpp4",
       "title_zh": "降血糖藥：DPP-4 抑制劑",
       "title_en": "Diabetes: DPP-4 inhibitor",
-      "summary_zh": "這類藥（名稱常以 -gliptin 結尾）單獨使用時較少造成低血糖，要留意胰臟炎、關節痛與水泡。",
-      "summary_en": "These medicines (names often end in -gliptin) rarely cause low blood sugar on their own. Watch for pancreatitis, joint pain and blisters.",
+      "summary_zh": "這類藥（名稱常以 -gliptin 結尾）單獨使用時較少造成低血糖，要留意嚴重的上腹痛、關節痛與皮膚水泡。",
+      "summary_en": "These medicines (names often end in -gliptin) rarely cause low blood sugar on their own. Watch for severe upper belly pain, joint pain and skin blisters.",
       "questions": [
+        {
+          "id": "dm_severe_now",
+          "kind": "boolean",
+          "label_zh": "現在有沒有意識模糊、抽搐，或血糖太高或太低，需要別人幫忙處理？",
+          "label_en": "Right now, are you confused, having a seizure, or with blood sugar so high or low that you need someone to help you?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "這可能是血糖的緊急狀況，請立刻撥 119 或到急診。",
+              "reason_en": "This may be a blood sugar emergency. Call 119 or go to the emergency room now.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
+            }
+          ]
+        },
         {
           "id": "dpp4_pancreatitis",
           "kind": "boolean",
@@ -1379,8 +1751,8 @@
                 "value": true
               },
               "disposition": "urgent",
-              "reason_zh": "持續的劇烈上腹痛可能是胰臟炎，請立刻就醫。",
-              "reason_en": "Severe lasting upper belly pain may be pancreatitis. Seek care now.",
+              "reason_zh": "嚴重又持續的上腹痛，需要馬上處理，請立刻就醫，並告訴醫師您在吃這個藥。",
+              "reason_en": "Severe, lasting upper belly pain needs immediate attention. Seek care now and tell the doctor you take this medicine.",
               "source_url": ""
             }
           ]
@@ -1421,7 +1793,7 @@
                 "value": true
               },
               "disposition": "in_person",
-              "reason_zh": "皮膚水泡可能是藥物反應，請先回診。",
+              "reason_zh": "皮膚出現水泡，請先回診。",
               "reason_en": "Skin blisters may be a drug reaction; please visit first.",
               "source_url": ""
             }
@@ -1442,8 +1814,8 @@
                 "value": true
               },
               "disposition": "in_person",
-              "reason_zh": "可能是心臟衰竭的徵兆，請先回診評估。",
-              "reason_en": "These may be signs of heart failure; please visit first.",
+              "reason_zh": "新的腿腫、躺下會喘或體重快速增加，請先回診評估。",
+              "reason_en": "New leg swelling, breathlessness lying down or quick weight gain; please visit first.",
               "source_url": ""
             }
           ]
@@ -1464,7 +1836,7 @@
                 "value": 7
               },
               "disposition": "review",
-              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值可依個人情況調整。",
+              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值會因人而異。",
               "reason_en": "HbA1c is 7% or higher, above the target for many adults (below 7%); the doctor should review. Targets can be individualised.",
               "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
             }
@@ -1542,9 +1914,30 @@
       "class_id": "antidiabetic_sglt2",
       "title_zh": "降血糖藥：SGLT2 抑制劑",
       "title_en": "Diabetes: SGLT2 inhibitor",
-      "summary_zh": "這類藥（名稱常以 -gliflozin 結尾）讓糖分從尿液排出；要留意生殖器與泌尿道感染、脫水，以及罕見但嚴重的酮酸中毒。",
-      "summary_en": "These medicines (names often end in -gliflozin) pass sugar out in the urine. Watch for genital and urinary infections, dehydration, and the rare but serious ketoacidosis.",
+      "summary_zh": "這類藥（名稱常以 -gliflozin 結尾）讓糖分從尿液排出；要留意生殖器與泌尿道感染、脫水，以及噁心嘔吐、肚子痛、極度疲倦或呼吸急促等警訊。",
+      "summary_en": "These medicines (names often end in -gliflozin) pass sugar out in the urine. Watch for genital and urinary infections, dehydration, and warning signs such as vomiting, belly pain, extreme tiredness or fast breathing.",
       "questions": [
+        {
+          "id": "dm_severe_now",
+          "kind": "boolean",
+          "label_zh": "現在有沒有意識模糊、抽搐，或血糖太高或太低，需要別人幫忙處理？",
+          "label_en": "Right now, are you confused, having a seizure, or with blood sugar so high or low that you need someone to help you?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "這可能是血糖的緊急狀況，請立刻撥 119 或到急診。",
+              "reason_en": "This may be a blood sugar emergency. Call 119 or go to the emergency room now.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
+            }
+          ]
+        },
         {
           "id": "sglt2_ketoacidosis",
           "kind": "boolean",
@@ -1560,8 +1953,8 @@
                 "value": true
               },
               "disposition": "urgent",
-              "reason_zh": "這些可能是酮酸中毒的警訊，請立刻就醫。",
-              "reason_en": "These may be signs of ketoacidosis. Seek care now.",
+              "reason_zh": "噁心、嘔吐、肚子痛、非常疲倦或呼吸急促，需要馬上處理，請立刻就醫，並告訴醫師您在吃這個藥。",
+              "reason_en": "Nausea, vomiting, belly pain, extreme tiredness or fast breathing need immediate attention. Seek care now and tell the doctor you take this medicine.",
               "source_url": "https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf"
             }
           ]
@@ -1602,8 +1995,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "脫水或吃喝很少時，這類藥可能要暫停，請醫師確認。",
-              "reason_en": "When dehydrated or not eating or drinking, this medicine may need pausing; the doctor should review.",
+              "reason_zh": "嚴重嘔吐、拉肚子或吃喝很少時，身體容易缺水，請醫師確認。",
+              "reason_en": "With severe vomiting, diarrhoea or very little eating and drinking you can become dehydrated; the doctor should review.",
               "source_url": ""
             }
           ]
@@ -1623,8 +2016,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "手術或長時間禁食前，這類藥通常要暫停，請醫師確認。",
-              "reason_en": "Before surgery or a long fast this medicine usually needs pausing; the doctor should review.",
+              "reason_zh": "要手術或長時間禁食，請醫師確認用藥安排。",
+              "reason_en": "Surgery or a long fast is coming up; the doctor should review your medicine plan.",
               "source_url": ""
             }
           ]
@@ -1645,7 +2038,7 @@
                 "value": 7
               },
               "disposition": "review",
-              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值可依個人情況調整。",
+              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值會因人而異。",
               "reason_en": "HbA1c is 7% or higher, above the target for many adults (below 7%); the doctor should review. Targets can be individualised.",
               "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
             }
@@ -1726,6 +2119,27 @@
       "summary_zh": "這類藥（如 glimepiride、gliclazide）會刺激胰島素分泌，最大的風險是低血糖，吃得少或年紀大時更要小心。",
       "summary_en": "These medicines (such as glimepiride and gliclazide) push the body to release insulin. The main risk is low blood sugar, especially when eating less or in older age.",
       "questions": [
+        {
+          "id": "dm_severe_now",
+          "kind": "boolean",
+          "label_zh": "現在有沒有意識模糊、抽搐，或血糖太高或太低，需要別人幫忙處理？",
+          "label_en": "Right now, are you confused, having a seizure, or with blood sugar so high or low that you need someone to help you?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "這可能是血糖的緊急狀況，請立刻撥 119 或到急診。",
+              "reason_en": "This may be a blood sugar emergency. Call 119 or go to the emergency room now.",
+              "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
+            }
+          ]
+        },
         {
           "id": "hypo_episodes",
           "kind": "choice",
@@ -1832,7 +2246,7 @@
                 "value": 7
               },
               "disposition": "review",
-              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值可依個人情況調整。",
+              "reason_zh": "糖化血色素 7% 以上，高於多數成人的目標（低於 7%），請醫師確認；目標值會因人而異。",
               "reason_en": "HbA1c is 7% or higher, above the target for many adults (below 7%); the doctor should review. Targets can be individualised.",
               "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12690178"
             }
@@ -1910,13 +2324,34 @@
       "class_id": "levothyroxine",
       "title_zh": "甲狀腺素",
       "title_en": "Thyroid hormone replacement",
-      "summary_zh": "Levothyroxine 用來補充甲狀腺素；劑量過多或不足都會有症狀，要定期追蹤甲狀腺刺激素 TSH，懷孕時需要更密集追蹤。",
-      "summary_en": "Levothyroxine replaces thyroid hormone. Too much or too little both cause symptoms; TSH needs regular follow-up, and pregnancy needs closer monitoring.",
+      "summary_zh": "Levothyroxine 用來補充甲狀腺素；要定期追蹤甲狀腺刺激素 TSH，懷孕時需要更密集追蹤。",
+      "summary_en": "Levothyroxine replaces thyroid hormone. TSH needs regular follow-up, and pregnancy needs closer monitoring.",
       "questions": [
+        {
+          "id": "levo_severe",
+          "kind": "boolean",
+          "label_zh": "心跳非常快或很亂、胸痛，或同時發高燒、嘔吐、意識不清？",
+          "label_en": "Is your heart racing or irregular, or do you have chest pain, or high fever with vomiting or confusion?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "心跳非常快或很亂、胸痛，或高燒、嘔吐、意識不清，需要馬上處理，請立刻就醫，並告訴醫師您在吃這個藥。",
+              "reason_en": "A racing or irregular heartbeat, chest pain, or high fever with vomiting or confusion need immediate attention. Seek care now and tell the doctor you take this medicine.",
+              "source_url": ""
+            }
+          ]
+        },
         {
           "id": "levo_dose_changed",
           "kind": "boolean",
-          "label_zh": "最近 6 週內，你的劑量有調整過嗎？",
+          "label_zh": "最近 6 週內，您的劑量有調整過嗎？",
           "label_en": "In the past 6 weeks, was your dose changed?",
           "help_zh": "",
           "help_en": "",
@@ -1928,8 +2363,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "調整劑量後約 4 至 6 週才適合再測 TSH，請醫師確認時機。",
-              "reason_en": "TSH is usually rechecked about 4 to 6 weeks after a dose change; the doctor should confirm the timing.",
+              "reason_zh": "處方有變動後約 4 至 6 週才適合再測 TSH，請醫師確認時機。",
+              "reason_en": "TSH is usually rechecked about 4 to 6 weeks after a prescription change; the doctor should confirm the timing.",
               "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4267409"
             }
           ]
@@ -1949,8 +2384,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "這些可能是藥量偏多的症狀，請醫師確認。",
-              "reason_en": "These may be signs of too much medicine; the doctor should review.",
+              "reason_zh": "有心悸、手抖、怕熱或體重下降等情形，請醫師確認。",
+              "reason_en": "A pounding heart, tremor, heat intolerance or weight loss was reported; the doctor should review.",
               "source_url": ""
             }
           ]
@@ -1970,8 +2405,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "這些可能是藥量不足的症狀，請醫師確認。",
-              "reason_en": "These may be signs of too little medicine; the doctor should review.",
+              "reason_zh": "有怕冷、容易累、便祕或體重增加等情形，請醫師確認。",
+              "reason_en": "Feeling cold or tired, constipation or weight gain was reported; the doctor should review.",
               "source_url": ""
             }
           ]
@@ -1979,7 +2414,7 @@
         {
           "id": "levo_timing",
           "kind": "boolean",
-          "label_zh": "你有沒有常常和鈣片、鐵劑或制酸劑一起吃，或沒有空腹吃？",
+          "label_zh": "您有沒有常常和鈣片、鐵劑或制酸劑一起吃，或沒有空腹吃？",
           "label_en": "Do you often take it together with calcium, iron or antacids, or not on an empty stomach?",
           "help_zh": "這些會影響吸收。",
           "help_en": "These affect absorption.",
@@ -2008,8 +2443,8 @@
           "unit": "",
           "rules": [],
           "stale_disposition": "review",
-          "reason_zh": "劑量穩定後，指引建議約每年追蹤一次 TSH；超過一年沒檢查就請醫師看。",
-          "reason_en": "Once the dose is stable, guidance suggests checking TSH about once a year; no test in over a year goes to the doctor.",
+          "reason_zh": "用藥穩定後，指引建議約每年追蹤一次 TSH；超過一年沒檢查就請醫師看。",
+          "reason_en": "Once treatment is stable, guidance suggests checking TSH about once a year; no test in over a year goes to the doctor.",
           "source_type": "guideline",
           "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4267409",
           "verified_on": "2026-11-25"
@@ -2080,7 +2515,7 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "白內障手術前要告知眼科醫師你有吃 alpha 阻斷劑，請醫師確認。",
+              "reason_zh": "白內障手術前要告知眼科醫師您有吃 alpha 阻斷劑，請醫師確認。",
               "reason_en": "Tell the eye surgeon you take an alpha blocker before cataract surgery; the doctor should review.",
               "source_url": ""
             }
@@ -2089,7 +2524,7 @@
         {
           "id": "bph_sexual",
           "kind": "boolean",
-          "label_zh": "有沒有性慾下降、勃起困難，或射精量變少而困擾你？",
+          "label_zh": "有沒有性慾下降、勃起困難，或射精量變少而困擾您？",
           "label_en": "Are you bothered by lower sex drive, erection problems or less ejaculate?",
           "help_zh": "",
           "help_en": "",
@@ -2135,9 +2570,30 @@
       "class_id": "antiplatelet",
       "title_zh": "抗血小板藥",
       "title_en": "Antiplatelet",
-      "summary_zh": "低劑量阿斯匹靈、clopidogrel 用來預防血栓；最主要的風險是出血，裝過支架的人不能自行停藥。",
-      "summary_en": "Low-dose aspirin and clopidogrel prevent clots. The main risk is bleeding, and people with stents must not stop on their own.",
+      "summary_zh": "低劑量阿斯匹靈、clopidogrel 用來預防血栓；要留意出血的情形。",
+      "summary_en": "Low-dose aspirin and clopidogrel prevent clots. Watch for bleeding.",
       "questions": [
+        {
+          "id": "ap_head",
+          "kind": "boolean",
+          "label_zh": "最近有沒有撞到頭，或突然劇烈頭痛、一直嘔吐？",
+          "label_en": "Recently, have you hit your head, or had a sudden severe headache or repeated vomiting?",
+          "help_zh": "吃抗血小板藥的人，頭部受傷要特別小心。",
+          "help_en": "If you take an antiplatelet, a head injury needs extra care.",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "撞到頭或突然劇烈頭痛，需要馬上處理，請立刻就醫，並告訴醫師您在吃抗血小板藥。",
+              "reason_en": "A head injury or a sudden severe headache needs immediate attention. Seek care now and tell the doctor you take an antiplatelet.",
+              "source_url": ""
+            }
+          ]
+        },
         {
           "id": "ap_black_stool",
           "kind": "boolean",
@@ -2153,8 +2609,8 @@
                 "value": true
               },
               "disposition": "urgent",
-              "reason_zh": "這可能是消化道出血，請立刻就醫。",
-              "reason_en": "This may be bleeding in the digestive tract. Seek care now.",
+              "reason_zh": "解黑色柏油狀的大便、吐血或吐出像咖啡渣的東西，需要馬上處理，請立刻就醫，並告訴醫師您在吃這個藥。",
+              "reason_en": "Black tarry stools, vomiting blood or vomiting something like coffee grounds need immediate attention. Seek care now and tell the doctor which medicine you take.",
               "source_url": ""
             }
           ]
@@ -2162,8 +2618,8 @@
         {
           "id": "ap_indication",
           "kind": "choice",
-          "label_zh": "你吃這個藥主要是為了什麼？",
-          "label_en": "What is the main reason you take this medicine?",
+          "label_zh": "您吃這類藥主要是為了什麼？",
+          "label_en": "What is the main reason you take this type of medicine?",
           "help_zh": "",
           "help_en": "",
           "options": [
@@ -2191,8 +2647,8 @@
                 "value": "stent_or_event"
               },
               "disposition": "review",
-              "reason_zh": "裝過支架或發生過心肌梗塞、中風，停藥時機要由醫師決定，請醫師確認。",
-              "reason_en": "After a stent, heart attack or stroke, the doctor decides when to stop; the doctor should review.",
+              "reason_zh": "裝過支架或發生過心肌梗塞、中風，請醫師確認用藥安排。",
+              "reason_en": "After a stent, heart attack or stroke; the doctor should review your medicine plan.",
               "source_url": ""
             },
             {
@@ -2243,8 +2699,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "侵入性處置前，抗血小板藥是否要暫停要由醫師決定。",
-              "reason_en": "Whether to pause an antiplatelet before a procedure is the doctor's decision.",
+              "reason_zh": "要做手術、拔牙或內視鏡檢查，請醫師確認用藥安排。",
+              "reason_en": "Surgery, a tooth extraction or an endoscopy is coming up; the doctor should review your medicine plan.",
               "source_url": ""
             }
           ]
@@ -2274,8 +2730,8 @@
                 "value": true
               },
               "disposition": "urgent",
-              "reason_zh": "這可能是消化道出血，請立刻就醫。",
-              "reason_en": "This may be bleeding in the digestive tract. Seek care now.",
+              "reason_zh": "解黑色柏油狀的大便、吐血或吐出像咖啡渣的東西，需要馬上處理，請立刻就醫，並告訴醫師您在吃這個藥。",
+              "reason_en": "Black tarry stools, vomiting blood or vomiting something like coffee grounds need immediate attention. Seek care now and tell the doctor which medicine you take.",
               "source_url": ""
             }
           ]
@@ -2304,7 +2760,7 @@
         {
           "id": "ppi_reviewed",
           "kind": "boolean",
-          "label_zh": "過去一年內，醫師有跟你討論過是否還需要繼續吃這類胃藥嗎？",
+          "label_zh": "過去一年內，醫師有跟您討論過是否還需要繼續吃這類胃藥嗎？",
           "label_en": "In the past year, has a doctor discussed whether you still need this stomach medicine?",
           "help_zh": "",
           "help_en": "",
@@ -2347,8 +2803,8 @@
                 "value": true
               },
               "disposition": "urgent",
-              "reason_zh": "可能是嚴重的藥物過敏反應，請立刻停藥並就醫。",
-              "reason_en": "This may be a severe drug allergy. Stop the medicine and seek care now.",
+              "reason_zh": "全身紅疹、口腔潰瘍、水泡或發燒，需要馬上處理，請立刻就醫，並告訴醫師您在吃這個藥。",
+              "reason_en": "A widespread rash, mouth ulcers, blisters or fever need immediate attention. Seek care now and tell the doctor you take this medicine.",
               "source_url": ""
             }
           ]
@@ -2368,8 +2824,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "仍有痛風發作，請醫師確認劑量是否足夠。",
-              "reason_en": "Gout attacks continue; the doctor should check whether the dose is enough.",
+              "reason_zh": "仍有痛風發作，請醫師確認。",
+              "reason_en": "Gout attacks continue; the doctor should review.",
               "source_url": ""
             }
           ]
@@ -2377,7 +2833,7 @@
         {
           "id": "urate_cvd",
           "kind": "boolean",
-          "label_zh": "你有沒有心臟病、心肌梗塞或中風的病史，或最近剛發生？",
+          "label_zh": "您有沒有心臟病、心肌梗塞或中風的病史，或最近剛發生？",
           "label_en": "Do you have a history of heart disease, heart attack or stroke, or has one just happened?",
           "help_zh": "",
           "help_en": "",
@@ -2410,8 +2866,8 @@
                 "value": true
               },
               "disposition": "in_person",
-              "reason_zh": "可能是肝臟問題，請先回診檢查。",
-              "reason_en": "This may be a liver problem; please visit for tests.",
+              "reason_zh": "皮膚或眼白變黃、右上腹痛，需要先回診檢查。",
+              "reason_en": "Yellow skin or eyes or upper right belly pain needs tests; please visit first.",
               "source_url": ""
             }
           ]
@@ -2432,14 +2888,14 @@
                 "value": 6
               },
               "disposition": "review",
-              "reason_zh": "尿酸 6 mg/dL 以上，高於 ACR 指引的目標（低於 6），請醫師確認劑量。",
-              "reason_en": "Uric acid is 6 mg/dL or higher, above the ACR target (below 6); the doctor should check the dose.",
+              "reason_zh": "尿酸 6 mg/dL 以上，高於 ACR 指引的目標（低於 6），請醫師確認。",
+              "reason_en": "Uric acid is 6 mg/dL or higher, above the ACR target (below 6); the doctor should review.",
               "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10563586/"
             }
           ],
           "stale_disposition": "review",
-          "reason_zh": "ACR 指引要求調整劑量後都要測尿酸，但沒有固定的追蹤間隔，所以這裡只看數值、不設期限。",
-          "reason_en": "The ACR guideline asks for a uric acid check after each dose change but gives no fixed interval, so only the value is checked here and no age limit is set.",
+          "reason_zh": "ACR 指引要求處方有變動後都要測尿酸，但沒有固定的追蹤間隔，所以這裡只看數值、不設期限。",
+          "reason_en": "The ACR guideline asks for a uric acid check after each prescription change but gives no fixed interval, so only the value is checked here and no age limit is set.",
           "source_type": "guideline",
           "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10563586/",
           "verified_on": "2026-11-25"
@@ -2453,6 +2909,27 @@
       "summary_zh": "含吸入型類固醇的控制型吸入劑用來預防氣喘發作；這裡用 GINA 的四個問題確認最近四週的控制情形。",
       "summary_en": "Inhaled-steroid controller inhalers prevent asthma attacks. The four GINA questions check control over the last four weeks.",
       "questions": [
+        {
+          "id": "gina_severe_now",
+          "kind": "boolean",
+          "label_zh": "現在是不是喘到說不完整一句話，或用了急救吸入劑還是沒有改善？",
+          "label_en": "Right now, are you too breathless to finish a sentence, or is your reliever inhaler not helping?",
+          "help_zh": "",
+          "help_en": "",
+          "required": true,
+          "rules": [
+            {
+              "when": {
+                "op": "eq",
+                "value": true
+              },
+              "disposition": "urgent",
+              "reason_zh": "氣喘發作用藥沒有改善，可能很危急，請立刻撥 119 或到急診。",
+              "reason_en": "An asthma attack that does not respond to your reliever can be an emergency. Call 119 or go to the emergency room now.",
+              "source_url": ""
+            }
+          ]
+        },
         {
           "id": "gina_day",
           "kind": "boolean",
@@ -2583,8 +3060,8 @@
                 "value": true
               },
               "disposition": "urgent",
-              "reason_zh": "這可能是嚴重過敏反應，請立刻就醫。",
-              "reason_en": "This may be a severe allergic reaction. Seek care now.",
+              "reason_zh": "喘不過氣、喉嚨緊，或臉、嘴唇腫起來，需要馬上處理，請立刻就醫。",
+              "reason_en": "Trouble breathing, a tight throat, or a swollen face or lips need immediate attention. Seek care now.",
               "source_url": ""
             }
           ]
@@ -2604,8 +3081,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "嗜睡影響生活，請醫師確認是否要換藥。",
-              "reason_en": "Drowsiness is affecting daily life; the doctor should consider another medicine.",
+              "reason_zh": "嗜睡影響生活，請醫師確認。",
+              "reason_en": "Drowsiness is affecting daily life; the doctor should review.",
               "source_url": ""
             }
           ]
@@ -2613,7 +3090,7 @@
         {
           "id": "ah_uncontrolled",
           "kind": "boolean",
-          "label_zh": "吃藥之後，過敏症狀（鼻水、打噴嚏、癢）還是很困擾你嗎？",
+          "label_zh": "吃藥之後，過敏症狀（鼻水、打噴嚏、癢）還是很困擾您嗎？",
           "label_en": "Even on the medicine, are allergy symptoms (runny nose, sneezing, itching) still bothering you a lot?",
           "help_zh": "",
           "help_en": "",
@@ -2625,8 +3102,8 @@
                 "value": true
               },
               "disposition": "review",
-              "reason_zh": "症狀控制不佳，請醫師確認是否要調整治療。",
-              "reason_en": "Symptoms are not well controlled; the doctor should consider changing treatment.",
+              "reason_zh": "症狀仍然困擾您，請醫師確認。",
+              "reason_en": "Symptoms are still bothering you; the doctor should review.",
               "source_url": ""
             }
           ]
