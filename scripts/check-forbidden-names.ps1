@@ -19,7 +19,7 @@ foreach ($rel in $files) {
     if ($skipNames -contains (Split-Path -Leaf $path)) { continue }
     if ($path -match $skipDirs) { continue }
     $ext = [IO.Path]::GetExtension($path).ToLower()
-    if ($ext -in '.png', '.jpg', '.jpeg', '.webp', '.gif', '.ico', '.woff', '.woff2', '.pdf', '.zip') { continue }
+    if ($ext -in '.avif', '.png', '.jpg', '.jpeg', '.webp', '.gif', '.ico', '.woff', '.woff2', '.pdf', '.zip') { continue }
     $m = Select-String -LiteralPath $path -Pattern $pattern -AllMatches -ErrorAction SilentlyContinue
     foreach ($x in $m) {
         $hits++

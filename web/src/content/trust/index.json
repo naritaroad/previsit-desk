@@ -1,0 +1,163 @@
+{
+  "version": "2.0",
+  "effective": "2026-11-25",
+  "next_review": "2027-02-25",
+  "documents": [
+    {
+      "order": 1,
+      "slug": "overview",
+      "file": "01-overview.md",
+      "title": {
+        "zh-TW": "總覽",
+        "en": "Overview"
+      },
+      "summary": {
+        "zh-TW": "PreVisit Desk 做什麼、不做什麼、由誰負責，以及發現問題時怎麼告訴我們。",
+        "en": "What PreVisit Desk does and does not do, who is responsible, and how to tell us about a problem."
+      }
+    },
+    {
+      "order": 2,
+      "slug": "intended-use",
+      "file": "02-intended-use.md",
+      "title": {
+        "zh-TW": "預定用途",
+        "en": "Intended use"
+      },
+      "summary": {
+        "zh-TW": "誰可以用、在什麼環境用、哪些用途不行，以及每一類醫療工作為什麼在範圍內或範圍外。",
+        "en": "Who may use it and where, which uses are ruled out, and why each kind of medical work is in or out of scope."
+      }
+    },
+    {
+      "order": 3,
+      "slug": "how-it-works",
+      "file": "03-how-it-works.md",
+      "title": {
+        "zh-TW": "系統怎麼運作",
+        "en": "How it works"
+      },
+      "summary": {
+        "zh-TW": "一則訊息從送出到回覆經過哪些步驟，模型看得到什麼，哪些決定由程式做。",
+        "en": "The steps a message goes through, what the model can and cannot see, and which decisions are made by code."
+      }
+    },
+    {
+      "order": 4,
+      "slug": "clinical-safety",
+      "file": "04-clinical-safety.md",
+      "title": {
+        "zh-TW": "臨床安全",
+        "en": "Clinical safety"
+      },
+      "summary": {
+        "zh-TW": "紅旗與輸出檢查的做法、已知會漏掉的句子、停止規則，以及完整的危害紀錄。",
+        "en": "How red flags and output checks work, sentences known to be missed, stopping rules, and the full hazard log."
+      }
+    },
+    {
+      "order": 5,
+      "slug": "human-oversight",
+      "file": "05-human-oversight.md",
+      "title": {
+        "zh-TW": "人為監督",
+        "en": "Human oversight"
+      },
+      "summary": {
+        "zh-TW": "誰在什麼時候看什麼、簽署與接手怎麼運作、目前的監督階段，以及研究對人工監督的提醒。",
+        "en": "Who sees what and when, how signing and take-over work, the current oversight phase, and what research says about supervision."
+      }
+    },
+    {
+      "order": 6,
+      "slug": "medication-renewal",
+      "file": "06-medication-renewal.md",
+      "title": {
+        "zh-TW": "續方與領藥安全",
+        "en": "Renewals and refills"
+      },
+      "summary": {
+        "zh-TW": "續開申請為什麼不是處方、協定引擎怎麼運作、哪些藥不收，以及和猶他州試辦有什麼不同。",
+        "en": "Why a renewal request is not a prescription, how the protocol engine works, which drugs are excluded, and how this differs from the Utah pilot."
+      }
+    },
+    {
+      "order": 7,
+      "slug": "privacy-and-data",
+      "file": "07-privacy-and-data.md",
+      "title": {
+        "zh-TW": "隱私與資料",
+        "en": "Privacy and data"
+      },
+      "summary": {
+        "zh-TW": "我們收什麼資料、為什麼收、誰看得到、留多久，以及哪些內容會送到模型供應商。",
+        "en": "What we collect and why, who can see it, how long it is kept, and what is sent to the model provider."
+      }
+    },
+    {
+      "order": 8,
+      "slug": "security",
+      "file": "08-security.md",
+      "title": {
+        "zh-TW": "資安",
+        "en": "Security"
+      },
+      "summary": {
+        "zh-TW": "帳號、權限、傳輸、容器與機密怎麼保護，目前知道的缺口，以及怎麼通報弱點。",
+        "en": "How accounts, permissions, transport, containers and secrets are protected, the known gaps, and how to report a weakness."
+      }
+    },
+    {
+      "order": 9,
+      "slug": "evaluation",
+      "file": "09-evaluation.md",
+      "title": {
+        "zh-TW": "評測與證據",
+        "en": "Evaluation and evidence"
+      },
+      "summary": {
+        "zh-TW": "題庫怎麼出、怎麼判分、結果是多少、數字不能說明什麼，以及審查找到過哪些錯。",
+        "en": "How the cases are written and graded, the results, what the numbers cannot show, and the errors that review found."
+      }
+    },
+    {
+      "order": 10,
+      "slug": "incidents",
+      "file": "10-incidents.md",
+      "title": {
+        "zh-TW": "事件通報與更正",
+        "en": "Incidents and corrections"
+      },
+      "summary": {
+        "zh-TW": "什麼算事件、分幾級、我們打算在多久內做什麼，以及使用者怎麼通報。",
+        "en": "What counts as an incident, how we grade it, what we intend to do and by when, and how to report one."
+      }
+    },
+    {
+      "order": 11,
+      "slug": "regulation",
+      "file": "11-regulation.md",
+      "title": {
+        "zh-TW": "法規對應",
+        "en": "Regulation"
+      },
+      "summary": {
+        "zh-TW": "設計時對照了哪些規範、讀過哪些原文、哪些沒讀到，以及為什麼我們不主張合規。",
+        "en": "Which rules we compared the design with, which originals we read or did not read, and why we claim no compliance."
+      }
+    },
+    {
+      "order": 12,
+      "slug": "references-and-changelog",
+      "file": "12-references-and-changelog.md",
+      "title": {
+        "zh-TW": "參考文獻與變更紀錄",
+        "en": "References and changelog"
+      },
+      "summary": {
+        "zh-TW": "各頁引用的文獻與查閱日期、名詞解釋，以及文件改過什麼、為什麼改。",
+        "en": "The references cited on these pages with access dates, a glossary, and what changed in the documents and why."
+      }
+    }
+  ]
+}
