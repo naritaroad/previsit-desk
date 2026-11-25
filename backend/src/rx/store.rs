@@ -24,7 +24,7 @@ use crate::clock::format_date;
 use crate::error::{AppError, AppResult};
 use crate::people::{self, PersonRef};
 use crate::perm::Permission;
-use crate::refill::{self, RefillInput, RefillResult, RefillRules};
+use crate::refill::{self, RefillInput, RefillResult};
 use crate::state::AppState;
 use crate::types::{Locale, RedFlagCategory, Urgency};
 
@@ -948,14 +948,13 @@ pub async fn next_prescription(
     old: Uuid,
     request: &Request,
     on: Date,
-    rules: &RefillRules,
 ) -> AppResult<Uuid> {
     let mut copy = prescriptions_by_id(&mut *db, &[old])
         .await?
         .pop()
         .ok_or(AppError::NotFound)?;
     copy.issued_on = on;
-    let valid_until = copy.valid_until(rules);
+    let valid_until = copy.valid_until();
     let id: Uuid = sqlx::query_scalar(
         "INSERT INTO prescriptions (patient_id, source, drug_id, name_zh, name_en, class_id, class_zh, class_en, controlled_level, dose_text, dose_text_en,
                                     issued_on, total_days, days_per_fill, fills_allowed, valid_until, prescriber_id, renewed_from, rx_request_id, is_demo)
@@ -1049,7 +1048,7 @@ pub async fn pharmacy(
 struct DecisionOut {
     outcome: String,
     note: Option<String>,
-    by: Option<PersonRef>,
+    by: PersonRef,
     at: Option<String>,
 }
 
@@ -1085,7 +1084,7 @@ struct EventOut {
 #[derive(Serialize)]
 struct MessageOut {
     id: Uuid,
-    author: Option<PersonRef>,
+    author: PersonRef,
     body: String,
     created_at: String,
     visibility: String,
@@ -1098,7 +1097,7 @@ struct RequestOut {
     kind: RxKind,
     status: RxStatus,
     revision: i32,
-    patient: Option<PersonRef>,
+    patient: PersonRef,
     items: Vec<ItemOut>,
     step: String,
     answers: Value,
@@ -1264,7 +1263,7 @@ pub async fn view(state: &AppState, request: &Request, user: &CurrentUser) -> Ap
                         .clone()
                         .filter(|_| staff || outcome != "approve"),
                     outcome,
-                    by: people.get(i.decided_by),
+                    by: people.get_or_unknown(i.decided_by, locale),
                     at: i.decided_at.map(rfc3339),
                 }),
             }
@@ -1276,7 +1275,7 @@ pub async fn view(state: &AppState, request: &Request, user: &CurrentUser) -> Ap
         kind: request.kind,
         status: request.status,
         revision: request.revision,
-        patient: people.get(Some(request.patient_id)),
+        patient: people.get_or_unknown(Some(request.patient_id), locale),
         items: out_items,
         step: request.step.clone(),
         answers: request.answers.clone(),
@@ -1323,7 +1322,7 @@ pub async fn view(state: &AppState, request: &Request, user: &CurrentUser) -> Ap
             .into_iter()
             .map(|m| MessageOut {
                 id: m.id,
-                author: people.get(m.author_id),
+                author: people.get_or_unknown(m.author_id, locale),
                 body: m.body,
                 created_at: rfc3339(m.created_at),
                 visibility: m.visibility,
@@ -1372,13 +1371,17 @@ pub struct BriefRow {
     submitted_at: Option<OffsetDateTime>,
     sla_due_at: Option<OffsetDateTime>,
     pub updated_at: OffsetDateTime,
+    pickup_window: Option<Value>,
+    pharmacy_zh: Option<String>,
+    pharmacy_en: Option<String>,
     unread: bool,
 }
 
 /// `$1` is the reader, `$2` whether staff-only lines count for them.
 macro_rules! brief_select {
     () => {
-        "SELECT r.id, r.no, r.kind, r.status, r.priority, r.patient_id, r.disposition, r.assigned_to, r.submitted_at, r.sla_due_at, r.updated_at,
+        "SELECT r.id, r.no, r.kind, r.status, r.priority, r.patient_id, r.disposition, r.assigned_to, r.submitted_at, r.sla_due_at, r.updated_at, r.pickup_window,
+                ph.name AS pharmacy_zh, NULLIF(ph.name_en, '') AS pharmacy_en,
                 ARRAY(SELECT p.name_zh FROM rx_request_items i JOIN prescriptions p ON p.id = i.prescription_id WHERE i.request_id = r.id ORDER BY i.position) AS drugs_zh,
                 ARRAY(SELECT CASE WHEN p.name_en = '' THEN p.name_zh ELSE p.name_en END FROM rx_request_items i JOIN prescriptions p ON p.id = i.prescription_id WHERE i.request_id = r.id ORDER BY i.position) AS drugs_en,
                 (r.status <> 'draft' AND (
@@ -1386,7 +1389,7 @@ macro_rules! brief_select {
                               AND e.at > COALESCE((SELECT x.read_at FROM rx_reads x WHERE x.request_id = r.id AND x.account_id = $1), '-infinity'))
                  OR EXISTS (SELECT 1 FROM rx_messages m WHERE m.request_id = r.id AND m.author_id IS DISTINCT FROM $1 AND ($2 OR m.visibility = 'all')
                               AND m.created_at > COALESCE((SELECT x.read_at FROM rx_reads x WHERE x.request_id = r.id AND x.account_id = $1), '-infinity')))) AS unread
-         FROM rx_requests r JOIN accounts pa ON pa.id = r.patient_id "
+         FROM rx_requests r JOIN accounts pa ON pa.id = r.patient_id LEFT JOIN pharmacies ph ON ph.id = r.pharmacy_id "
     };
 }
 
@@ -1414,7 +1417,7 @@ pub async fn briefs(state: &AppState, rows: &[BriefRow], locale: Locale) -> AppR
                 "kind": r.kind,
                 "status": r.status,
                 "priority": r.priority,
-                "patient": people.get(Some(r.patient_id)),
+                "patient": people.get_or_unknown(Some(r.patient_id), locale),
                 "drug_names": if locale.is_en() { &r.drugs_en } else { &r.drugs_zh },
                 "disposition": r.disposition,
                 "assigned_to": people.get(r.assigned_to),
@@ -1423,6 +1426,8 @@ pub async fn briefs(state: &AppState, rows: &[BriefRow], locale: Locale) -> AppR
                 "overdue": r.status.waits_for_physician() && r.sla_due_at.is_some_and(|d| d < now),
                 "updated_at": rfc3339(r.updated_at),
                 "unread": r.unread,
+                "pickup_window": r.pickup_window,
+                "pharmacy_name": if locale.is_en() { r.pharmacy_en.as_ref().or(r.pharmacy_zh.as_ref()) } else { r.pharmacy_zh.as_ref() },
             })
         })
         .collect())

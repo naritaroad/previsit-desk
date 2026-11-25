@@ -1753,14 +1753,8 @@ async fn dispense(
             .iter()
             .filter(|i| i.outcome.as_deref() == Some(DecisionOutcome::Approve.as_str()))
         {
-            let id = store::next_prescription(
-                &mut o.tx,
-                item.prescription_id,
-                &o.request,
-                today,
-                &state.rules.refill,
-            )
-            .await?;
+            let id = store::next_prescription(&mut o.tx, item.prescription_id, &o.request, today)
+                .await?;
             store::add_fill(&mut o.tx, id, 1, today, shop.as_ref(), actor, o.request.id).await?;
             events.push(NewEvent::new(ev::NEXT_PRESCRIPTION, None));
         }

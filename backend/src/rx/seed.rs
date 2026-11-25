@@ -193,7 +193,7 @@ const PANEL: [Plan; 13] = [
     renewal(5, None, Stage::Submitted),
     renewal(20, Some(Disposition::Review), Stage::InReview),
     renewal(74, Some(Disposition::InPerson), Stage::Submitted),
-    renewal(1, Some(Disposition::Urgent), Stage::Urgent),
+    renewal(0, Some(Disposition::Urgent), Stage::Urgent),
     renewal(44, Some(Disposition::Review), Stage::MoreInfo { asked: 22 }),
     renewal(50, None, Stage::AtPharmacy { decided: 10 }),
     renewal(
@@ -327,11 +327,14 @@ async fn pick(
 ) -> Result<Option<Prescription>> {
     let today = state.clock.today();
     let rules = &state.rules.refill;
+    let submitted_on = store::taipei_date(state.clock.now() - Duration::hours(plan.submitted));
     let mut conn = state.db.acquire().await?;
     let mut list: Vec<Prescription> = store::active_prescriptions(&mut conn, patient)
         .await?
         .into_iter()
         .filter(|p| !p.self_reported && !used.contains(&p.id))
+        // A request cannot be older than the prescription it is about.
+        .filter(|p| p.issued_on <= submitted_on)
         .filter(|p| match plan.kind {
             RxKind::Renewal => store::scope_of(state, p).0 == RenewalScope::InScope,
             RxKind::Refill => medications::check_refill(
@@ -521,20 +524,12 @@ async fn build_in_tx(
         } => {
             to_pharmacy(&mut tx, &mut r, doctor, pharmacist, ago(decided)).await?;
             make_ready(&mut tx, &mut r, pharmacist, ago(ready)).await?;
-            hand_over(
-                &mut tx,
-                &mut r,
-                prescription,
-                pharmacist,
-                ago(handed),
-                &state.rules.refill,
-            )
-            .await?;
+            hand_over(&mut tx, &mut r, prescription, pharmacist, ago(handed)).await?;
         }
         Stage::Closed { decided, outcome } => {
             start_review(&mut tx, &mut r, doctor, ago(decided) - Duration::hours(1)).await?;
             let note = if outcome == DecisionOutcome::Decline {
-                "這個藥上次回診已經停用，不再續開，請依回診時的說明用藥。"
+                "這次先不續開，請在下次回診時和醫師討論。"
             } else {
                 "症狀有變化，請回診讓醫師當面評估後再決定。"
             };
@@ -715,11 +710,10 @@ async fn hand_over(
     prescription: Uuid,
     pharmacist: Option<Uuid>,
     at: OffsetDateTime,
-    rules: &crate::refill::RefillRules,
 ) -> Done {
     let on = store::taipei_date(at);
     let shop = store::pharmacy(tx, r.pharmacy_id.as_deref()).await?;
-    let next = store::next_prescription(tx, prescription, r, on, rules).await?;
+    let next = store::next_prescription(tx, prescription, r, on).await?;
     store::add_fill(tx, next, 1, on, shop.as_ref(), pharmacist, r.id).await?;
     store::advance(
         tx,
