@@ -1,0 +1,26 @@
+[
+  {
+    "id": "lin",
+    "display_name": "林秀琴",
+    "display_name_en": "Hsiu-Chin Lin",
+    "age_band": "60-69",
+    "summary_zh": "62 歲女性，高血壓和第二型糖尿病，固定拿慢箋。",
+    "summary_en": "62-year-old woman with high blood pressure and type 2 diabetes on refillable prescriptions."
+  },
+  {
+    "id": "chang",
+    "display_name": "張志明",
+    "display_name_en": "Chih-Ming Chang",
+    "age_band": "40-49",
+    "summary_zh": "45 歲男性，氣喘和過敏性鼻炎，換季時症狀比較多。",
+    "summary_en": "45-year-old man with asthma and allergic rhinitis that flare when the season changes."
+  },
+  {
+    "id": "wu",
+    "display_name": "吳金水",
+    "display_name_en": "Chin-Shui Wu",
+    "age_band": "70-79",
+    "summary_zh": "71 歲男性，高血壓、高血脂和攝護腺肥大，睡前另外吃一顆安眠藥。",
+    "summary_en": "71-year-old man with high blood pressure, high cholesterol and an enlarged prostate, plus a sleeping pill at night."
+  }
+]

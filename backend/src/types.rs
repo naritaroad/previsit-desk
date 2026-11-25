@@ -5,6 +5,8 @@ use serde_json::Value;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
+use crate::people::PersonRef;
+
 macro_rules! str_enum {
     ($(#[$meta:meta])* $name:ident { $($var:ident => $text:literal),+ $(,)? }) => {
         $(#[$meta])*
@@ -255,7 +257,13 @@ impl From<RunRow> for Run {
 pub struct Ticket {
     pub id: Uuid,
     pub ticket_no: String,
-    pub visit_id: Uuid,
+    /// `None` for a ticket opened from an rx request.
+    pub visit_id: Option<Uuid>,
+    pub rx_request_id: Option<Uuid>,
+    #[serde(skip)]
+    pub patient_id: Option<Uuid>,
+    #[sqlx(skip)]
+    pub patient: Option<PersonRef>,
     pub reason: String,
     #[sqlx(try_from = "String")]
     pub urgency: Urgency,

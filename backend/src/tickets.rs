@@ -1,16 +1,20 @@
 //! Clinician tickets: creation with (visit, reason) de-duplication, numbering `T-YYYYMMDD-NNNN`, listing, resolving.
 
 use serde::Serialize;
+use serde_json::json;
 use sqlx::PgPool;
 use time::Date;
 use uuid::Uuid;
 
 use crate::clock::Clock;
+use crate::notify;
+use crate::perm::Permission;
+use crate::state::AppState;
 use crate::types::{CreatedBy, Ticket, TicketReason, Urgency};
 
 macro_rules! ticket_cols {
     () => {
-        "t.id, t.ticket_no, t.visit_id, t.reason, t.urgency, t.summary, t.status, t.created_by, t.created_at, t.resolved_at, t.resolved_by, t.resolution_note"
+        "t.id, t.ticket_no, t.visit_id, t.rx_request_id, t.patient_id, t.reason, t.urgency, t.summary, t.status, t.created_by, t.created_at, t.resolved_at, t.resolved_by, t.resolution_note"
     };
 }
 
@@ -24,8 +28,20 @@ pub fn format_ticket_no(day: Date, n: i32) -> String {
     )
 }
 
+/// What a ticket is about.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Source {
+    Visit(Uuid),
+    /// An rx request (the rx module opens these; `urgent` results go here).
+    #[allow(dead_code)]
+    Rx {
+        request_id: Uuid,
+        patient_id: Uuid,
+    },
+}
+
 pub struct NewTicket<'a> {
-    pub visit_id: Uuid,
+    pub source: Source,
     pub reason: TicketReason,
     pub urgency: Urgency,
     pub summary: &'a str,
@@ -70,22 +86,63 @@ fn urgency_rank(u: Urgency) -> u8 {
     }
 }
 
-/// Opens a ticket, or returns the open one for the same visit and reason (raising its urgency if the new one is higher).
-/// One transaction with an advisory lock per (visit, reason) so two parallel requests cannot both open one.
-pub async fn create_or_get(
-    db: &PgPool,
-    clock: &Clock,
-    new: NewTicket<'_>,
-) -> sqlx::Result<Created> {
+/// Opens a ticket (see [`create_or_get`]) and tells the staff who handle tickets, unless it was already open.
+pub async fn open(state: &AppState, new: NewTicket<'_>) -> sqlx::Result<Created> {
+    let created = create_or_get(&state.db, &state.clock, new).await?;
+    if !created.deduped {
+        let ticket = &created.ticket;
+        // A red flag has its own, louder notification from whoever raised it.
+        if ticket.reason != TicketReason::RedFlag.as_str() {
+            let params = json!({ "no": ticket.ticket_no, "reason": ticket.reason, "patient_id": ticket.patient_id.unwrap_or_default() });
+            notify::notify_staff(
+                state,
+                Permission::TicketHandle,
+                notify::Kind::TicketNew,
+                params,
+                &link(ticket),
+                None,
+            )
+            .await;
+        }
+        state.hub.to_permission(
+            Permission::TicketHandle,
+            "queue.changed",
+            json!({ "name": "tickets" }),
+        );
+    }
+    Ok(created)
+}
+
+/// Where staff open what the ticket is about.
+pub fn link(ticket: &Ticket) -> String {
+    match (ticket.visit_id, ticket.rx_request_id) {
+        (Some(id), _) => format!("/clinic/visits/{id}"),
+        (None, Some(id)) => format!("/clinic/rx/{id}"),
+        (None, None) => "/clinic".to_string(),
+    }
+}
+
+/// Opens a ticket, or returns the open one for the same source and reason (raising its urgency if the new one is higher).
+/// One transaction with an advisory lock per (source, reason) so two parallel requests cannot both open one.
+async fn create_or_get(db: &PgPool, clock: &Clock, new: NewTicket<'_>) -> sqlx::Result<Created> {
+    let (visit_id, rx_request_id) = match new.source {
+        Source::Visit(id) => (Some(id), None),
+        Source::Rx { request_id, .. } => (None, Some(request_id)),
+    };
     let mut tx = db.begin().await?;
     sqlx::query("SELECT pg_advisory_xact_lock(hashtextextended($1, 0))")
-        .bind(format!("ticket:{}:{}", new.visit_id, new.reason.as_str()))
+        .bind(format!(
+            "ticket:{}:{}",
+            visit_id.or(rx_request_id).unwrap_or_default(),
+            new.reason.as_str()
+        ))
         .execute(&mut *tx)
         .await?;
 
-    let existing: Option<Ticket> = sqlx::query_as(concat!("SELECT ", ticket_cols!(), " FROM clinician_tickets t WHERE t.visit_id = $1 AND t.reason = $2 AND t.status = 'open' ORDER BY t.created_at LIMIT 1"))
-        .bind(new.visit_id)
+    let existing: Option<Ticket> = sqlx::query_as(concat!("SELECT ", ticket_cols!(), " FROM clinician_tickets t WHERE t.visit_id IS NOT DISTINCT FROM $1 AND t.rx_request_id IS NOT DISTINCT FROM $3 AND t.reason = $2 AND t.status = 'open' ORDER BY t.created_at LIMIT 1"))
+        .bind(visit_id)
         .bind(new.reason.as_str())
+        .bind(rx_request_id)
         .fetch_optional(&mut *tx)
         .await?;
     if let Some(mut ticket) = existing {
@@ -116,15 +173,20 @@ pub async fn create_or_get(
     let n: i32 = sqlx::query_scalar("INSERT INTO ticket_counters (day, n) VALUES ($1, 1) ON CONFLICT (day) DO UPDATE SET n = ticket_counters.n + 1 RETURNING n").bind(clock.today()).fetch_one(&mut *tx).await?;
     let ticket_no = format_ticket_no(clock.today(), n);
     let ticket: Ticket = sqlx::query_as(
-        "INSERT INTO clinician_tickets AS t (ticket_no, visit_id, reason, urgency, summary, created_by) VALUES ($1, $2, $3, $4, $5, $6)
-         RETURNING t.id, t.ticket_no, t.visit_id, t.reason, t.urgency, t.summary, t.status, t.created_by, t.created_at, t.resolved_at, t.resolved_by, t.resolution_note",
+        "INSERT INTO clinician_tickets AS t (ticket_no, visit_id, reason, urgency, summary, created_by, rx_request_id, patient_id) VALUES ($1, $2, $3, $4, $5, $6, $7, COALESCE($8, (SELECT v.patient_id FROM visits v WHERE v.id = $2)))
+         RETURNING t.id, t.ticket_no, t.visit_id, t.rx_request_id, t.patient_id, t.reason, t.urgency, t.summary, t.status, t.created_by, t.created_at, t.resolved_at, t.resolved_by, t.resolution_note",
     )
     .bind(&ticket_no)
-    .bind(new.visit_id)
+    .bind(visit_id)
     .bind(new.reason.as_str())
     .bind(new.urgency.as_str())
     .bind(new.summary)
     .bind(new.created_by.as_str())
+    .bind(rx_request_id)
+    .bind(match new.source {
+        Source::Rx { patient_id, .. } => Some(patient_id),
+        Source::Visit(_) => None,
+    })
     .fetch_one(&mut *tx)
     .await?;
     tx.commit().await?;
@@ -158,7 +220,7 @@ pub async fn list(db: &PgPool, status: &str) -> sqlx::Result<Vec<TicketRow>> {
     sqlx::query_as(concat!(
         "SELECT ",
         ticket_cols!(),
-        ", v.intake->>'chief_complaint' AS chief_complaint FROM clinician_tickets t JOIN visits v ON v.id = t.visit_id
+        ", v.intake->>'chief_complaint' AS chief_complaint FROM clinician_tickets t LEFT JOIN visits v ON v.id = t.visit_id
          WHERE ($1 = 'all' OR t.status = $1)
          ORDER BY CASE t.urgency WHEN 'urgent' THEN 0 WHEN 'soon' THEN 1 ELSE 2 END, t.created_at DESC, t.id LIMIT 500"
     ))
@@ -187,7 +249,7 @@ pub async fn resolve(
 ) -> Result<Ticket, ResolveError> {
     let updated: Option<Ticket> = sqlx::query_as(
         "UPDATE clinician_tickets AS t SET status = 'resolved', resolved_at = now(), resolved_by = $2, resolution_note = $3 WHERE t.id = $1 AND t.status = 'open'
-         RETURNING t.id, t.ticket_no, t.visit_id, t.reason, t.urgency, t.summary, t.status, t.created_by, t.created_at, t.resolved_at, t.resolved_by, t.resolution_note",
+         RETURNING t.id, t.ticket_no, t.visit_id, t.rx_request_id, t.patient_id, t.reason, t.urgency, t.summary, t.status, t.created_by, t.created_at, t.resolved_at, t.resolved_by, t.resolution_note",
     )
     .bind(id)
     .bind(by)

@@ -1,5 +1,5 @@
 //! Settings from the environment (the project's `.env` during development). Names are fixed by `.env.example`.
-//! `Config` deliberately has no `Debug` impl: it holds the clinician password.
+//! `Config` deliberately has no `Debug` impl: it holds passwords.
 
 use std::env;
 use std::net::SocketAddr;
@@ -31,11 +31,15 @@ impl Thinking {
     }
 }
 
+/// Login of one default account (`data/seed/demo/accounts.json` holds its name, role and title).
 #[derive(Clone)]
-pub struct ClinicianAccount {
-    pub username: String,
+pub struct DefaultLogin {
+    /// Key in accounts.json: `admin`, `physician`, `pharmacist`, `coordinator`, `patient`.
+    pub key: &'static str,
+    /// From the environment when it can be set there, else the one in accounts.json.
+    pub username: Option<String>,
     pub password: String,
-    pub display_name: String,
+    pub display_name: Option<String>,
 }
 
 #[derive(Clone)]
@@ -61,7 +65,9 @@ pub struct Config {
     pub per_ip_daily_call_limit: i64,
     /// Patient messages one visit may hold before the model stops answering it.
     pub max_messages_per_visit: i64,
-    pub clinician: Option<ClinicianAccount>,
+    /// Models an administrator may choose; always includes the configured primary and fallback.
+    pub model_choices: Vec<String>,
+    pub logins: Vec<DefaultLogin>,
     pub cookie_secure: bool,
     pub session_days: i64,
     pub retention_days: i64,
@@ -97,23 +103,35 @@ impl Config {
                 format!("LLM_THINKING must be minimal|low|medium|high|default, not {v}")
             })?,
         };
-        let clinician = match (
-            optional("CLINICIAN_USERNAME"),
-            optional("CLINICIAN_PASSWORD"),
-        ) {
-            (Some(username), Some(password)) => {
-                if password.chars().count() < 8 {
-                    bail!("CLINICIAN_PASSWORD must be at least 8 characters");
-                }
-                let display_name = get("CLINICIAN_DISPLAY_NAME", &username);
-                Some(ClinicianAccount {
-                    username,
-                    password,
-                    display_name,
-                })
+        let mut logins = Vec::new();
+        for (key, user_var, password_var, name_var) in [
+            ("admin", Some("ADMIN_USERNAME"), "ADMIN_PASSWORD", None),
+            (
+                "physician",
+                Some("CLINICIAN_USERNAME"),
+                "CLINICIAN_PASSWORD",
+                Some("CLINICIAN_DISPLAY_NAME"),
+            ),
+            ("pharmacist", None, "PHARMACIST_PASSWORD", None),
+            ("coordinator", None, "COORDINATOR_PASSWORD", None),
+            ("patient", None, "DEMO_PATIENT_PASSWORD", None),
+        ] {
+            let Some(password) = optional(password_var) else {
+                continue;
+            };
+            if password.chars().count() < 8 {
+                bail!("{password_var} must be at least 8 characters");
             }
-            _ => None,
-        };
+            logins.push(DefaultLogin {
+                key,
+                username: user_var.and_then(optional),
+                password,
+                // The v1 placeholder is not a name.
+                display_name: name_var
+                    .and_then(optional)
+                    .filter(|n| n != "Demo Clinician"),
+            });
+        }
         let positive = |key: &str, default: &str| -> Result<i64> {
             let n = number(key, default)?;
             if n < 1 {
@@ -121,6 +139,19 @@ impl Config {
             }
             Ok(n)
         };
+
+        let model_fallback = optional("LLM_MODEL_FALLBACK").filter(|f| *f != model);
+        let mut model_choices: Vec<String> = optional("LLM_MODEL_CHOICES")
+            .unwrap_or_default()
+            .split(',')
+            .map(|m| m.trim().to_string())
+            .filter(|m| !m.is_empty())
+            .collect();
+        for name in std::iter::once(&model).chain(model_fallback.iter()) {
+            if !model_choices.contains(name) {
+                model_choices.push(name.clone());
+            }
+        }
 
         Ok(Self {
             database_url: env::var("DATABASE_URL").context("DATABASE_URL is required")?,
@@ -130,8 +161,9 @@ impl Config {
             web_dir: optional("WEB_DIR").map(PathBuf::from),
             data_dir: PathBuf::from(get("DATA_DIR", "data")),
             client_ip_header: optional("CLIENT_IP_HEADER").map(|h| h.to_ascii_lowercase()),
-            model_fallback: optional("LLM_MODEL_FALLBACK").filter(|f| *f != model),
+            model_fallback,
             model,
+            model_choices,
             thinking,
             max_steps: positive("AGENT_MAX_STEPS", "5")? as usize,
             llm_timeout: Duration::from_secs(positive("LLM_TIMEOUT_SECS", "45")? as u64),
@@ -142,7 +174,7 @@ impl Config {
             max_message_chars: positive("MAX_MESSAGE_CHARS", "800")? as usize,
             per_ip_daily_call_limit: positive("PER_IP_DAILY_CALL_LIMIT", "200")?,
             max_messages_per_visit: positive("MAX_MESSAGES_PER_VISIT", "40")?,
-            clinician,
+            logins,
             cookie_secure: get("COOKIE_SECURE", "false") == "true",
             session_days: positive("SESSION_DAYS", "7")?,
             retention_days: positive("RETENTION_DAYS", "14")?,
@@ -191,7 +223,8 @@ impl Config {
             max_message_chars: 800,
             per_ip_daily_call_limit: 200,
             max_messages_per_visit: 40,
-            clinician: None,
+            model_choices: vec!["mock".into()],
+            logins: Vec::new(),
             cookie_secure: false,
             session_days: 7,
             retention_days: 14,

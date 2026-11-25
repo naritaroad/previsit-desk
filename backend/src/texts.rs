@@ -283,6 +283,121 @@ texts! {
     CatAnaphylaxis => ("疑似嚴重過敏", "Possible severe allergic reaction"),
     CatSeizure => ("抽搐或癲癇發作", "Seizure"),
     CatSuicide => ("自殺或自傷念頭", "Suicidal thoughts or self-harm"),
+
+    // ---- v2: errors and field messages ----
+    ErrStale => (
+        "這筆資料已經在別處更新過。請看過最新內容，再決定要保留哪一份。",
+        "This was changed somewhere else. Look at the latest version and choose which one to keep."
+    ),
+    FieldErrUsername => (
+        "帳號要 3 到 32 個字元，只能用英文小寫、數字、底線、句點和連字號，開頭要是英文或數字。",
+        "Use 3 to 32 characters: lowercase letters, digits, underscore, dot or hyphen, starting with a letter or digit."
+    ),
+    FieldErrPassword => ("密碼要 8 到 128 個字元。", "Passwords have 8 to 128 characters."),
+    FieldErrLength => ("長度要在 {min} 到 {max} 個字之間。", "Write between {min} and {max} characters."),
+    FieldErrPersonal => ("看起來有個人資料，請改用暱稱。", "That looks like personal data. Use a nickname instead."),
+    FieldErrTaken => ("這個帳號名稱已經有人使用。", "That username is already taken."),
+    FieldErrConfirm => ("請輸入 {word} 確認。", "Type {word} to confirm."),
+    UnknownPatient => ("未具名病人", "Unnamed patient"),
+    SomeoneLabel => ("醫療團隊", "The care team"),
+
+    // ---- v2: permission names for the matrix ----
+    PermVisitOwn => ("自己的預問診", "Own pre-visits"),
+    PermVisitOwnDesc => ("建立、填寫和送出自己的預問診。", "Start, fill in and submit their own pre-visits."),
+    PermRxOwn => ("自己的用藥與申請", "Own medicines and requests"),
+    PermRxOwnDesc => ("看自己的用藥、預約領藥和申請續開。", "See their medicines, book refills and ask for renewals."),
+    PermProfileOwn => ("自己的健康檔案", "Own health record"),
+    PermProfileOwnDesc => ("編輯自己的病史、過敏和量測，匯出或刪除資料。", "Edit their history, allergies and measurements; export or delete their data."),
+    PermApptOwn => ("自己的約診", "Own appointments"),
+    PermApptOwnDesc => ("預約和取消自己的約診。", "Book and cancel their own appointments."),
+    PermVisitRead => ("看預問診", "Read pre-visits"),
+    PermVisitReadDesc => ("看病人的預問診對話和摘要，每次都留下讀取紀錄。", "Read patients' conversations and summaries. Every read is logged."),
+    PermVisitReview => ("審閱預問診", "Review pre-visits"),
+    PermVisitReviewDesc => ("指派預問診、撰寫看診筆記草稿。", "Assign pre-visits and draft clinical notes."),
+    PermNoteSign => ("簽署筆記", "Sign notes"),
+    PermNoteSignDesc => ("簽署看診筆記和補記，簽署後病人會看到給他的話。", "Sign notes and addenda. The patient sees the message to them after signing."),
+    PermThreadReply => ("回覆病人", "Reply to patients"),
+    PermThreadReplyDesc => ("接手對話並回覆病人；藥師只限申請的訊息。", "Take over a conversation and reply; pharmacists only in request threads."),
+    PermTicketHandle => ("處理轉交單", "Handle tickets"),
+    PermTicketHandleDesc => ("看轉交單並結案。", "See tickets and close them."),
+    PermPatientRead => ("看病人資料", "Read patient records"),
+    PermPatientReadDesc => ("看健康檔案和紀錄；藥師只看用藥、過敏和申請。", "Read records; pharmacists see medicines, allergies and requests only."),
+    PermPatientManage => ("管理病人", "Manage patients"),
+    PermPatientManageDesc => ("標籤、追蹤狀態、負責人、內部備註和聯絡紀錄。", "Tags, follow-up status, responsible staff, internal notes and contact log."),
+    PermApptManage => ("看門診表", "Clinic schedule"),
+    PermApptManageDesc => ("看每天的門診時段和預約。", "See each day's slots and bookings."),
+    PermRxRead => ("看申請", "Read requests"),
+    PermRxReadDesc => ("看領藥預約和續開申請，可以指派。", "See refill and renewal requests and assign them."),
+    PermRxDecide => ("決定續開", "Decide renewals"),
+    PermRxDecideDesc => ("逐項決定續開申請。", "Decide each item of a renewal request."),
+    PermRxDispense => ("調劑", "Dispense"),
+    PermRxDispenseDesc => ("核對、備藥、交付，或退回申請。", "Check, prepare and hand over medicines, or return a request."),
+    PermAccountManage => ("管理帳號", "Manage accounts"),
+    PermAccountManageDesc => ("新增、停用、改角色、重設密碼和登出所有裝置。", "Create, disable, change roles, reset passwords and end sessions."),
+    PermSettingsManage => ("管理設定", "Manage settings"),
+    PermSettingsManageDesc => ("AI 模型、用量上限、預算、停用開關和保留天數。", "AI models, limits, budget, the off switch and retention."),
+    PermAuditRead => ("看稽核紀錄", "Read the audit log"),
+    PermAuditReadDesc => ("看操作紀錄、讀取紀錄和執行紀錄，不含病人文字。", "See changes, reads and runs, without patient text."),
+    PermOversightRead => ("看監督指標", "Read oversight figures"),
+    PermOversightReadDesc => ("引擎與醫師一致率、處理時間和退回率。", "Engine and physician agreement, turnaround and return rate."),
+    PermRulesRead => ("看規則", "Read the rules"),
+    PermRulesReadDesc => ("紅旗、越界、慢箋、協定和藥品範圍。", "Red flags, scope, refill rules, protocols and formulary."),
+    PermDemoReset => ("重設示範資料", "Reset demo data"),
+    PermDemoResetDesc => ("重建示範資料，不動其他帳號。", "Rebuild the demo data without touching other accounts."),
+
+    // ---- v2: notifications ----
+    NtfVisitReviewed => ("醫師看過您的預問診了", "Your pre-visit has been reviewed"),
+    NtfVisitReviewedBody => ("{actor}已審閱「{title}」。點開可以看給您的話。", "{actor} reviewed \"{title}\". Open it to read the message for you."),
+    NtfStaffMessage => ("醫療團隊回覆您", "The care team replied"),
+    NtfStaffMessageBody => ("{actor}在「{title}」留了訊息。", "{actor} left a message in \"{title}\"."),
+    NtfRxStatus => ("申請 {no} 有新進度", "Update on request {no}"),
+    NtfRxStatusBody => ("目前狀態：{status}。", "Current status: {status}."),
+    NtfRxMoreInfo => ("醫師需要您補充資料", "The doctor needs more from you"),
+    NtfRxMoreInfoBody => ("申請 {no} 有問題要請您回答。", "Request {no} has questions for you."),
+    NtfRxReady => ("藥備好了", "Your medicine is ready"),
+    NtfRxReadyBody => ("申請 {no} 可以到{pharmacy}領藥。", "Request {no} can be collected at {pharmacy}."),
+    NtfRxMessage => ("申請 {no} 有新訊息", "New message on request {no}"),
+    NtfRxMessageBody => ("{actor}留了訊息。", "{actor} left a message."),
+    NtfApptReminder => ("約診提醒", "Appointment reminder"),
+    NtfApptReminderBody => ("{at}，{physician}，{department}。報到前可以先完成預問診。", "{at}, {physician}, {department}. You can finish the pre-visit before you check in."),
+    NtfRefillWindow => ("可以領下一次的藥了", "Your next refill can be collected"),
+    NtfRefillWindowBody => ("「{drug}」從 {date} 起可以領。", "{drug} can be collected from {date}."),
+    NtfTicketNew => ("新的轉交單 {no}", "New ticket {no}"),
+    NtfTicketNewBody => ("{patient}的轉交單：{reason}。", "Ticket for {patient}: {reason}."),
+    NtfRxNew => ("新的申請 {no}", "New request {no}"),
+    NtfRxNewBody => ("{patient}送出{rx_kind}。", "{patient} sent a request: {rx_kind}."),
+    NtfRxOverdue => ("申請 {no} 超過處理時限", "Request {no} is overdue"),
+    NtfRxOverdueBody => ("{patient}的申請還沒處理完。", "The request from {patient} is still open."),
+    NtfVisitSubmitted => ("新的預問診待審", "New pre-visit to review"),
+    NtfVisitSubmittedBody => ("{patient}送出了預問診。", "{patient} submitted a pre-visit."),
+    NtfRedFlag => ("紅旗警示", "Red flag"),
+    NtfRedFlagBody => ("{patient}的訊息命中「{label}」，請先確認病人狀況。", "A message from {patient} matched \"{label}\". Check on the patient first."),
+
+    // ---- v2: labels for codes ----
+    RxKindRefill => ("領藥預約", "Refill"),
+    RxKindRenewal => ("續開申請", "Renewal"),
+    RxStDraft => ("草稿", "Draft"),
+    RxStSubmitted => ("已送出", "Submitted"),
+    RxStInReview => ("醫師審閱中", "In review"),
+    RxStMoreInfo => ("等您補充", "Waiting for your reply"),
+    RxStApproved => ("醫師同意", "Approved"),
+    RxStPartial => ("部分同意", "Partly approved"),
+    RxStDeclined => ("醫師未同意", "Declined"),
+    RxStVisitRequired => ("需要看診", "Visit required"),
+    RxStAtPharmacy => ("藥局處理中", "At the pharmacy"),
+    RxStReturned => ("藥局退回", "Returned by the pharmacy"),
+    RxStReady => ("備藥完成", "Ready to collect"),
+    RxStDispensed => ("已領取", "Collected"),
+    RxStCancelled => ("已取消", "Cancelled"),
+    ReasonRedFlag => ("紅旗警示", "Red flag"),
+    ReasonPrescription => ("要求開藥", "Prescription request"),
+    ReasonControlled => ("管制藥品", "Controlled drug"),
+    ReasonSymptom => ("症狀變化", "Symptom change"),
+    ReasonSideEffects => ("疑似副作用", "Possible side effects"),
+    ReasonSpecial => ("特殊身分領藥", "Special refill status"),
+    ReasonMedical => ("醫療問題", "Medical question"),
+    ReasonPatient => ("病人請醫師聯絡", "Patient asked for contact"),
+    ReasonOther => ("其他", "Other"),
 }
 
 /// The text for `key` in `locale` (placeholders untouched).
@@ -349,6 +464,55 @@ pub fn field_label(key: &str, locale: Locale) -> &'static str {
             "medications" => T::FieldMedications,
             "allergies" => T::FieldAllergies,
             _ => T::ErrInvalidRequest,
+        },
+        locale,
+    )
+}
+
+pub fn rx_status_label(status: &str, locale: Locale) -> &'static str {
+    t(
+        match status {
+            "draft" => T::RxStDraft,
+            "submitted" => T::RxStSubmitted,
+            "in_review" => T::RxStInReview,
+            "more_info" => T::RxStMoreInfo,
+            "approved" => T::RxStApproved,
+            "partially_approved" => T::RxStPartial,
+            "declined" => T::RxStDeclined,
+            "visit_required" => T::RxStVisitRequired,
+            "at_pharmacy" => T::RxStAtPharmacy,
+            "returned" => T::RxStReturned,
+            "ready" => T::RxStReady,
+            "dispensed" => T::RxStDispensed,
+            _ => T::RxStCancelled,
+        },
+        locale,
+    )
+}
+
+pub fn rx_kind_label(kind: &str, locale: Locale) -> &'static str {
+    t(
+        if kind == "refill" {
+            T::RxKindRefill
+        } else {
+            T::RxKindRenewal
+        },
+        locale,
+    )
+}
+
+pub fn ticket_reason_label(reason: &str, locale: Locale) -> &'static str {
+    t(
+        match reason {
+            "red_flag" => T::ReasonRedFlag,
+            "prescription_request" => T::ReasonPrescription,
+            "controlled_drug" => T::ReasonControlled,
+            "symptom_change" => T::ReasonSymptom,
+            "side_effects" => T::ReasonSideEffects,
+            "special_status" => T::ReasonSpecial,
+            "out_of_scope_medical" => T::ReasonMedical,
+            "patient_request" => T::ReasonPatient,
+            _ => T::ReasonOther,
         },
         locale,
     )

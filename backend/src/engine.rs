@@ -294,11 +294,10 @@ pub async fn run_turn(
             locale,
             &[("label", matched.label(locale)), ("rule", &matched.rule_id)],
         );
-        let created = tickets::create_or_get(
-            db,
-            &state.clock,
+        let created = tickets::open(
+            state,
             NewTicket {
-                visit_id,
+                source: tickets::Source::Visit(visit_id),
                 reason: TicketReason::RedFlag,
                 urgency: Urgency::Urgent,
                 summary: &summary_text,
@@ -385,11 +384,10 @@ pub async fn run_turn(
         };
         let created = match ticket_plan {
             Some((reason, summary_key)) => Some(
-                tickets::create_or_get(
-                    db,
-                    &state.clock,
+                tickets::open(
+                    state,
                     NewTicket {
-                        visit_id,
+                        source: tickets::Source::Visit(visit_id),
                         reason,
                         urgency: Urgency::Soon,
                         summary: t(summary_key, locale),
@@ -740,6 +738,7 @@ async fn run_loop(
                         gateway.model_name(),
                         reply.input_tokens,
                         reply.output_tokens,
+                        0.0,
                     )
                     .await
                     .map_err(db_fail)?;
@@ -750,14 +749,14 @@ async fn run_loop(
                 }
                 Ok(Err(e)) => {
                     tracing::warn!(model = gateway.model_name(), step, error = %redact(&format!("{e:#}")), "model call failed");
-                    limits::record_call(db, &state.clock, gateway.model_name(), 0, 0)
+                    limits::record_call(db, &state.clock, gateway.model_name(), 0, 0, 0.0)
                         .await
                         .map_err(db_fail)?;
                     "model_error"
                 }
                 Err(_) => {
                     tracing::warn!(model = gateway.model_name(), step, "model call timed out");
-                    limits::record_call(db, &state.clock, gateway.model_name(), 0, 0)
+                    limits::record_call(db, &state.clock, gateway.model_name(), 0, 0, 0.0)
                         .await
                         .map_err(db_fail)?;
                     "timeout"

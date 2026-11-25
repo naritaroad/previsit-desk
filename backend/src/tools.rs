@@ -300,11 +300,10 @@ pub async fn perform_refill_check(
     let mut result = evaluation.result;
     let mut ticket = None;
     if let Some(plan) = evaluation.ticket {
-        let created = tickets::create_or_get(
-            &state.db,
-            &state.clock,
+        let created = tickets::open(
+            state,
             NewTicket {
-                visit_id,
+                source: tickets::Source::Visit(visit_id),
                 reason: plan.reason,
                 urgency: plan.urgency,
                 summary: &plan.summary,
@@ -406,11 +405,10 @@ async fn transfer_to_clinician(
         summary = t(T::TransferSummaryFallback, ctx.locale).to_string();
     }
     let reason = TicketReason::parse(&parsed.reason).unwrap_or(TicketReason::Other);
-    match tickets::create_or_get(
-        &ctx.state.db,
-        &ctx.state.clock,
+    match tickets::open(
+        ctx.state,
         NewTicket {
-            visit_id: ctx.visit_id,
+            source: tickets::Source::Visit(ctx.visit_id),
             reason,
             urgency,
             summary: &summary,
