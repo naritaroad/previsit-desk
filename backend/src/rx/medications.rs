@@ -47,8 +47,11 @@ pub struct FillRecord {
 pub struct Prescription {
     pub id: String,
     pub drug: DrugRef,
-    pub dose_text: String,
+    /// As written on the record. Shown, never computed.
+    pub dose: LText,
     pub self_reported: bool,
+    /// A record this system made when a renewal was handed over (demonstration only).
+    pub is_demo: bool,
     pub issued_on: Date,
     pub total_days: i64,
     pub days_per_fill: i64,
@@ -67,6 +70,8 @@ pub struct MedicationCard {
     pub drug: DrugRef,
     pub dose_text: String,
     pub source: &'static str,
+    /// Not in the contract's minimum: true for the demonstration record a handed-over renewal creates.
+    pub is_demo: bool,
     pub issued_on: String,
     pub total_days: i64,
     pub days_per_fill: i64,
@@ -274,7 +279,12 @@ pub fn card(
     MedicationCard {
         prescription_id: p.id.clone(),
         drug: p.drug.clone(),
-        dose_text: p.dose_text.clone(),
+        dose_text: if p.dose.get(locale).is_empty() {
+            p.dose.zh.clone()
+        } else {
+            p.dose.get(locale).to_string()
+        },
+        is_demo: p.is_demo,
         source: if p.self_reported {
             "self_reported"
         } else {
@@ -339,7 +349,8 @@ mod tests {
         Prescription {
             id: "p1".into(),
             drug: drug(0),
-            dose_text: "每天一次".into(),
+            dose: LText::new("每天一次", "Once a day"),
+            is_demo: false,
             self_reported: false,
             issued_on: ISSUED,
             total_days: 90,

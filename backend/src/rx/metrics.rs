@@ -1,9 +1,10 @@
 //! Oversight numbers (contract §6 `GET /admin/oversight`): how often the engine and the physician agree per class,
 //! how long decisions take, how often a pharmacist returns a request. Pure functions over rows read by the store.
 //!
-//! Agreement (contract): the engine said `ready` and the physician approved, or the engine said `in_person`/`urgent`
-//! and the physician asked for a visit or declined; divided by all decided items. `review` items are decided but the
-//! engine made no prediction, so they count in the total and never as agreement. `more_info` is not a decision yet.
+//! Agreement: the engine said `ready` and the physician approved, or the engine said `in_person`/`urgent` and the
+//! physician asked for a visit or declined; divided by the decided items where the engine said one of those three.
+//! With `review` the engine makes no prediction, so those items are left out and counted on their own.
+//! `more_info` is not a decision yet.
 
 use std::collections::BTreeMap;
 
@@ -32,6 +33,8 @@ pub struct ClassStats {
     pub engine: BTreeMap<&'static str, u32>,
     pub decisions: BTreeMap<&'static str, u32>,
     pub agreement_rate: Option<f64>,
+    /// Decided items where the engine only asked for a look: in neither side of `agreement_rate`.
+    pub review_decided: u32,
     pub threshold_total: u32,
 }
 
@@ -71,12 +74,17 @@ pub fn by_class(rows: &[ItemRow], locale: Locale) -> Vec<ClassStats> {
                 .iter()
                 .map(|d| (d.as_str(), 0))
                 .collect();
-            let (mut decided, mut agreed) = (0u32, 0u32);
+            let (mut decided, mut agreed, mut review_decided) = (0u32, 0u32, 0u32);
             for row in &rows {
                 *engine.entry(row.engine.as_str()).or_default() += 1;
                 let Some(d) = row.decision else { continue };
                 *decisions.entry(d.as_str()).or_default() += 1;
-                if d != DecisionOutcome::MoreInfo {
+                if d == DecisionOutcome::MoreInfo {
+                    continue;
+                }
+                if row.engine == Disposition::Review {
+                    review_decided += 1;
+                } else {
                     decided += 1;
                     agreed += u32::from(agrees(row.engine, d));
                 }
@@ -89,6 +97,7 @@ pub fn by_class(rows: &[ItemRow], locale: Locale) -> Vec<ClassStats> {
                 decisions,
                 agreement_rate: (decided > 0)
                     .then(|| round(f64::from(agreed) / f64::from(decided), 4)),
+                review_decided,
                 threshold_total: THRESHOLD_TOTAL,
             }
         })
@@ -177,7 +186,12 @@ mod tests {
             (ccb.decisions["approve"], ccb.decisions["more_info"]),
             (2, 1)
         );
-        assert_eq!(ccb.agreement_rate, Some(0.5), "2 of 4 decided");
+        assert_eq!(
+            ccb.agreement_rate,
+            Some(0.6667),
+            "2 of the 3 decided where the engine said ready or in_person"
+        );
+        assert_eq!(ccb.review_decided, 1);
         assert_eq!(ccb.threshold_total, 250);
         let arb = stats.iter().find(|s| s.class_id == "arb").expect("arb");
         assert_eq!(

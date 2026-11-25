@@ -57,6 +57,7 @@ pub enum Step {
     Cancel,
 }
 
+#[cfg(test)]
 impl Step {
     pub const ALL: &'static [Step] = &[
         Step::Submit,

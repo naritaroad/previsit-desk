@@ -1,7 +1,9 @@
 //! Fixed texts of the prescription request flow, in the same style as [`crate::texts`]: zh-TW and en side by side,
 //! so a key can never exist in one language only. The emergency wording is not here; it is reused from `crate::texts`.
 
-use crate::types::Locale;
+use super::LText;
+use crate::texts::{T, t};
+use crate::types::{Locale, RedFlagCategory};
 
 macro_rules! rx_texts {
     ($($key:ident => ($zh:literal, $en:literal)),+ $(,)?) => {
@@ -46,7 +48,14 @@ rx_texts! {
     ErrPharmacyRequired => ("請選一間領藥的藥局。", "Choose a pharmacy."),
     ErrPickupRequired => ("請選取藥日期和時段。", "Choose a pickup date and time."),
     ErrPickupPast => ("取藥日期不能早於今天。", "The pickup date cannot be in the past."),
-    ErrConsentVersion => ("說明內容已更新，請重新看過再同意。", "The notice has changed. Read it again before you agree."),
+    ErrConsentVersion => ("請先看完說明再同意送出。", "Read the notice and agree before you submit."),
+    ErrPickupTooFar => ("取藥日期請選 {days} 天內。", "Choose a pickup date within {days} days."),
+    ErrPharmacyUnknown => ("找不到這間藥局。", "That pharmacy was not found."),
+    ErrNoItems => ("請至少選一項藥。", "Choose at least one medicine."),
+    ErrTooManyItems => ("一件申請最多 {max} 項藥。", "At most {max} medicines per request."),
+    ErrAssignee => ("不能指派給這個人。", "This person cannot take the request."),
+    ErrNameRequired => ("請填藥名。", "Enter the medicine name."),
+    ErrRevision => ("請帶上目前的版本號。", "Send the current revision."),
     ErrAllExcluded => (
         "選的藥都不接受線上續開申請，請預約回診。",
         "None of these medicines can be renewed online. Book a visit instead."
@@ -88,6 +97,24 @@ rx_texts! {
         "這些藥不接受線上續開申請，請預約回診。",
         "These medicines cannot be renewed online. Book a visit instead."
     ),
+    NoticedText => ("您寫的內容提到「{label}」", "what you wrote mentions \"{label}\""),
+    NoticedAnswer => ("您在「{label}」的回答", "your answer to \"{label}\""),
+    UrgentPhysical => (
+        "我們注意到{what}，這可能很緊急。請現在就撥 119，或請身邊的人陪您到最近的急診，不要自己開車。",
+        "We noticed {what}. This may be an emergency. Call 119 now, or ask someone nearby to take you to the closest emergency department. Do not drive yourself."
+    ),
+    UrgentSelfHarm => (
+        "我們注意到{what}。請先撥 1925 安心專線（24 小時、免費），會有人陪您談。如果您已經有傷害自己的行動，或身邊有立即的危險，請撥 119。如果已經吃了過量的藥，或喝了不該喝的東西，請立刻撥 119，不要等。",
+        "We noticed {what}. Please call the 1925 hotline first (free, 24 hours); someone will talk with you. If you have already hurt yourself, or you are in immediate danger, call 119. If you have already taken too much medicine or swallowed something you should not have, call 119 right away and do not wait."
+    ),
+    UrgentAlerted => (
+        "醫療團隊已收到通知。這件申請會保留，但不會照一般流程處理。",
+        "The care team has been alerted. This request is kept but will not be handled as a routine one."
+    ),
+    UrgentNotAlerted => (
+        "送出後會通知醫療團隊，這件申請不會照一般流程處理。不要等回覆才就醫。",
+        "The care team is alerted when you submit, and this request will not be handled as a routine one. Do not wait for a reply before you seek care."
+    ),
     LabelScope => ("藥品範圍", "Medicine scope"),
     LabelControlled => ("管制藥品", "Controlled drug"),
     LabelFillsLeft => ("剩餘領藥次數", "Fills left"),
@@ -108,7 +135,7 @@ rx_texts! {
     EvCreated => ("建立申請", "Request created"),
     EvSubmitted => ("病人送出申請", "Submitted by the patient"),
     EvItemsLeftOut => ("不接受線上申請，沒有一起送出：{drugs}", "Not accepted online, left out of the request: {drugs}"),
-    EvUrgent => ("回答出現緊急情況，已通知醫療團隊", "An answer pointed to an emergency. The care team was alerted"),
+    EvUrgentStaff => ("病人填的內容出現緊急情況，已開緊急轉交單", "The patient's entry points to an emergency. An urgent ticket was opened"),
     EvAssigned => ("指派給{name}", "Assigned to {name}"),
     EvUnassigned => ("取消指派", "Assignment removed"),
     EvReviewStarted => ("醫師開始審閱", "Review started"),
@@ -125,21 +152,65 @@ rx_texts! {
     EvFillRecorded => ("已記錄第 {n} 次領藥", "Fill {n} recorded"),
     EvNextPrescription => ("已建立下一張處方紀錄（示範）", "Next prescription record created (demo)"),
     EvReturned => ("藥師退回：{note}", "Returned by the pharmacist: {note}"),
-    EvAskedPhysician => ("藥師請醫師確認：{note}", "The pharmacist asked the physician: {note}"),
+    EvAskedPhysician => ("藥師請醫師確認", "The pharmacist asked the physician"),
     EvCancelled => ("病人取消申請", "Cancelled by the patient"),
     EvOverdue => ("超過預計處理時間", "Past the expected handling time"),
+    EvOther => ("申請有更新", "The request was updated"),
 
     // ---- tickets ----
     TicketRxUrgent => (
-        "申請 {no} 的回答出現緊急情況：{reasons}。系統已顯示固定的緊急提醒，請盡快聯絡病人。",
-        "Answers in request {no} point to an emergency: {reasons}. The fixed emergency notice was shown. Contact the patient promptly."
+        "病人在申請 {no} 填的內容出現緊急情況：「{label}」。系統已顯示固定的緊急提醒，請盡快聯絡病人。",
+        "What the patient entered in request {no} points to an emergency: \"{label}\". The fixed emergency notice was shown. Contact the patient promptly."
     ),
+    ChatDraftNote => (
+        "草稿已建立，還沒送出。請打開連結完成；由醫師或藥師處理。",
+        "A draft was created and not submitted. Open the link to finish it; a physician or pharmacist handles it."
+    ),
+    TicketRxDraft => ("這件申請還沒送出。", " The request has not been submitted yet."),
 }
 
 /// The text for `key` in `locale` (placeholders untouched).
 pub fn rt(key: R, locale: Locale) -> &'static str {
     let (zh, en) = key.pair();
     if locale.is_en() { en } else { zh }
+}
+
+/// The fixed emergency text of a request: what was noticed, what to do now, and what happens to the request. The team
+/// is only said to be alerted when it was.
+pub fn urgent_text(
+    category: Option<RedFlagCategory>,
+    noticed: &LText,
+    alerted: bool,
+    locale: Locale,
+) -> String {
+    let body = if category == Some(RedFlagCategory::Suicide) {
+        R::UrgentSelfHarm
+    } else {
+        R::UrgentPhysical
+    };
+    let extra = match category {
+        Some(RedFlagCategory::Stroke) => Some(T::RedFlagExtraStroke),
+        Some(RedFlagCategory::Consciousness) => Some(T::RedFlagExtraConsciousness),
+        Some(RedFlagCategory::Anaphylaxis) => Some(T::RedFlagExtraAnaphylaxis),
+        Some(RedFlagCategory::Seizure) => Some(T::RedFlagExtraSeizure),
+        _ => None,
+    };
+    let mut parts = vec![rf(body, locale, &[("what", noticed.get(locale))])];
+    if let Some(key) = extra {
+        parts.push(t(key, locale).to_string());
+    }
+    parts.push(
+        rt(
+            if alerted {
+                R::UrgentAlerted
+            } else {
+                R::UrgentNotAlerted
+            },
+            locale,
+        )
+        .to_string(),
+    );
+    parts.join("\n\n")
 }
 
 /// The text with `{name}` placeholders replaced.
@@ -232,6 +303,27 @@ mod tests {
         }
         assert!(rt(R::SummaryReady, Locale::ZhTw).contains("不代表核准"));
         assert!(rt(R::SummaryReady, Locale::En).contains("not an approval"));
+    }
+
+    #[test]
+    fn emergency_texts_name_the_numbers_and_only_claim_an_alert_that_happened() {
+        let noticed = LText::new("您寫的內容", "what you wrote");
+        for locale in [Locale::ZhTw, Locale::En] {
+            for category in RedFlagCategory::ALL.iter().copied().map(Some).chain([None]) {
+                for alerted in [true, false] {
+                    let text = urgent_text(category, &noticed, alerted, locale);
+                    assert!(text.contains("119"), "{category:?}");
+                    assert_eq!(
+                        text.contains("1925"),
+                        category == Some(RedFlagCategory::Suicide)
+                    );
+                    assert!(text.contains(noticed.get(locale)));
+                    assert!(!text.contains("問診"), "this is a request, not a pre-visit");
+                    let claims = text.contains("已收到通知") || text.contains("has been alerted");
+                    assert_eq!(claims, alerted, "{text}");
+                }
+            }
+        }
     }
 
     #[test]

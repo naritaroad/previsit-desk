@@ -17,8 +17,7 @@ use super::protocol::{
 use super::texts::{R, rt};
 use super::{Disposition, LText, RenewalScope};
 use crate::clock::parse_date;
-use crate::precheck::RedFlagRules;
-use crate::texts;
+use crate::precheck::{RedFlagMatch, RedFlagRules};
 use crate::types::{Locale, RedFlagCategory, Urgency};
 
 /// An item running out within this many days is handled sooner.
@@ -72,8 +71,45 @@ pub struct EngineOutput {
     pub stale_monitoring: Vec<LText>,
     /// Required questions without an answer.
     pub unanswered: Vec<String>,
-    /// Which fixed emergency text to show. Set exactly when something urgent fired.
-    pub urgent_category: Option<RedFlagCategory>,
+    /// Set exactly when something urgent fired.
+    pub urgent: Option<UrgentNotice>,
+}
+
+/// What the fixed emergency text is about.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct UrgentNotice {
+    /// The red-flag category, when the wording names one. Self-harm has its own text.
+    pub category: Option<RedFlagCategory>,
+    /// Free text, or the answer to a question.
+    pub from_text: bool,
+    /// The red-flag label or the question's own label, never a diagnosis.
+    pub label: LText,
+}
+
+impl UrgentNotice {
+    /// Free text that matched a red-flag rule.
+    pub fn from_text(hit: &RedFlagMatch) -> Self {
+        Self {
+            category: Some(hit.category),
+            from_text: true,
+            label: LText::new(&hit.label_zh, &hit.label_en),
+        }
+    }
+
+    /// "您寫的內容提到「…」", for the patient.
+    pub fn noticed(&self) -> LText {
+        let key = if self.from_text {
+            R::NoticedText
+        } else {
+            R::NoticedAnswer
+        };
+        pair_with(key, "label", &self.label)
+    }
+
+    /// `alerted`: the care team has been told. Never claim it when no ticket was opened.
+    pub fn text(&self, alerted: bool, locale: Locale) -> String {
+        super::texts::urgent_text(self.category, &self.noticed(), alerted, locale)
+    }
 }
 
 /// Contract §4 `FiredRule`.
@@ -114,6 +150,7 @@ impl Fired {
 }
 
 impl EngineOutput {
+    #[cfg(test)]
     pub fn item(&self, item_id: &str) -> Option<&ItemResult> {
         self.items.iter().find(|i| i.item_id == item_id)
     }
@@ -131,42 +168,35 @@ impl EngineOutput {
         ids.len()
     }
 
-    /// The fixed emergency text for the patient, when something urgent fired.
-    pub fn urgent_text(&self, locale: Locale) -> Option<String> {
-        self.urgent_category
-            .map(|c| texts::red_flag_reply(c, locale))
-    }
-
-    /// The reasons that made it urgent, each once.
-    pub fn urgent_reasons(&self) -> Vec<LText> {
-        let mut out: Vec<LText> = Vec::new();
-        for fired in self.items.iter().flat_map(|i| &i.fired) {
-            if fired.disposition == Disposition::Urgent && !out.contains(&fired.reason) {
-                out.push(fired.reason.clone());
-            }
-        }
-        out
-    }
-
     /// Patients read the fixed emergency text when urgent; staff read what to do.
-    pub fn summary(&self, locale: Locale, staff: bool) -> String {
+    pub fn summary(&self, locale: Locale, staff: bool, alerted: bool) -> String {
         let n = self.points().to_string();
         match self.disposition {
             Disposition::Ready => rt(R::SummaryReady, locale).to_string(),
             Disposition::Review => super::texts::rf(R::SummaryReview, locale, &[("n", &n)]),
             Disposition::InPerson => super::texts::rf(R::SummaryInPerson, locale, &[("n", &n)]),
             Disposition::Urgent if staff => rt(R::SummaryUrgentStaff, locale).to_string(),
-            Disposition::Urgent => self.urgent_text(locale).unwrap_or_default(),
+            Disposition::Urgent => self
+                .urgent
+                .as_ref()
+                .map(|u| u.text(alerted, locale))
+                .unwrap_or_default(),
             Disposition::Excluded => rt(R::SummaryExcluded, locale).to_string(),
         }
     }
 
-    pub fn to_out(&self, locale: Locale, staff: bool, evaluated_at: String) -> EngineResultOut {
+    pub fn to_out(
+        &self,
+        locale: Locale,
+        staff: bool,
+        alerted: bool,
+        evaluated_at: String,
+    ) -> EngineResultOut {
         EngineResultOut {
             protocol_version: self.protocol_version.clone(),
             disposition: self.disposition,
             evaluated_at,
-            summary: self.summary(locale, staff),
+            summary: self.summary(locale, staff, alerted),
             stale_monitoring: self
                 .stale_monitoring
                 .iter()
@@ -300,7 +330,7 @@ struct Run<'a> {
     red_flags: &'a RedFlagRules,
     unanswered: Vec<String>,
     stale: Vec<LText>,
-    categories: Vec<RedFlagCategory>,
+    urgent: Vec<UrgentNotice>,
 }
 
 impl Run<'_> {
@@ -356,7 +386,7 @@ impl Run<'_> {
                 && let Some(text) = answer.and_then(Value::as_str)
                 && let Some(hit) = self.red_flags.check(text)
             {
-                self.categories.push(hit.category);
+                self.urgent.push(UrgentNotice::from_text(&hit));
                 fired.push(Fired {
                     question_id: q.id.clone(),
                     label,
@@ -380,8 +410,12 @@ impl Run<'_> {
             .red_flags
             .check(reason_zh)
             .or_else(|| self.red_flags.check(&label.zh))
-            .map_or(RedFlagCategory::ChestPain, |hit| hit.category);
-        self.categories.push(category);
+            .map(|hit| hit.category);
+        self.urgent.push(UrgentNotice {
+            category,
+            from_text: false,
+            label: label.clone(),
+        });
     }
 
     fn monitoring(&mut self, list: &[Monitoring], fired: &mut Vec<Fired>) {
@@ -484,7 +518,7 @@ pub fn evaluate(
         red_flags,
         unanswered: Vec::new(),
         stale: Vec::new(),
-        categories: Vec::new(),
+        urgent: Vec::new(),
     };
     let mut items = Vec::new();
     for item in input.items {
@@ -566,14 +600,13 @@ pub fn evaluate(
         .filter(|d| *d != Disposition::Excluded)
         .max()
         .unwrap_or(Disposition::Excluded);
-    let urgent_category = if disposition == Disposition::Urgent {
+    let urgent = if disposition == Disposition::Urgent {
         // The self-harm text also names 119, so it wins over the others.
-        run.categories
+        run.urgent
             .iter()
-            .copied()
-            .find(|c| *c == RedFlagCategory::Suicide)
-            .or_else(|| run.categories.first().copied())
-            .or(Some(RedFlagCategory::ChestPain))
+            .find(|u| u.category == Some(RedFlagCategory::Suicide))
+            .or_else(|| run.urgent.first())
+            .cloned()
     } else {
         None
     };
@@ -583,7 +616,7 @@ pub fn evaluate(
         items,
         stale_monitoring: run.stale,
         unanswered: run.unanswered,
-        urgent_category,
+        urgent,
     }
 }
 
@@ -664,8 +697,11 @@ mod tests {
         let out = run(&items, &calm(&items), &bp(128.0, "2026-11-20"));
         assert_eq!(out.disposition, Disposition::Ready);
         assert!(out.items[0].fired.is_empty() && out.unanswered.is_empty());
-        assert!(out.urgent_category.is_none());
-        assert!(out.summary(Locale::ZhTw, false).contains("不代表核准"));
+        assert!(out.urgent.is_none());
+        assert!(
+            out.summary(Locale::ZhTw, false, true)
+                .contains("不代表核准")
+        );
         assert_eq!(out.priority(Some(20)), Urgency::Routine);
         assert_eq!(out.priority(Some(3)), Urgency::Soon);
     }
@@ -732,17 +768,17 @@ mod tests {
             &bp(128.0, "2026-11-20"),
         );
         assert_eq!(out.disposition, Disposition::Urgent);
-        assert_eq!(out.urgent_category, Some(RedFlagCategory::ChestPain));
-        assert_eq!(
-            out.summary(Locale::ZhTw, false),
-            texts::red_flag_reply(RedFlagCategory::ChestPain, Locale::ZhTw)
-        );
+        let urgent = out.urgent.as_ref().expect("urgent");
+        assert_eq!(urgent.category, Some(RedFlagCategory::ChestPain));
+        let before = out.summary(Locale::ZhTw, false, false);
+        let after = out.summary(Locale::ZhTw, false, true);
+        assert!(before.contains("119") && before.contains("現在有胸痛"));
+        assert!(after.contains("醫療團隊已收到通知") && !before.contains("已收到通知"));
         assert!(
-            !out.summary(Locale::ZhTw, true).contains("119"),
+            !out.summary(Locale::ZhTw, true, true).contains("119"),
             "staff read what to do instead"
         );
         assert_eq!(out.priority(Some(30)), Urgency::Urgent);
-        assert_eq!(out.urgent_reasons().len(), 1);
     }
 
     #[test]
@@ -754,12 +790,9 @@ mod tests {
             &MonitoringSet::new(),
         );
         assert_eq!(out.disposition, Disposition::Urgent);
-        assert_eq!(out.urgent_category, Some(RedFlagCategory::Suicide));
-        assert!(
-            out.urgent_text(Locale::ZhTw)
-                .expect("text")
-                .contains("1925")
-        );
+        let urgent = out.urgent.as_ref().expect("urgent");
+        assert_eq!(urgent.category, Some(RedFlagCategory::Suicide));
+        assert!(urgent.text(true, Locale::ZhTw).contains("1925"));
         let calm_text = run(
             &items,
             &with(&items, json!({"note": "我沒有胸痛，想換成早上領藥"})),
@@ -776,7 +809,10 @@ mod tests {
             &with(&items, json!({"chest_pain_now": true, "note": "我想死"})),
             &MonitoringSet::new(),
         );
-        assert_eq!(out.urgent_category, Some(RedFlagCategory::Suicide));
+        assert_eq!(
+            out.urgent.expect("urgent").category,
+            Some(RedFlagCategory::Suicide)
+        );
     }
 
     #[test]
@@ -797,7 +833,7 @@ mod tests {
         assert_eq!(missing.disposition, Disposition::Review);
         assert_eq!(
             missing
-                .to_out(Locale::ZhTw, true, String::new())
+                .to_out(Locale::ZhTw, true, true, String::new())
                 .stale_monitoring,
             ["收縮壓"]
         );
@@ -1098,7 +1134,13 @@ mod tests {
                         q.id
                     );
                     if rule.disposition == Disposition::Urgent {
-                        assert!(out.urgent_text(Locale::ZhTw).expect("text").contains("119"));
+                        assert!(
+                            out.urgent
+                                .as_ref()
+                                .expect("urgent")
+                                .text(true, Locale::ZhTw)
+                                .contains("119")
+                        );
                     }
                     checked += 1;
                 }
@@ -1145,7 +1187,7 @@ mod tests {
             println!(
                 "== {name}: overall {} | {}",
                 out.disposition.as_str(),
-                out.summary(Locale::ZhTw, false).replace('\n', " ")
+                out.summary(Locale::ZhTw, false, true).replace('\n', " ")
             );
             for i in &out.items {
                 println!(

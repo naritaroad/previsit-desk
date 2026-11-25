@@ -519,6 +519,7 @@ impl Protocols {
                     "rules": rules_out(&m.rules, locale),
                     "stale_disposition": m.stale_disposition,
                     "reason": pick(&m.reason_zh, &m.reason_en, locale),
+                    "source_type": non_blank(&m.source_type),
                     "source_url": non_blank(&m.source_url),
                     "verified_on": non_blank(&m.verified_on),
                 })).collect::<Vec<_>>(),
@@ -838,7 +839,7 @@ pub struct Cleaned {
     pub answers: Map<String, Value>,
     /// How many identifiers were masked in free text.
     pub masked: usize,
-    /// Masked free-text values in this patch (for red-flag checks).
+    /// Masked free-text values that this patch changed (for red-flag checks).
     pub texts: Vec<String>,
 }
 
@@ -884,7 +885,9 @@ pub fn clean_answers(
                 .map(|s| {
                     let masked = pii::mask(s);
                     out.masked += masked.count;
-                    out.texts.push(masked.text.clone());
+                    if previous.get(&q.id).and_then(Value::as_str) != Some(masked.text.as_str()) {
+                        out.texts.push(masked.text.clone());
+                    }
                     Value::from(masked.text)
                 }),
             _ => None,

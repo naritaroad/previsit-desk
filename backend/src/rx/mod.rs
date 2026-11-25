@@ -5,13 +5,20 @@
 //! [`crate::refill`] and nothing here repeats those numbers.
 //!
 //! Pure modules: [`formulary`], [`protocol`], [`engine`], [`machine`], [`medications`], [`metrics`], [`texts`].
+//! With the database: [`store`], [`http`], [`seed`], [`chat`].
 
+pub mod chat;
 pub mod engine;
 pub mod formulary;
+pub mod http;
 pub mod machine;
 pub mod medications;
+// The oversight endpoint belongs to core and calls these.
+#[allow(dead_code)]
 pub mod metrics;
 pub mod protocol;
+pub mod seed;
+pub mod store;
 pub mod texts;
 
 use std::path::Path;
@@ -23,7 +30,13 @@ use serde_json::Value;
 use crate::types::Locale;
 
 pub use formulary::Formulary;
+pub use http::routes;
 pub use protocol::Protocols;
+// Called by the patient, clinic and demo modules as they are built.
+#[allow(unused_imports)]
+pub use seed::{seed_demo_requests, seed_guest_requests};
+#[allow(unused_imports)]
+pub use store::{briefs_for, medications_for};
 
 pub const FORMULARY_FILE: &str = "formulary.csv";
 pub const PROTOCOL_FILE: &str = "renewal_protocols.json";
@@ -37,6 +50,7 @@ macro_rules! wire_enum {
             $(#[serde(rename = $text)] $var),+
         }
 
+        #[allow(dead_code)]
         impl $name {
             pub const ALL: &'static [$name] = &[$($name::$var),+];
 
@@ -125,6 +139,8 @@ pub struct RxRules {
     pub protocols: Protocols,
 }
 
+// Counts and views are read by `/meta`, `/trust/facts` and `/admin/rules`.
+#[allow(dead_code)]
 impl RxRules {
     pub fn load(data_dir: &Path) -> Result<Self> {
         let seed = data_dir.join("seed");
