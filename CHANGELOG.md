@@ -6,6 +6,15 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-25
+
+### Added
+
+- **5 Workspaces**: Public/Trust Centre, Patient portal with chronic refill & renewal request wizard, Clinician cockpit with event-log visit stream & SOAP note sign-off, Pharmacy dispensing desk, and Admin console with RBAC/settings/oversight/audit/eval.
+- **Offline Capabilities**: IndexedDB offline outbox and draft sync for robust offline resilience.
+- **Internationalization (i18n)**: 4,033 i18n keys across 9 namespaces supporting traditional Chinese (zh-TW) and English.
+- **Evaluation**: 54-case real model evaluation suite and automated runner (`cargo run -- eval`).
+
 ## [0.1.0] - 2026-11-25
 
 First public release, built for a class demonstration. The service skeleton is adapted from the author's earlier course project `tracen-aas-tsr` (see [NOTICE.md](NOTICE.md)); the git history starts here.
@@ -32,5 +41,6 @@ First public release, built for a class demonstration. The service skeleton is a
 
 - The model API key stays on the server. Containers run as a non-root user with a read-only root file system and memory limits.
 
-[Unreleased]: https://github.com/naritaroad/previsit-desk/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/naritaroad/previsit-desk/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/naritaroad/previsit-desk/releases/tag/v0.2.0
 [0.1.0]: https://github.com/naritaroad/previsit-desk/releases/tag/v0.1.0

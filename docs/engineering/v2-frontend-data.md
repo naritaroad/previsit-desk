@@ -229,4 +229,3 @@ $env:API_PROXY_TARGET='http://127.0.0.1:8098'; npx vite
 - `RxRequest.questions` 另含每項藥的 `same_as_record:<item id>`；領藥預約也有三題。決定的欄位錯誤以 item id 為鍵。
 - 一般續開送出後是 `submitted`，指派醫師或醫師做決定才變 `in_review`；緊急的直接 `in_review`。
 - `note.signed` 事件不帶筆記，前端會重讀一次 visit。
-- `RxRequestBrief.pickup_window`、`pharmacy_name` 已宣告，2026-11-25 14:39 建置的後端還沒有回傳，`shapes.ts` 暫時容許缺少。
