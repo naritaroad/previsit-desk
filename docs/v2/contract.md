@@ -86,7 +86,7 @@ interface EngineResult{ protocol_version; disposition:Disposition; evaluated_at;
 interface ProtocolQuestion{ id; scope:'general'|'class'|'monitoring'; class_id:string|null; kind:'boolean'|'choice'|'number'|'text'|'date'; label; help; options:{value,label}[]; unit; min; max; required; max_age_days:number|null } // 已依 locale 在地化
 interface RxEvent{ at; type:string; actor:PersonRef|null; text:string /*已在地化*/; visibility:'all'|'staff' }
 interface RxMessage{ id; author:PersonRef; body; created_at; visibility:'all'|'staff' }
-interface RxRequestBrief{ id; no; kind; status; priority; patient:PersonRef; drug_names:string[]; disposition:Disposition|null; assigned_to:PersonRef|null; submitted_at; sla_due_at; overdue; updated_at; unread:boolean }
+interface RxRequestBrief{ id; no; kind; status; priority; patient:PersonRef; drug_names:string[]; disposition:Disposition|null; assigned_to:PersonRef|null; submitted_at; sla_due_at; overdue; updated_at; unread:boolean; pickup_window:{date,slot}|null; pharmacy_name:string|null }
 interface Pharmacy{ id; name; district; address; hours:string; services:string[] } // 虛構
 ```
 
@@ -136,7 +136,7 @@ interface Pharmacy{ id; name; district; address; hours:string; services:string[]
 | `GET /admin/runs?status=&model=`、`GET /admin/runs/{id}` | 內容只含工具名、狀態、用量，不含病人文字 |
 | `GET /admin/audit?actor=&action=&from=&to=` | 合併 audit_log 與 access_log：`{at,actor:PersonRef,kind:'admin'\|'access'\|'rx'\|'auth',action,target,detail}` |
 | `GET /admin/rules` | 紅旗、越界、慢箋、協定、藥品範圍（唯讀） |
-| `GET /admin/eval` | `{latest:EvalSummary, history:[EvalSummary]}` |
+| `GET /admin/eval` | `{latest:EvalSummary & {cases:[{id,category,passed}]}, history:[EvalSummary]}` |
 | `POST /admin/demo/reset` `{confirm:"RESET"}` | 重建示範資料（不動非示範帳號） |
 
 ## 7. 公開
