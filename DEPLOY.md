@@ -1,7 +1,7 @@
 # 部署手冊 — PreVisit Desk 診前助理
 
 > 狀態：2026-11-25 已照這份文件把服務部署到 Lightsail 主機。每段指令標示 `[已實跑]` 或 `[尚未實跑]`；實跑紀錄與證據見第 16 節。
-> 「本機已驗證」的項目與證據見最後一節；涉及主機、Cloudflare 帳號的步驟都沒有實際執行過。
+> 沒有實跑的只有回復腳本的 `--apply`、資料庫備份、GHCR 與 trycloudflare 備案；第 16 節列出已實跑的證據。
 > 這是展示用站台：只放虛構病人資料，介面已標示「請勿輸入真實病歷或個資」。
 
 ## 0. 先看這裡
@@ -383,9 +383,9 @@ ssh @SshOpt $SshHost "cd $Remote && ./rollback.sh --apply"
 - Dockerfile 的相依快取層假設後端是**單一 crate**，二進位檔名為 `previsit-api`，`Cargo.toml` 沒有自訂 `[[bin]] path`、沒有 `build.rs`（有的話要調整那一層）。
 - 映像建置使用 `cargo build --locked`：`backend/Cargo.lock` 必須與 `Cargo.toml` 同步（先在本機 `cargo build` 一次讓鎖檔更新，再提交）。SQL 假設都是執行期的靜態字串；若程式使用 `sqlx::query!` 這類編譯期檢查巨集，建置階段還需要 `.sqlx` 離線資料。
 - 前端建置假設 `web/` 自給自足（`npm run build` 不讀 `web/` 以外的檔案）；映像檔只複製 `data/seed`、`data/rag`、`data/eval`。
-- 執行階段的時區是 UTC（映像有 tzdata，但沒設定 `TZ`）；若慢箋日期用伺服器日期計算，台灣凌晨 0–8 點會差一天，這個決定屬於後端，不是部署。
-- `previsit-api healthcheck` 與 `check-data` 子指令依後端規格 §11 假設已實作；後端完成前無法驗證。
-- 完整映像尚未建置過（後端與前端原始碼仍在撰寫），所以建置腳本與 Dockerfile 的整合尚未實測；各階段與各腳本已分開驗證（第 16 節）。
+- 容器的系統時區是 UTC（映像有 tzdata，但沒設定 `TZ`）。後端自己用固定 UTC+8 的時鐘算慢箋日期、單號與每日上限（有假時鐘的單元測試，包含 UTC 17:00 ＝ 台北隔天 01:00），所以時區不影響結果。
+- `previsit-api healthcheck` 與 `check-data` 已在真實映像內實測：容器 healthy，`check-data` 回報 data ok（見 `build-image.ps1` 的建置後檢查）。
+- 完整映像已在 2026-11-25 建置、傳到主機並運行（第 16 節的實際部署紀錄）。
 
 ## 15. 基底映像與元件版本（查證日 2026-11-25）
 
