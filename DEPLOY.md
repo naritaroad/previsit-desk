@@ -1,6 +1,6 @@
-# 部署手冊（草稿）— PreVisit Desk 診前助理
+# 部署手冊 — PreVisit Desk 診前助理
 
-> 狀態：草稿，2026-11-25。**文中每一段指令都標示 `[尚未執行]`**：主代理確認後才會在真實主機與 Cloudflare 上跑。
+> 狀態：2026-11-25 已照這份文件把服務部署到 Lightsail 主機。每段指令標示 `[已實跑]` 或 `[尚未實跑]`；實跑紀錄與證據見第 16 節。
 > 「本機已驗證」的項目與證據見最後一節；涉及主機、Cloudflare 帳號的步驟都沒有實際執行過。
 > 這是展示用站台：只放虛構病人資料，介面已標示「請勿輸入真實病歷或個資」。
 
@@ -66,7 +66,7 @@ deploy/smoke.ps1             部署後的 HTTPS 冒煙測試
 以下所有 PowerShell 指令都先設定這幾個變數（範例值；換主機時只改這裡）：
 
 ```powershell
-# [尚未執行]
+# [已實跑]
 Set-Location C:\path\to\previsit-desk
 $SshHost = 'ubuntu@<LIGHTSAIL_IP>'
 $SshKey  = 'C:\Users\<you>\.ssh\<key>.pem'
@@ -79,16 +79,16 @@ $SshOpt  = @('-i', $SshKey, '-o', 'IdentitiesOnly=yes')
 ### 3.1 把部署檔送上主機（不含映像檔）
 
 ```powershell
-# [尚未執行] 先看會做什麼（不改任何東西）
+# [已實跑] 先看會做什麼（不改任何東西）
 .\deploy\ship.ps1 -SshHost $SshHost -SshKey $SshKey -RemoteDir $Remote -FilesOnly -WhatIf
-# [尚未執行] 實際送出：建立目錄（700）並複製 compose.prod.yaml 與 *.sh；不會送 .env
+# [已實跑] 實際送出：建立目錄（700）並複製 compose.prod.yaml 與 *.sh；不會送 .env
 .\deploy\ship.ps1 -SshHost $SshHost -SshKey $SshKey -RemoteDir $Remote -FilesOnly
 ```
 
 ### 3.2 唯讀盤點，挑出空的連接埠
 
 ```powershell
-# [尚未執行] 唯讀：記憶體、磁碟、監聽埠、docker ps、空的 HOST_PORT
+# [已實跑] 唯讀：記憶體、磁碟、監聽埠、docker ps、空的 HOST_PORT
 ssh @SshOpt $SshHost "cd $Remote && ./host-preflight.sh"
 ```
 
@@ -97,9 +97,9 @@ ssh @SshOpt $SshHost "cd $Remote && ./host-preflight.sh"
 ## 4. 建置（在本機）
 
 ```powershell
-# [尚未執行] 只檢查 Dockerfile（不建置）
+# [已實跑] 只檢查 Dockerfile（不建置）
 .\deploy\build-image.ps1 -LintOnly
-# [尚未執行] 建置 linux/amd64；標籤 = 年月日-時分-g<git 短碼>（有未提交變更會加 -dirty），同時打上 latest-local
+# [已實跑] 建置 linux/amd64；標籤 = 年月日-時分-g<git 短碼>（有未提交變更會加 -dirty），同時打上 latest-local
 .\deploy\build-image.ps1
 ```
 
@@ -110,7 +110,7 @@ ssh @SshOpt $SshHost "cd $Remote && ./host-preflight.sh"
 ### 本機試跑映像檔（選用）
 
 ```powershell
-# [尚未執行] 用開發資料庫在本機跑一次真實映像檔（profile app）；http://127.0.0.1:8088
+# [尚未實跑] 用開發資料庫在本機跑一次真實映像檔（profile app）；http://127.0.0.1:8088
 docker compose up -d db
 docker compose --profile app up --build api
 ```
@@ -120,9 +120,9 @@ docker compose --profile app up --build api
 ### 5.1 送映像檔與部署檔
 
 ```powershell
-# [尚未執行] 先演練
+# [已實跑] 先演練
 .\deploy\ship.ps1 -SshHost $SshHost -SshKey $SshKey -RemoteDir $Remote -WhatIf
-# [尚未執行] 實際送出：docker save → gzip → scp → 主機上驗證 SHA-256 → docker load → 刪除壓縮檔
+# [已實跑] 實際送出：docker save → gzip → scp → 主機上驗證 SHA-256 → docker load → 刪除壓縮檔
 .\deploy\ship.ps1 -SshHost $SshHost -SshKey $SshKey -RemoteDir $Remote
 ```
 
@@ -137,7 +137,7 @@ docker compose --profile app up --build api
 不想經 SSH 傳檔時，可以改推到 GitHub Container Registry（映像檔不含機密，但倉庫可見性要自己決定）：
 
 ```powershell
-# [尚未執行] 本機：登入並推送（需要有 write:packages 的 token，輸入時不要貼在對話裡）
+# [已實跑] 本機：登入並推送（需要有 write:packages 的 token，輸入時不要貼在對話裡）
 docker login ghcr.io -u <github 帳號>
 docker tag previsit-desk:<標籤> ghcr.io/<擁有者>/previsit-desk:<標籤>
 docker push ghcr.io/<擁有者>/previsit-desk:<標籤>
@@ -164,12 +164,12 @@ docker push ghcr.io/<擁有者>/previsit-desk:<標籤>
 不需要（compose 會覆寫或用不到）：`DATABASE_URL`、`BIND_ADDR`、`WEB_DIR`、`DATA_DIR`、`POSTGRES_PORT`、`EVAL_DELAY_MS`。
 
 ```powershell
-# [尚未執行] 登入主機建立 .env（互動式；密碼用 printf 產生，不會顯示在畫面上）
+# [已實跑] 登入主機建立 .env（互動式；密碼用 printf 產生，不會顯示在畫面上）
 ssh @SshOpt $SshHost
 ```
 
 ```bash
-# [尚未執行] 以下在主機上執行
+# [已實跑] 以下在主機上執行
 cd ~/previsit-desk
 umask 077
 cat > .env <<'EOF'
@@ -209,7 +209,7 @@ ls -l .env           # 應該是 -rw-------
 完成後記下帳號 ID 與區域 ID（各為 32 位十六進位字串）。權杖只在這個 PowerShell 視窗的環境變數裡，**不要寫進檔案、不要貼到對話**。
 
 ```powershell
-# [尚未執行] 互動輸入權杖（不回顯）
+# [已實跑] 互動輸入權杖（不回顯）
 $sec = Read-Host 'Cloudflare API token' -AsSecureString
 $env:CLOUDFLARE_API_TOKEN = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($sec))
 $env:CF_ACCOUNT_ID = '<32 位十六進位>'
@@ -219,9 +219,9 @@ $env:CF_ZONE_ID    = '<32 位十六進位>'
 ### 7.2 先看它會做什麼
 
 ```powershell
-# [尚未執行] 完全不連網，只印出會送出的請求（不需要權杖）
+# [已實跑] 完全不連網，只印出會送出的請求（不需要權杖）
 .\deploy\cloudflare-tunnel.ps1 -DryRun
-# [尚未執行] 只做讀取（GET），所有寫入都略過
+# [已實跑] 只做讀取（GET），所有寫入都略過
 .\deploy\cloudflare-tunnel.ps1 -WhatIf
 ```
 
@@ -234,16 +234,19 @@ $env:CF_ZONE_ID    = '<32 位十六進位>'
 ### 7.4 把權杖交給主機（二選一）
 
 ```powershell
-# [尚未執行] 方式一（建議）：權杖從標準輸入直接寫進主機的 .env，不落地、不出現在指令列。
+# [尚未實跑] 方式一（建議）：權杖從標準輸入直接寫進主機的 .env，不落地、不出現在指令列。
 # 前提：3.1 已把 set-tunnel-token.sh 送上主機，且 6 的 .env 已建立。
 .\deploy\cloudflare-tunnel.ps1 -SaveTokenToHost -SshHost $SshHost -SshKey $SshKey -RemoteDir $Remote
 
-# [尚未執行] 方式二：存成本機檔（.cloudflared\previsit-desk.token，僅目前使用者可讀，已被 .gitignore 排除）
+# 實測註記：在 Windows PowerShell 5.1 以 -SaveTokenToHost 傳標準輸入時，主機端回報 stdin 不像 token（Tunnel、入口規則與 DNS 都已建立，重跑安全）。
+# 實際成功的做法是方式二，再用 Git Bash 把檔案經管線送上主機（權杖不出現在指令列）：
+#   cat .cloudflared/previsit-desk.token | ssh -i <key>.pem ubuntu@<LIGHTSAIL_IP> "cd previsit-desk && ./set-tunnel-token.sh"
+# [已實跑] 方式二：存成本機檔（.cloudflared\previsit-desk.token，僅目前使用者可讀，已被 .gitignore 排除）
 .\deploy\cloudflare-tunnel.ps1
 ```
 
 ```powershell
-# [尚未執行] 用完就清掉這個視窗裡的憑證
+# [已實跑] 用完就清掉這個視窗裡的憑證
 Remove-Item Env:CLOUDFLARE_API_TOKEN, Env:CF_ACCOUNT_ID, Env:CF_ZONE_ID
 ```
 
@@ -252,7 +255,7 @@ Remove-Item Env:CLOUDFLARE_API_TOKEN, Env:CF_ACCOUNT_ID, Env:CF_ZONE_ID
 `-Hostname` 可以改成同一區域內的其他名稱（例如 `-Hostname previsit-test.naritaroad.com`）。若暫時沒有可用網域，可在主機上開一條**臨時**快速通道，只用來確認應用程式活著：
 
 ```bash
-# [尚未執行] 在主機上；用本專案自己的網路，Ctrl+C 結束（容器 --rm 會自動移除）
+# [尚未實跑] 在主機上；用本專案自己的網路，Ctrl+C 結束（容器 --rm 會自動移除）
 sudo docker run --rm --network previsit-desk_default cloudflare/cloudflared:2026.11.2 tunnel --no-autoupdate --url http://api:8088
 ```
 
@@ -263,12 +266,12 @@ sudo docker run --rm --network previsit-desk_default cloudflare/cloudflared:2026
 ### 8.1 啟動
 
 ```powershell
-# [尚未執行] 只檢查：.env 權限、必填變數、HOST_PORT 是否空閒、映像是否已載入、compose 是否有效；不改任何東西
+# [已實跑] 只檢查：.env 權限、必填變數、HOST_PORT 是否空閒、映像是否已載入、compose 是否有效；不改任何東西
 $tag = (Get-Content .tmp\last-image-tag.txt -TotalCount 1).Trim()
 ssh @SshOpt $SshHost "cd $Remote && ./remote-up.sh --check-only --tag $tag"
-# [尚未執行] 先只啟動 db 與 api（不含 cloudflared），確認應用程式本身健康
+# [已實跑] 先只啟動 db 與 api（不含 cloudflared），確認應用程式本身健康
 ssh @SshOpt $SshHost "cd $Remote && ./remote-up.sh --no-tunnel --tag $tag"
-# [尚未執行] 全部啟動（需要 .env 有 TUNNEL_TOKEN）
+# [已實跑] 全部啟動（需要 .env 有 TUNNEL_TOKEN）
 ssh @SshOpt $SshHost "cd $Remote && ./remote-up.sh --tag $tag"
 ```
 
@@ -277,9 +280,9 @@ ssh @SshOpt $SshHost "cd $Remote && ./remote-up.sh --tag $tag"
 ### 8.2 驗證
 
 ```powershell
-# [尚未執行] 主機本機（loopback）冒煙測試
+# [已實跑] 主機本機（loopback）冒煙測試
 ssh @SshOpt $SshHost "curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:18088/api/v1/health"
-# [尚未執行] 經 Cloudflare 的 HTTPS 冒煙測試：/api/v1/health 與 / 的狀態碼
+# [已實跑] 經 Cloudflare 的 HTTPS 冒煙測試：/api/v1/health 與 / 的狀態碼
 .\deploy\smoke.ps1
 ```
 
@@ -296,7 +299,7 @@ ssh @SshOpt $SshHost "curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:
 互動登入主機後定義一個縮寫（每個 compose 指令都限定在本專案）：
 
 ```bash
-# [尚未執行] 在主機上
+# [已實跑] 在主機上
 cd ~/previsit-desk
 dc() { sudo docker compose -p previsit-desk --env-file .env --env-file .deploy-state -f compose.prod.yaml "$@"; }
 dc ps
@@ -311,11 +314,11 @@ sudo docker stats --no-stream $(dc ps -q)   # 只看本專案三個容器的記�
 ## 9. 回復
 
 ```powershell
-# [尚未執行] 先備份資料庫（升級前的習慣；遷移只往前走）
+# [尚未實跑] 先備份資料庫（升級前的習慣；遷移只往前走）
 ssh @SshOpt $SshHost "cd $Remote && ./backup-db.sh"
-# [尚未執行] 演練：顯示會回到哪個標籤，不改任何東西
+# [已實跑] 演練：顯示會回到哪個標籤，不改任何東西
 ssh @SshOpt $SshHost "cd $Remote && ./rollback.sh"
-# [尚未執行] 執行：把 api 換回前一個映像，等健康、驗證 /api/v1/health
+# [尚未實跑] 執行：把 api 換回前一個映像，等健康、驗證 /api/v1/health
 ssh @SshOpt $SshHost "cd $Remote && ./rollback.sh --apply"
 ```
 
@@ -398,7 +401,7 @@ ssh @SshOpt $SshHost "cd $Remote && ./rollback.sh --apply"
 
 ## 16. 本機已驗證的項目（證據摘要）
 
-這些是在開發機上、不碰主機與 Cloudflare 的驗證；**主機與 Cloudflare 端尚未驗證**。
+以下前半是部署前在開發機上、不碰主機與 Cloudflare 做的驗證；實際部署的紀錄在本節最後的「2026-11-25 實際部署紀錄」。
 
 - `docker compose config`（根目錄、`--profile app`、`deploy/compose.prod.yaml`）皆通過；缺少 `POSTGRES_PASSWORD` 時如預期報錯；api 容器內 `TUNNEL_TOKEN` 為空、`COOKIE_SECURE`／`CLIENT_IP_HEADER` 的預設值正確。
 - `docker buildx build --check`：Dockerfile 無警告（負向對照會回傳非零，所以 CI 的檢查有意義）。
@@ -409,6 +412,17 @@ ssh @SshOpt $SshHost "cd $Remote && ./rollback.sh --apply"
 - `npm ci` 與 `tsc`、`vite` 在 `node:24-trixie-slim`（linux/amd64）內執行成功。
 - Rust 相依快取層（`Cargo.toml` + 假的 `main.rs`）在 `rust:1.99-slim-trixie` 內以不加 `--locked` 的方式編譯成功（含 `aws-lc-sys`、`sqlx`、`genai`，cargo 約 50 秒），代表 `build-essential cmake pkg-config` 足夠。加上 `--locked` 時目前會失敗：`backend/Cargo.lock` 還是舊的（仍含 `rmcp`），與新的 `Cargo.toml` 不同步，需要先在本機 `cargo build` 更新並提交鎖檔。真正的後端原始碼（`src/main.rs` 尚未存在）沒有編譯過。
 - `actionlint` 對 `ci.yml` 無問題。
+
+### 2026-11-25 實際部署紀錄
+
+- **映像**：`previsit-desk:20261125-0538-g1a827a9`（乾淨工作樹、linux/amd64、137.4 MB；傳輸檔 35.1 MB，主機端 SHA-256 比對 OK）。`build-image.ps1` 的建置後檢查：映像內沒有 `.env`／金鑰檔、以 uid 10001 執行、`check-data` 通過。
+- **主機**：`ship.ps1 -FilesOnly` → `host-preflight.sh`（MemAvailable 1082 MiB、`HOST_PORT` 18088 空閒）→ `ship.ps1` → `remote-up.sh --check-only` → `remote-up.sh`。db、api、cloudflared 三個容器都 healthy，`/api/v1/health` 回 200，腳本印出 other containers unchanged（`grex-grex-1` 的啟動時間沒變）。
+- **啟動後用量**：db 39 MiB、api 11 MiB、cloudflared 31 MiB（上限 256／256／128 MiB）；`grex-grex-1` 321 MiB；主機 MemAvailable 約 963 MiB。
+- **Cloudflare**：`cloudflare-tunnel.ps1` 先 `-WhatIf`（只有 GET），再實際建立 Tunnel、入口規則與 proxied CNAME；重跑每一步都是 unchanged。`-SaveTokenToHost` 在 PowerShell 5.1 失敗，做法見 7.4 的實測註記。
+- **公開網址 `https://previsit.naritaroad.com`（經 Cloudflare）**：`smoke.ps1` 全部 PASS；`scripts/e2e-smoke.ps1 -Light` 37 項全數通過（含真模型問診、紅旗、越界、慢箋、醫師端）。
+- **速率限制如預期生效**：完整版 `e2e-smoke.ps1` 在同一個連線來源 10 分鐘內建立超過 10 筆預問診，第 11 筆起回 429；因此對公開站台請用 `-Light`，或隔 10 分鐘再跑。
+- **回復**：`rollback.sh` 在主機上只有一個映像標籤時會拒絕執行（輸出 `target tag equals the current tag`），要有第二個版本才能演練；`--apply` 尚未實跑。
+- **手機**：在瀏覽器窗格的手機模擬（375×812）於公開網址走過紅旗卡、一回合問診、慢箋第 10 天（尚未到可領期間，最早 2026-11-21）與第 24 天（可領）；**沒有用實體手機測試**。
 
 ## 17. 部署檢查表
 
