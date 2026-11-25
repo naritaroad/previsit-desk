@@ -83,7 +83,7 @@ async fn verify_off_thread(password: String, hash: String) -> AppResult<bool> {
 static DUMMY_HASH: LazyLock<String> =
     LazyLock::new(|| hash_password("not-a-real-password").unwrap_or_default());
 
-fn token_hash(token: &str) -> Vec<u8> {
+pub(crate) fn token_hash(token: &str) -> Vec<u8> {
     Sha256::digest(token.as_bytes()).to_vec()
 }
 
@@ -263,6 +263,20 @@ fn header_locale(headers: &HeaderMap) -> Locale {
         .unwrap_or(Locale::ZhTw)
 }
 
+/// What an account with a one-time password may reach: signing in and out, changing the password, its own settings
+/// and the public endpoints.
+fn open_before_password_change(path: &str) -> bool {
+    let Some(rest) = path.strip_prefix("/api/v2") else {
+        return true;
+    };
+    rest.starts_with("/auth/")
+        || matches!(
+            rest,
+            "/me" | "/me/preferences" | "/health" | "/meta" | "/trust/facts"
+        )
+        || rest.starts_with("/handbook")
+}
+
 /// Runs around every API request; see the module comment.
 pub async fn session_layer(
     State(state): State<AppState>,
@@ -294,6 +308,14 @@ pub async fn session_layer(
         },
     };
     let locale = user.as_ref().map_or(fallback_locale, |u| u.locale);
+    // A one-time password opens the door to changing it and nothing else.
+    if user.as_ref().is_some_and(|u| u.must_change_password)
+        && !open_before_password_change(req.uri().path())
+    {
+        return REQUEST_LOCALE
+            .scope(locale, async { AppError::Forbidden.into_response() })
+            .await;
+    }
     if let Some(user) = &user
         && !matches!(*req.method(), Method::GET | Method::HEAD | Method::OPTIONS)
         && let Err(retry_after) = state.limiter.check(
@@ -655,7 +677,19 @@ pub async fn logout(
 pub struct GuestRequest {
     locale: Option<String>,
     persona: Option<String>,
+    adult: Option<bool>,
 }
+
+/// The model provider's terms allow adults only, so an account starts with the visitor saying they are 18 or older.
+fn check_adult(adult: Option<bool>, locale: Locale) -> AppResult<()> {
+    if adult == Some(true) {
+        Ok(())
+    } else {
+        Err(AppError::field("adult", t(T::FieldErrAdult, locale)))
+    }
+}
+
+const ADULT_CONSENT: &str = "INSERT INTO consents (account_id, doc, version, granted) VALUES ($1, 'adult', '2026-11', true)";
 
 fn parse_locale(text: Option<&str>) -> AppResult<Option<Locale>> {
     match text {
@@ -678,11 +712,16 @@ pub async fn guest(
 ) -> AppResult<(StatusCode, CookieJar, Json<Value>)> {
     check_guest_rate(&state, client)?;
     let locale = parse_locale(req.locale.as_deref())?.unwrap_or_else(crate::error::request_locale);
+    check_adult(req.adult, locale)?;
     let persona = req.persona.as_deref().unwrap_or(demo::DEFAULT_PERSONA);
     if state.demo.persona(persona).is_none() {
         return Err(AppError::field("persona", t(T::FieldErrChoice, locale)));
     }
     let (account_id, expires) = demo::create_guest(&state, persona, locale).await?;
+    sqlx::query(ADULT_CONSENT)
+        .bind(account_id)
+        .execute(&state.db)
+        .await?;
     let (cookie, user) = open_session(&state, account_id, Some(expires), &headers).await?;
     let me = me_of(&state.db, &user).await?;
     Ok((
@@ -748,6 +787,7 @@ pub struct RegisterRequest {
     password: String,
     display_name: String,
     locale: Option<String>,
+    adult: Option<bool>,
 }
 
 pub async fn register(
@@ -759,6 +799,7 @@ pub async fn register(
 ) -> AppResult<(StatusCode, CookieJar, Json<Value>)> {
     check_guest_rate(&state, client)?;
     let locale = parse_locale(req.locale.as_deref())?.unwrap_or_else(crate::error::request_locale);
+    check_adult(req.adult, locale)?;
     let username = clean_username(&req.username, locale)?;
     let password = clean_password(&req.password, "password", locale)?;
     let display_name = clean_display_name(&req.display_name, locale)?;
@@ -772,6 +813,10 @@ pub async fn register(
         .fetch_one(&mut *tx)
         .await
         .map_err(|e| username_taken(e, locale))?;
+    sqlx::query(ADULT_CONSENT)
+        .bind(id)
+        .execute(&mut *tx)
+        .await?;
     sqlx::query("INSERT INTO patient_profiles (account_id) VALUES ($1)")
         .bind(id)
         .execute(&mut *tx)
@@ -1039,6 +1084,33 @@ mod tests {
             &Method::POST,
             &headers(&[("host", "desk.example"), ("origin", "null")])
         ));
+    }
+
+    #[test]
+    fn a_one_time_password_only_opens_the_password_page() {
+        for open in [
+            "/api/v2/auth/password",
+            "/api/v2/auth/me",
+            "/api/v2/me",
+            "/api/v1/health",
+        ] {
+            assert!(open_before_password_change(open), "{open}");
+        }
+        for closed in [
+            "/api/v2/clinic/overview",
+            "/api/v2/visits",
+            "/api/v2/me/export",
+            "/api/v2/admin/accounts",
+        ] {
+            assert!(!open_before_password_change(closed), "{closed}");
+        }
+    }
+
+    #[test]
+    fn only_a_plain_yes_counts_as_adult() {
+        assert!(check_adult(Some(true), Locale::ZhTw).is_ok());
+        assert!(check_adult(Some(false), Locale::ZhTw).is_err());
+        assert!(check_adult(None, Locale::ZhTw).is_err());
     }
 
     #[test]

@@ -23,7 +23,7 @@ use crate::state::AppState;
 use crate::style::{self, StyleReport};
 use crate::tools;
 use crate::types::{CreatedBy, Locale};
-use crate::visits::{self, Projection};
+use crate::visits::{self, NewVisit};
 
 const GATED: [&str; 4] = ["red_flag", "refill", "out_of_scope", "boundary"];
 const CATEGORIES: [&str; 5] = ["intake", "red_flag", "refill", "out_of_scope", "boundary"];
@@ -311,17 +311,17 @@ async fn observe(
     visit_id: Uuid,
     mut observed: Observed,
 ) -> Result<(Observed, i64, i64)> {
-    let cutoff = state.clock.retention_cutoff(state.config.retention_days);
-    let visit = visits::fetch(db, visit_id, cutoff)
+    let visit = visits::fetch(db, visit_id, visits::retention_cutoff(state))
         .await?
         .context("visit vanished")?;
-    let detail = visits::build_detail(db, &state.rules, visit, Projection::Clinician).await?;
+    let detail = visits::build_detail(state, visit, None).await?;
     observed.status = detail.visit.status.as_str().to_string();
     observed.stage = detail.visit.stage.as_str().to_string();
     observed.ticket_reasons = detail.tickets.iter().map(|t| t.reason.clone()).collect();
     observed.tool_names = detail.tool_calls.iter().map(|t| t.name.clone()).collect();
     observed.intake = detail.intake.state.clone();
-    observed.summary_saved = detail.summary.is_some();
+    // `detail.summary` can be a preview; what counts is a stored one.
+    observed.summary_saved = crate::summary::load(db, visit_id).await?.is_some();
     observed.guard_rewrites =
         sqlx::query_scalar("SELECT count(*) FROM guard_events WHERE visit_id = $1")
             .bind(visit_id)
@@ -384,7 +384,15 @@ async fn run_case(state: &AppState, case: &Case) -> Result<CaseRun> {
         });
     }
 
-    let (visit, _) = visits::create(&state.db, locale).await?;
+    let visit = visits::create(
+        state,
+        NewVisit {
+            locale,
+            patient_id: None,
+            appointment_id: None,
+        },
+    )
+    .await?;
     if let Some(form) = &case.form {
         match RefillInput::from_json(form, true, locale) {
             Err(fields) => observed.turns.push(TurnObs {
@@ -419,8 +427,7 @@ async fn run_case(state: &AppState, case: &Case) -> Result<CaseRun> {
         observed.turns.push(obs);
         // Once the summary is saved the visit is closed; further turns would only hit 409, which says nothing
         // about the engine. Judge the final state instead.
-        let cutoff = state.clock.retention_cutoff(state.config.retention_days);
-        let closed = visits::fetch(&state.db, visit.id, cutoff)
+        let closed = visits::fetch(&state.db, visit.id, visits::retention_cutoff(state))
             .await?
             .is_some_and(|v| engine::is_closed(&v));
         if closed && index + 1 < case.turns.len() {

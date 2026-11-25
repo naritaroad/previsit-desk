@@ -1,0 +1,6 @@
+[
+  { "weekdays": [1, 2, 3, 4, 5], "starts": "09:00", "ends": "12:00", "minutes": 15, "department": "家庭醫學科", "department_en": "Family medicine", "mode": "in_person", "room": "第 3 診間" },
+  { "weekdays": [2, 4], "starts": "14:00", "ends": "16:30", "minutes": 15, "department": "慢性病門診", "department_en": "Chronic care clinic", "mode": "in_person", "room": "第 3 診間" },
+  { "weekdays": [1, 3, 5], "starts": "14:00", "ends": "15:30", "minutes": 15, "department": "慢性病門診", "department_en": "Chronic care clinic", "mode": "video", "room": null },
+  { "weekdays": [6], "starts": "09:00", "ends": "11:00", "minutes": 15, "department": "家庭醫學科", "department_en": "Family medicine", "mode": "in_person", "room": "第 2 診間" }
+]

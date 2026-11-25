@@ -298,8 +298,74 @@ texts! {
     FieldErrPersonal => ("看起來有個人資料，請改用暱稱。", "That looks like personal data. Use a nickname instead."),
     FieldErrTaken => ("這個帳號名稱已經有人使用。", "That username is already taken."),
     FieldErrConfirm => ("請輸入 {word} 確認。", "Type {word} to confirm."),
+    FieldErrSlot => ("這個時段不能預約，可能剛被約走。請重新整理後再選。", "That slot cannot be booked; someone may have just taken it. Refresh and choose again."),
+    FieldErrSignature => ("簽署前要先寫評估與計畫。", "Write the assessment and the plan before signing."),
+    FieldErrDiastolic => ("舒張壓要比收縮壓低。", "The lower number must be below the upper one."),
+    MeasureBp => ("血壓", "Blood pressure"),
+    MeasureGlucose => ("血糖", "Glucose"),
+    MeasureWeight => ("體重", "Weight"),
+    MeasurePulse => ("脈搏", "Pulse"),
+    SourcePatient => ("自述", "self-reported"),
+    SourceClinic => ("診所", "clinic"),
+    FieldErrAdult => ("本服務只給年滿 18 歲的人使用，請先確認。", "This service is for people aged 18 or older. Please confirm first."),
+    FieldErrRolePatient => ("病人帳號和工作人員帳號不能互換。", "A patient account cannot become a staff account, or the other way round."),
+    SystemLabel => ("系統", "System"),
+    TaskRedFlag => ("有緊急提醒，請先就醫", "Emergency reminder: get care first"),
+    TaskPrevisit => ("完成看診前的預問診", "Finish the pre-visit before your appointment"),
+    TaskRxMoreInfo => ("醫師需要您補充：申請 {no}", "The doctor needs more on request {no}"),
+    TaskRxReady => ("可以去領藥：{drugs}", "Ready to collect: {drugs}"),
+    TaskRxDraft => ("有一份還沒送出的申請：{drugs}", "A request you have not sent yet: {drugs}"),
+    TaskRefill => ("可以預約領藥：{drug}", "You can book a refill: {drug}"),
+    TaskRenewal => ("「{drug}」的處方已用完，可以申請續開", "Your prescription for {drug} has run out; you can ask for a renewal"),
+    TaskConsent => ("看過 AI 使用說明並選擇是否同意", "Read how AI is used and choose whether to agree"),
+    ActSubmitted => ("{patient}送出預問診", "{patient} submitted a pre-visit"),
+    ActSigned => ("{actor}簽署了{patient}的看診筆記", "{actor} signed the note for {patient}"),
+    ActRedFlag => ("{patient}的訊息命中紅旗「{label}」", "A message from {patient} matched the red flag \"{label}\""),
+    ActRx => ("{patient}的申請：{status}", "Request from {patient}: {status}"),
+    ActContact => ("{actor}聯絡了{patient}", "{actor} contacted {patient}"),
+    TlVisitCreated => ("開始預問診「{title}」", "Started the pre-visit \"{title}\""),
+    TlVisitSubmitted => ("送出預問診「{title}」", "Submitted the pre-visit \"{title}\""),
+    TlVisitReviewed => ("審閱完成「{title}」", "Reviewed \"{title}\""),
+    TlAppointment => ("{department}約診：{status}", "Appointment, {department}: {status}"),
+    TlTicket => ("轉交單 {no}：{reason}", "Ticket {no}: {reason}"),
+    TlRx => ("{kind} {no} 目前{status}", "{kind} {no}: {status}"),
+    TlPhone => ("電話紀錄：{text}", "Phone note: {text}"),
+    TlMessage => ("站內訊息：{text}", "Message: {text}"),
+    ApptBooked => ("已預約", "Booked"),
+    ApptCheckedIn => ("已報到", "Checked in"),
+    ApptCompleted => ("已完成", "Completed"),
+    ApptCancelled => ("已取消", "Cancelled"),
     UnknownPatient => ("未具名病人", "Unnamed patient"),
     SomeoneLabel => ("醫療團隊", "The care team"),
+
+    // ---- v2: visits ----
+    DefaultVisitTitle => ("新的預問診", "New pre-visit"),
+    CareThreadTitle => ("醫療團隊訊息", "Message from the care team"),
+    FollowUpMissing => ("未取得：{fields}", "Not collected: {fields}"),
+    NoticeAiDisabled => (
+        "AI 問答目前停用。您剛才的內容已儲存，醫療團隊看得到。要找真人，請按「請醫師聯絡我」。紅旗警示和「慢箋檢核」表單不受影響。",
+        "AI chat is switched off right now. What you typed is saved and the care team can see it. To reach a person, choose \"Ask the clinic to contact me\". Red-flag screening and the refill check form still work."
+    ),
+    NoticeMonthlyBudget => (
+        "這個月的 AI 額度用完了，下個月才能再用。紅旗警示和「慢箋檢核」表單不受影響。要找真人，請按「請醫師聯絡我」。",
+        "This month's AI quota is used up and resets next month. Red-flag screening and the refill check form still work. To reach a person, choose \"Ask the clinic to contact me\"."
+    ),
+    NoticeInterrupted => (
+        "上一則沒有完成，請按「重試」。",
+        "The last reply did not finish. Choose \"Retry\"."
+    ),
+    HandoffTaken => (
+        "{name}接手這段對話，接下來由真人回覆。AI 暫停回覆；緊急警示照常運作。",
+        "{name} has taken over this conversation and a person will reply from here. The AI is paused; emergency screening keeps running."
+    ),
+    HandoffReleased => (
+        "{name}把對話交回 AI 預問診助理。",
+        "{name} has handed the conversation back to the AI assistant."
+    ),
+    StaffContactOpening => (
+        "這裡是醫療團隊和您的對話。請不要輸入真實的病歷或個人資料；緊急狀況請直接撥 119。",
+        "This is your conversation with the care team. Please do not enter real medical records or personal details; in an emergency call 119."
+    ),
 
     // ---- v2: permission names for the matrix ----
     PermVisitOwn => ("自己的預問診", "Own pre-visits"),
@@ -496,6 +562,18 @@ pub fn rx_kind_label(kind: &str, locale: Locale) -> &'static str {
             T::RxKindRefill
         } else {
             T::RxKindRenewal
+        },
+        locale,
+    )
+}
+
+pub fn appt_status_label(status: &str, locale: Locale) -> &'static str {
+    t(
+        match status {
+            "booked" => T::ApptBooked,
+            "checked_in" => T::ApptCheckedIn,
+            "completed" => T::ApptCompleted,
+            _ => T::ApptCancelled,
         },
         locale,
     )

@@ -192,9 +192,9 @@ impl Config {
         )
     }
 
-    /// Whether replies can be produced: the offline model needs nothing, a real one needs the API key.
-    pub fn model_ready(&self) -> bool {
-        self.model == "mock" || self.api_key_present
+    /// Whether `model` can answer: the offline model needs nothing, a real one needs the API key.
+    pub fn model_ready(&self, model: &str) -> bool {
+        model.starts_with("mock") || self.api_key_present
     }
 
     /// Run-wide timeout: twice one model call, at most 90 seconds.

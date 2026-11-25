@@ -86,21 +86,27 @@ impl Ai {
     }
 
     /// A gateway for `model` with the given thinking level (`None` or `Default` sends no thinking option).
-    pub fn gateway(&self, model: &str, thinking: Option<Thinking>) -> Box<dyn ModelGateway> {
-        if model == "mock" {
+    /// Every name that starts with `mock` is the offline stand-in.
+    pub fn gateway(
+        &self,
+        model: &str,
+        thinking: Option<Thinking>,
+        temperature: f64,
+    ) -> Box<dyn ModelGateway> {
+        if model.starts_with("mock") {
             return Box::new(mock::MockGateway);
         }
         Box::new(GenaiGateway {
             client: self.client.clone(),
             model: model.to_string(),
-            options: chat_options(thinking),
+            options: chat_options(thinking, temperature),
         })
     }
 }
 
-fn chat_options(thinking: Option<Thinking>) -> ChatOptions {
+fn chat_options(thinking: Option<Thinking>, temperature: f64) -> ChatOptions {
     let mut options = ChatOptions::default()
-        .with_temperature(0.3)
+        .with_temperature(temperature)
         .with_max_tokens(2048);
     if let Some(effort) = reasoning_effort(thinking) {
         options = options.with_reasoning_effort(effort);
@@ -146,10 +152,10 @@ mod tests {
     #[test]
     fn chat_options_carry_the_effort_only_when_asked() {
         assert!(matches!(
-            chat_options(Some(Thinking::Minimal)).reasoning_effort,
+            chat_options(Some(Thinking::Minimal), 0.3).reasoning_effort,
             Some(ReasoningEffort::Minimal)
         ));
-        assert!(chat_options(None).reasoning_effort.is_none());
+        assert!(chat_options(None, 0.3).reasoning_effort.is_none());
     }
 
     #[tokio::test]
@@ -157,9 +163,9 @@ mod tests {
         let ai = Ai {
             client: genai::Client::new().expect("client"),
         };
-        assert_eq!(ai.gateway("mock", None).model_name(), "mock");
+        assert_eq!(ai.gateway("mock", None, 0.3).model_name(), "mock");
         assert_eq!(
-            ai.gateway("gemini-3.5-flash", Some(Thinking::Minimal))
+            ai.gateway("gemini-3.5-flash", Some(Thinking::Minimal), 0.3)
                 .model_name(),
             "gemini-3.5-flash"
         );

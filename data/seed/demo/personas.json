@@ -4,23 +4,222 @@
     "display_name": "林秀琴",
     "display_name_en": "Hsiu-Chin Lin",
     "age_band": "60-69",
-    "summary_zh": "62 歲女性，高血壓和第二型糖尿病，固定拿慢箋。",
-    "summary_en": "62-year-old woman with high blood pressure and type 2 diabetes on refillable prescriptions."
+    "summary_zh": "62 歲女性，高血壓和第二型糖尿病，固定拿慢箋。有一種藥可以領了，另一種快用完，要申請續開。",
+    "summary_en": "62-year-old woman with high blood pressure and type 2 diabetes. One refill window is open; another prescription is about to run out and needs a renewal.",
+    "record": {
+      "age": 62,
+      "sex": "female",
+      "height_cm": 156,
+      "conditions": [
+        { "name": "高血壓", "name_en": "High blood pressure", "since": "2014", "source": "clinic" },
+        { "name": "第二型糖尿病", "name_en": "Type 2 diabetes", "since": "2018", "source": "clinic" },
+        { "name": "高血脂", "name_en": "High cholesterol", "since": "2020", "source": "clinic" }
+      ],
+      "medications": [
+        { "name": "魚油", "name_en": "Fish oil", "detail": "早餐後自己買來吃", "detail_en": "Bought over the counter, after breakfast", "source": "patient" }
+      ],
+      "allergies": [
+        { "name": "青黴素", "name_en": "Penicillin", "detail": "起疹子", "detail_en": "Rash", "source": "clinic" }
+      ],
+      "family_history": [
+        { "name": "母親糖尿病", "name_en": "Mother: diabetes", "source": "patient" }
+      ],
+      "lifestyle": { "smoking": "不抽菸", "smoking_en": "Does not smoke", "alcohol": "不喝酒", "alcohol_en": "Does not drink", "exercise": "每天傍晚快走 30 分鐘", "exercise_en": "Walks 30 minutes every evening" },
+      "preferred_pharmacy": "ph-anhe",
+      "care": { "status": "active", "tags": ["三高", "慢箋"], "last_contact": -20 },
+      "measurements": [
+        { "kind": "bp", "time": "07:40", "points": [[-56, 142, 86], [-49, 139, 85], [-42, 140, 84], [-35, 136, 82], [-28, 138, 83], [-21, 134, 82], [-14, 135, 80], [-7, 132, 80], [-2, 133, 79]] },
+        { "kind": "glucose", "time": "07:30", "points": [[-49, 148], [-42, 141], [-35, 144], [-28, 136], [-21, 138], [-14, 131], [-7, 134], [-2, 129]] },
+        { "kind": "weight", "time": "07:20", "points": [[-56, 64.2], [-28, 63.8], [-7, 63.5]] },
+        { "kind": "lab", "name": "HbA1c", "unit": "%", "time": "09:30", "source": "clinic", "points": [[-112, 7.6], [-22, 7.1]] },
+        { "kind": "lab", "name": "LDL-C", "unit": "mg/dL", "time": "09:30", "source": "clinic", "points": [[-112, 118], [-22, 92]] },
+        { "kind": "lab", "name": "eGFR", "unit": "mL/min", "time": "09:30", "source": "clinic", "points": [[-112, 78], [-22, 76]] },
+        { "kind": "lab", "name": "K", "unit": "mmol/L", "time": "09:30", "source": "clinic", "points": [[-112, 4.3], [-22, 4.2]] }
+      ],
+      "prescriptions": [
+        { "drug_id": "losartan", "dose": "50 mg，每日一次，早餐後一顆", "dose_en": "50 mg, one tablet once a day after breakfast", "issued": -22, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-22, "ph-anhe"]] },
+        { "drug_id": "metformin", "dose": "500 mg，每日兩次，早晚餐後各一顆", "dose_en": "500 mg, one tablet twice a day after breakfast and dinner", "issued": -80, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-80, "ph-anhe"], [-53, "ph-anhe"], [-25, "ph-anhe"]] },
+        { "drug_id": "atorvastatin", "dose": "10 mg，每日一次，睡前一顆", "dose_en": "10 mg, one tablet once a day at bedtime", "issued": -10, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-10, "ph-anhe"]] }
+      ],
+      "visits": [
+        {
+          "key": "past",
+          "day": -22,
+          "guest_day": -6,
+          "time": "08:20",
+          "status": "reviewed",
+          "messages": [
+            ["assistant", "請先說說，您今天哪裡不舒服？", "To start: what is bothering you today?"],
+            ["patient", "這次是回診拿藥，另外早上起床有點頭暈，大概兩個禮拜了", "I am here for my regular follow-up, and I have felt a little dizzy on getting up for about two weeks"],
+            ["assistant", "兩個禮拜，起床會頭暈。是一下子就過去，還是會持續？", "Two weeks of dizziness on getting up. Does it pass quickly, or does it stay?"],
+            ["patient", "坐一下就好了，沒有跌倒，也沒有想吐。難受的程度大概 2 分", "It goes away after I sit for a moment. No falls, no nausea. About 2 out of 10"],
+            ["assistant", "坐一下就好，沒有跌倒。健康檔案上有高血壓、糖尿病和高血脂，對青黴素過敏，現在還是一樣嗎？", "It passes when you sit, and no falls. Your record lists high blood pressure, diabetes and high cholesterol, and a penicillin allergy. Is that still right?"],
+            ["patient", "一樣，藥也都照吃", "Yes, the same, and I take the medicines as usual"]
+          ],
+          "intake": {
+            "chief_complaint": ["回診，早上起床頭暈", "Follow-up visit, dizzy on getting up"],
+            "hpi.onset": ["約兩週前", "About two weeks ago"],
+            "hpi.course": ["只在起床時，坐一下就好", "Only on getting up, passes after sitting"],
+            "hpi.severity": 2,
+            "hpi.associated": ["沒有跌倒、沒有想吐", "No falls, no nausea"],
+            "past_history": [["高血壓", "High blood pressure"], ["第二型糖尿病", "Type 2 diabetes"], ["高血脂", "High cholesterol"]],
+            "medications": [["洛沙坦", "Losartan"], ["Metformin", "Metformin"], ["阿托伐他汀", "Atorvastatin"]],
+            "allergies": [["青黴素", "Penicillin"]]
+          },
+          "evidence": { "chief_complaint": [1], "hpi.onset": [1], "hpi.course": [3], "hpi.severity": [3], "hpi.associated": [3], "past_history": [5], "medications": [5], "allergies": [5] },
+          "note": {
+            "assessment": "姿勢性頭暈，血壓與血糖控制尚可。",
+            "plan": "原處方續用，請病人起床放慢並記錄早晨血壓，四週後回診。",
+            "patient_message": ["起床時先在床邊坐一分鐘再站起來。早上量一次血壓，記在健康檔案裡，下次我們一起看。頭暈變嚴重或跌倒，請提早回診。", "Sit on the edge of the bed for a minute before standing. Measure your blood pressure in the morning and log it; we will look at it together next time. Come back sooner if the dizziness gets worse or you fall."]
+          }
+        }
+      ]
+    }
   },
   {
     "id": "chang",
     "display_name": "張志明",
     "display_name_en": "Chih-Ming Chang",
     "age_band": "40-49",
-    "summary_zh": "45 歲男性，氣喘和過敏性鼻炎，換季時症狀比較多。",
-    "summary_en": "45-year-old man with asthma and allergic rhinitis that flare when the season changes."
+    "summary_zh": "45 歲男性，氣喘和過敏性鼻炎，換季時症狀比較多。吸入劑可以領了，抗組織胺已經用完兩天。",
+    "summary_en": "45-year-old man with asthma and allergic rhinitis that flare when the season changes. The inhaler can be refilled; the antihistamine ran out two days ago.",
+    "record": {
+      "age": 45,
+      "sex": "male",
+      "height_cm": 172,
+      "conditions": [
+        { "name": "氣喘", "name_en": "Asthma", "since": "1995", "source": "clinic" },
+        { "name": "過敏性鼻炎", "name_en": "Allergic rhinitis", "since": "2001", "source": "clinic" }
+      ],
+      "medications": [],
+      "allergies": [
+        { "name": "塵蟎", "name_en": "Dust mites", "source": "patient" },
+        { "name": "阿斯匹靈", "name_en": "Aspirin", "detail": "吃了會喘", "detail_en": "Causes wheezing", "source": "clinic" }
+      ],
+      "family_history": [
+        { "name": "父親氣喘", "name_en": "Father: asthma", "source": "patient" }
+      ],
+      "lifestyle": { "smoking": "五年前戒菸", "smoking_en": "Quit five years ago", "alcohol": "聚餐才喝", "alcohol_en": "Socially", "exercise": "週末騎腳踏車", "exercise_en": "Cycles at weekends" },
+      "preferred_pharmacy": "ph-heping",
+      "care": { "status": "active", "tags": ["氣喘"], "last_contact": -35 },
+      "measurements": [
+        { "kind": "weight", "time": "08:00", "points": [[-60, 78.4], [-30, 78.0], [-5, 77.6]] },
+        { "kind": "pulse", "time": "08:00", "points": [[-30, 76], [-14, 74], [-5, 78]] },
+        { "kind": "bp", "time": "08:00", "points": [[-30, 124, 78], [-5, 122, 76]] }
+      ],
+      "prescriptions": [
+        { "drug_id": "budesonide_formoterol", "dose": "160/4.5 mcg，每日早晚各吸一次", "dose_en": "160/4.5 mcg, one inhalation morning and evening", "issued": -20, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-20, "ph-heping"]] },
+        { "drug_id": "cetirizine", "dose": "10 mg，每日一次，睡前一顆", "dose_en": "10 mg, one tablet once a day at bedtime", "issued": -58, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-58, "ph-heping"], [-30, "ph-heping"]] },
+        { "drug_id": "montelukast", "dose": "10 mg，每日一次，睡前一顆", "dose_en": "10 mg, one tablet once a day at bedtime", "issued": -70, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-70, "ph-heping"], [-42, "ph-heping"], [-14, "ph-heping"]] }
+      ],
+      "visits": [
+        {
+          "key": "past",
+          "day": -20,
+          "guest_day": -5,
+          "time": "09:05",
+          "status": "reviewed",
+          "messages": [
+            ["assistant", "請先說說，您今天哪裡不舒服？", "To start: what is bothering you today?"],
+            ["patient", "換季鼻塞、打噴嚏，晚上偶爾會咳", "Stuffy nose and sneezing since the season changed, and a cough some nights"],
+            ["assistant", "鼻塞、打噴嚏，晚上偶爾咳。大概多久了，有喘嗎？", "Stuffy nose, sneezing and some night cough. How long has it been, and any wheezing?"],
+            ["patient", "一個禮拜，沒有喘，吸入劑都有用。難受的程度 3 分", "A week. No wheezing, I use the inhaler every day. About 3 out of 10"],
+            ["assistant", "一個禮拜，沒有喘。檔案上有氣喘和過敏性鼻炎，對阿斯匹靈過敏，現在還是一樣嗎？", "A week, no wheezing. Your record lists asthma, allergic rhinitis and an aspirin allergy. Is that still right?"],
+            ["patient", "對，一樣", "Yes, the same"]
+          ],
+          "intake": {
+            "chief_complaint": ["鼻塞打噴嚏", "Stuffy nose and sneezing"],
+            "hpi.onset": ["一週前換季開始", "A week ago, when the season changed"],
+            "hpi.course": ["差不多，晚上偶爾咳", "About the same, some night cough"],
+            "hpi.severity": 3,
+            "hpi.associated": ["沒有喘", "No wheezing"],
+            "past_history": [["氣喘", "Asthma"], ["過敏性鼻炎", "Allergic rhinitis"]],
+            "medications": [["吸入劑", "Inhaler"], ["西替利嗪", "Cetirizine"]],
+            "allergies": [["阿斯匹靈", "Aspirin"], ["塵蟎", "Dust mites"]]
+          },
+          "evidence": { "chief_complaint": [1], "hpi.onset": [3], "hpi.course": [1], "hpi.severity": [3], "hpi.associated": [3], "past_history": [5], "allergies": [5] },
+          "note": {
+            "assessment": "過敏性鼻炎換季發作，氣喘目前穩定。",
+            "plan": "原處方續用，加強防蟎與鼻腔沖洗，一個月後追蹤。",
+            "patient_message": ["鼻子的症狀和換季有關，照原本的藥繼續用。每天洗鼻子，寢具每週用熱水洗一次。半夜喘醒或要常用急救藥，請提早回診。", "Your nose symptoms go with the season. Keep taking your usual medicines. Rinse your nose daily and wash bedding in hot water weekly. Come back sooner if you wake up wheezing or need your rescue inhaler often."]
+          }
+        }
+      ]
+    }
   },
   {
     "id": "wu",
     "display_name": "吳金水",
     "display_name_en": "Chin-Shui Wu",
     "age_band": "70-79",
-    "summary_zh": "71 歲男性，高血壓、高血脂和攝護腺肥大，睡前另外吃一顆安眠藥。",
-    "summary_en": "71-year-old man with high blood pressure, high cholesterol and an enlarged prostate, plus a sleeping pill at night."
+    "summary_zh": "71 歲男性，高血壓、高血脂和攝護腺肥大。睡前的安眠藥是管制藥，不能在線上申請。",
+    "summary_en": "71-year-old man with high blood pressure, high cholesterol and an enlarged prostate. His bedtime sleeping pill is a controlled drug and cannot be requested online.",
+    "record": {
+      "age": 71,
+      "sex": "male",
+      "height_cm": 165,
+      "conditions": [
+        { "name": "高血壓", "name_en": "High blood pressure", "since": "2008", "source": "clinic" },
+        { "name": "高血脂", "name_en": "High cholesterol", "since": "2012", "source": "clinic" },
+        { "name": "攝護腺肥大", "name_en": "Enlarged prostate", "since": "2019", "source": "clinic" },
+        { "name": "失眠", "name_en": "Insomnia", "since": "2023", "source": "patient" }
+      ],
+      "medications": [
+        { "name": "葉黃素", "name_en": "Lutein", "source": "patient" }
+      ],
+      "allergies": [],
+      "family_history": [
+        { "name": "哥哥中風", "name_en": "Brother: stroke", "source": "patient" }
+      ],
+      "lifestyle": { "smoking": "十年前戒菸", "smoking_en": "Quit ten years ago", "alcohol": "偶爾小酌", "alcohol_en": "Occasionally", "exercise": "早上公園打太極拳", "exercise_en": "Tai chi in the park every morning" },
+      "preferred_pharmacy": "ph-minsheng",
+      "care": { "status": "active", "tags": ["三高", "長者"], "last_contact": -12 },
+      "measurements": [
+        { "kind": "bp", "time": "06:50", "points": [[-63, 148, 84], [-49, 145, 82], [-35, 142, 80], [-21, 141, 80], [-14, 138, 78], [-7, 140, 79], [-1, 137, 78]] },
+        { "kind": "weight", "time": "06:40", "points": [[-63, 66.0], [-35, 65.8], [-7, 65.9]] },
+        { "kind": "lab", "name": "LDL-C", "unit": "mg/dL", "time": "10:00", "source": "clinic", "points": [[-83, 96]] },
+        { "kind": "lab", "name": "eGFR", "unit": "mL/min", "time": "10:00", "source": "clinic", "points": [[-83, 64]] },
+        { "kind": "lab", "name": "PSA", "unit": "ng/mL", "time": "10:00", "source": "clinic", "points": [[-83, 2.1]] }
+      ],
+      "prescriptions": [
+        { "drug_id": "amlodipine", "dose": "5 mg，每日一次，早餐後一顆", "dose_en": "5 mg, one tablet once a day after breakfast", "issued": -52, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-52, "ph-minsheng"], [-24, "ph-minsheng"]] },
+        { "drug_id": "rosuvastatin", "dose": "10 mg，每日一次，睡前一顆", "dose_en": "10 mg, one tablet once a day at bedtime", "issued": -82, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-82, "ph-minsheng"], [-54, "ph-minsheng"], [-27, "ph-minsheng"]] },
+        { "drug_id": "tamsulosin", "dose": "0.4 mg，每日一次，晚餐後一顆", "dose_en": "0.4 mg, one capsule once a day after dinner", "issued": -12, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-12, "ph-minsheng"]] },
+        { "drug_id": "zolpidem", "dose": "睡前需要時一顆", "dose_en": "One tablet at bedtime when needed", "issued": -14, "total_days": 28, "days_per_fill": 28, "fills_allowed": 1, "fills": [[-14, "ph-minsheng"]] }
+      ],
+      "visits": [
+        {
+          "key": "past",
+          "day": -12,
+          "guest_day": -4,
+          "time": "10:15",
+          "status": "reviewed",
+          "messages": [
+            ["assistant", "請先說說，您今天哪裡不舒服？", "To start: what is bothering you today?"],
+            ["patient", "晚上起來尿尿三四次，睡不好", "I get up three or four times a night to pass water and sleep badly"],
+            ["assistant", "晚上起來三四次。這樣多久了，尿的時候會痛嗎？", "Three or four times a night. How long has that been going on, and does it hurt?"],
+            ["patient", "快一個月，不會痛，就是要等一下才尿得出來。難受的程度 4 分", "Nearly a month. It does not hurt, it just takes a while to start. About 4 out of 10"],
+            ["assistant", "快一個月，要等一下才出來，不會痛。檔案上有高血壓、高血脂和攝護腺肥大，現在還是一樣嗎？", "Nearly a month, slow to start, no pain. Your record lists high blood pressure, high cholesterol and an enlarged prostate. Is that still right?"],
+            ["patient", "一樣，沒有對什麼藥過敏", "The same, and no allergies"]
+          ],
+          "intake": {
+            "chief_complaint": ["夜尿三四次", "Getting up three or four times a night to pass water"],
+            "hpi.onset": ["近一個月", "Nearly a month"],
+            "hpi.course": ["沒有變好", "Not getting better"],
+            "hpi.severity": 4,
+            "hpi.associated": ["排尿要等，不痛", "Slow to start, no pain"],
+            "past_history": [["高血壓", "High blood pressure"], ["高血脂", "High cholesterol"], ["攝護腺肥大", "Enlarged prostate"]],
+            "medications": [["Amlodipine", "Amlodipine"], ["瑞舒伐他汀", "Rosuvastatin"]],
+            "allergies": []
+          },
+          "evidence": { "chief_complaint": [1], "hpi.onset": [3], "hpi.severity": [3], "hpi.associated": [3], "past_history": [5], "allergies": [5] },
+          "note": {
+            "assessment": "攝護腺肥大併夜尿。",
+            "plan": "開立 tamsulosin，衛教晚餐後減少喝水，四週後追蹤症狀與血壓。",
+            "patient_message": ["這次加的藥晚餐後吃，吃完站起來慢一點，避免頭暈。晚餐後少喝水、少喝茶。完全尿不出來，請直接到急診。", "Take the new medicine after dinner and stand up slowly in case you feel dizzy. Drink less water and tea in the evening. Go to the emergency department if you cannot pass water at all."]
+          }
+        }
+      ]
+    }
   }
 ]

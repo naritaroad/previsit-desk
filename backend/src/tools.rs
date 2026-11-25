@@ -23,7 +23,7 @@ use crate::tickets::{self, NewTicket};
 use crate::types::{
     CreatedBy, Locale, Stage, Ticket, TicketReason, ToolStatus, Urgency, VisitStatus,
 };
-use crate::visits;
+use crate::{rx, visits};
 
 pub const TOOL_NAMES: [&str; 5] = [
     "record_intake",
@@ -44,8 +44,21 @@ const MODEL_TICKET_REASONS: [&str; 7] = [
     "other",
 ];
 
-/// The tool specs the model sees.
-pub fn specs() -> Vec<Tool> {
+/// The tool specs the model sees. With a patient account behind the visit, the two medicine-list tools of the rx
+/// module are added; a visit without one (the eval runner) does not get them.
+pub fn specs(with_patient: bool) -> Vec<Tool> {
+    let mut specs = base_specs();
+    if with_patient {
+        specs.extend(rx::chat::specs().into_iter().map(|s| {
+            Tool::new(s.name)
+                .with_description(s.description)
+                .with_schema(s.schema)
+        }));
+    }
+    specs
+}
+
+fn base_specs() -> Vec<Tool> {
     vec![
         Tool::new("record_intake")
             .with_description("把病人剛說的內容記進問診欄位。每當病人說了新資訊（包括「沒有」「不知道」）就先呼叫。只填這一輪新取得的欄位，其餘不要送。回傳 stage（目前階段）和 missing（還缺的欄位）。")
@@ -113,7 +126,8 @@ pub fn specs() -> Vec<Tool> {
                 "type": "object",
                 "properties": {
                     "confirmed_by_patient": { "type": "boolean", "description": "病人已明確確認摘要正確時填 true" },
-                    "narrative": { "type": "string", "description": "給醫師看的一段摘要，300 字內，只寫病人說的，不含診斷或用藥建議" }
+                    "narrative": { "type": "string", "description": "給醫師看的一段摘要，300 字內，只寫病人說的，不含診斷或用藥建議" },
+                    "follow_up": { "type": "array", "items": { "type": "string" }, "description": "可省略。病人說法不清楚、醫師看診時可以再問的問題，最多 5 題，每題 60 字內，不含病名推測或用藥建議" }
                 },
                 "required": ["confirmed_by_patient", "narrative"]
             })),
@@ -152,6 +166,32 @@ pub struct ToolCtx<'a> {
     pub patient_text: String,
     /// The patient's message of this turn (masked), checked for a clear confirmation before a summary is saved.
     pub patient_message: String,
+    pub message_id: Uuid,
+    /// The account behind the visit, if it has one.
+    pub patient_id: Option<Uuid>,
+    /// Field key -> message ids, as stored on the visit.
+    pub evidence: Value,
+}
+
+/// Adds the current message as the source of each applied field (the last 5 messages per field are kept).
+pub fn add_evidence(evidence: &mut Value, applied: &[String], message_id: Uuid) {
+    if !evidence.is_object() {
+        *evidence = json!({});
+    }
+    let id = json!(message_id);
+    for field in applied {
+        let list = &mut evidence[field.as_str()];
+        if !list.is_array() {
+            *list = json!([]);
+        }
+        if let Some(ids) = list.as_array_mut()
+            && !ids.contains(&id)
+        {
+            ids.push(id.clone());
+            let extra = ids.len().saturating_sub(5);
+            ids.drain(..extra);
+        }
+    }
 }
 
 fn rejected(detail: impl Into<String>) -> (ToolStatus, Value, Value) {
@@ -172,6 +212,9 @@ pub async fn dispatch(ctx: &mut ToolCtx<'_>, name: &str, args: &Value) -> ToolOu
         "check_chronic_refill" => check_chronic_refill(ctx, args, &mut effects).await,
         "transfer_to_clinician" => transfer_to_clinician(ctx, args, &mut effects).await,
         "save_previsit_summary" => save_previsit_summary(ctx, args, &mut effects).await,
+        "list_my_prescriptions" | "start_rx_draft" if ctx.patient_id.is_some() => {
+            rx_tool(ctx, name, args).await
+        }
         other => rejected(format!(
             "unknown tool {other}; use one of {}",
             TOOL_NAMES.join(", ")
@@ -183,6 +226,22 @@ pub async fn dispatch(ctx: &mut ToolCtx<'_>, name: &str, args: &Value) -> ToolOu
         stored_result,
         duration_ms: started.elapsed().as_millis().min(i32::MAX as u128) as i32,
         effects,
+    }
+}
+
+/// The medicine list and the draft request, always for the visit's own patient.
+async fn rx_tool(ctx: &ToolCtx<'_>, name: &str, args: &Value) -> (ToolStatus, Value, Value) {
+    let Some(patient) = ctx.patient_id else {
+        return rejected("no patient account");
+    };
+    match rx::chat::dispatch(ctx.state, patient, ctx.locale, name, args).await {
+        Ok(Ok(result)) => (ToolStatus::Ok, result.clone(), result),
+        Ok(Err(reason)) => rejected(reason),
+        Err(e) => {
+            tracing::error!(error = %e, tool = name, "rx chat tool failed");
+            let body = json!({ "error": "internal" });
+            (ToolStatus::Error, body.clone(), body)
+        }
     }
 }
 
@@ -213,8 +272,16 @@ async fn record_intake(
         } else {
             ctx.intake.stage()
         };
-        if let Err(e) =
-            visits::save_intake(&ctx.state.db, ctx.visit_id, &ctx.intake, new_stage).await
+        add_evidence(&mut ctx.evidence, &outcome.applied, ctx.message_id);
+        if let Err(e) = visits::save_intake(
+            &ctx.state.db,
+            ctx.visit_id,
+            &ctx.intake,
+            new_stage,
+            &ctx.evidence,
+            false,
+        )
+        .await
         {
             return db_error(&e);
         }
@@ -646,6 +713,25 @@ pub fn is_confirmation(message: &str) -> bool {
 struct SaveArgs {
     confirmed_by_patient: bool,
     narrative: String,
+    #[serde(default)]
+    follow_up: Vec<String>,
+}
+
+const MAX_MODEL_FOLLOW_UP: usize = 5;
+
+/// The model's follow-up questions that pass the same checks as a reply; the rest are dropped.
+fn clean_follow_up(items: &[String], locale: Locale, patient_text: &str) -> Vec<String> {
+    items
+        .iter()
+        .map(|i| i.split_whitespace().collect::<Vec<_>>().join(" "))
+        .filter(|i| {
+            let n = i.chars().count();
+            (1..=80).contains(&n)
+                && !contains_personal_data(i)
+                && guard::is_clean(i, locale, patient_text)
+        })
+        .take(MAX_MODEL_FOLLOW_UP)
+        .collect()
 }
 
 async fn save_previsit_summary(
@@ -721,12 +807,13 @@ async fn save_previsit_summary(
         refill,
         narrative: usable.then_some(narrative),
         model: Some(ctx.model.to_string()),
+        follow_up: clean_follow_up(&parsed.follow_up, ctx.locale, &ctx.patient_text),
         now: ctx.state.clock.now(),
     });
     if let Err(e) = summary::save(&ctx.state.db, &built).await {
         return db_error(&e);
     }
-    if let Err(e) = visits::finalize_submit(&ctx.state.db, ctx.visit_id).await {
+    if let Err(e) = visits::finalize_submit(ctx.state, ctx.visit_id).await {
         return db_error(&e);
     }
     ctx.stage = Stage::Done;
@@ -745,15 +832,57 @@ mod tests {
     use super::*;
 
     #[test]
+    fn the_medicine_tools_need_a_patient_account() {
+        let names = |with| {
+            specs(with)
+                .iter()
+                .map(|t| t.name.to_string())
+                .collect::<Vec<_>>()
+        };
+        assert!(!names(false).contains(&"list_my_prescriptions".to_string()));
+        assert!(names(true).contains(&"list_my_prescriptions".to_string()));
+        assert!(names(true).contains(&"start_rx_draft".to_string()));
+        assert_eq!(names(true).len(), names(false).len() + 2);
+    }
+
+    #[test]
+    fn evidence_collects_message_ids_per_field() {
+        let mut evidence = Value::Null;
+        let ids: Vec<Uuid> = (0..7).map(|_| Uuid::new_v4()).collect();
+        for id in &ids {
+            add_evidence(&mut evidence, &["hpi.onset".to_string()], *id);
+        }
+        add_evidence(&mut evidence, &["allergies".to_string()], ids[6]);
+        add_evidence(&mut evidence, &["allergies".to_string()], ids[6]);
+        let parsed = summary::parse_evidence(&evidence);
+        assert_eq!(parsed["hpi.onset"], ids[2..].to_vec());
+        assert_eq!(parsed["allergies"], vec![ids[6]]);
+    }
+
+    #[test]
+    fn follow_up_questions_are_checked_like_a_reply() {
+        let items = [
+            "咳嗽有痰嗎".to_string(),
+            "可能是肺炎，建議照 X 光".to_string(),
+            "打 0912345678 給病人".to_string(),
+            "  ".to_string(),
+        ];
+        assert_eq!(
+            clean_follow_up(&items, Locale::ZhTw, ""),
+            vec!["咳嗽有痰嗎".to_string()]
+        );
+    }
+
+    #[test]
     fn specs_cover_exactly_the_whitelist() {
-        let specs = specs();
+        let specs = specs(false);
         let names: Vec<String> = specs.iter().map(|t| t.name.to_string()).collect();
         assert_eq!(names, TOOL_NAMES.map(String::from).to_vec());
     }
 
     #[test]
     fn the_model_schema_for_refills_has_no_today() {
-        let spec = specs()
+        let spec = specs(false)
             .into_iter()
             .find(|t| t.name.to_string() == "check_chronic_refill")
             .expect("spec");
@@ -764,7 +893,7 @@ mod tests {
 
     #[test]
     fn the_transfer_schema_excludes_red_flag_and_urgent() {
-        let spec = specs()
+        let spec = specs(false)
             .into_iter()
             .find(|t| t.name.to_string() == "transfer_to_clinician")
             .expect("spec");

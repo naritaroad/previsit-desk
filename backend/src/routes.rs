@@ -3,69 +3,24 @@
 
 use std::path::Path as FsPath;
 
-use axum::extract::State;
+use axum::Router;
+use axum::http::HeaderValue;
 use axum::http::header::HeaderName;
-use axum::http::{HeaderValue, StatusCode};
 use axum::middleware;
-use axum::response::{IntoResponse, Response};
 use axum::routing::{any, delete, get, patch, post, put};
-use axum::{Json, Router};
-use serde_json::{Value, json};
 use sha2::Digest;
 use tower_http::compression::CompressionLayer;
 use tower_http::services::{ServeDir, ServeFile};
 use tower_http::set_header::SetResponseHeaderLayer;
 
-use crate::clock::format_date;
 use crate::error::AppError;
-use crate::limits;
 use crate::state::AppState;
-use crate::{auth, me, rx};
+use crate::{
+    admin, appts, auth, clinic, me, measure, notes, patient, profile, public, rx, visit_routes,
+};
 
 /// Bodies up to 64 KB: a clinical note is the largest thing anyone sends.
 const MAX_BODY_BYTES: usize = 64 * 1024;
-
-// ---------------------------------------------------------------------------
-// Health and meta
-// ---------------------------------------------------------------------------
-
-async fn health(State(state): State<AppState>) -> Response {
-    // Never touches the model: the database answer is what the deployment health check needs.
-    match sqlx::query_scalar::<_, i32>("SELECT 1").fetch_one(&state.db).await {
-        Ok(_) => Json(json!({ "ok": true, "version": env!("CARGO_PKG_VERSION"), "model_ready": state.config.model_ready() })).into_response(),
-        Err(_) => (StatusCode::SERVICE_UNAVAILABLE, Json(json!({ "ok": false }))).into_response(),
-    }
-}
-
-fn eval_summary(data_dir: &FsPath) -> Value {
-    let path = data_dir.join("eval").join("results").join("summary.json");
-    let Ok(raw) = std::fs::read_to_string(path) else {
-        return Value::Null;
-    };
-    match serde_json::from_str::<Value>(raw.trim_start_matches('\u{feff}')) {
-        Ok(Value::Object(mut map)) => {
-            map.remove("cases");
-            Value::Object(map)
-        }
-        _ => Value::Null,
-    }
-}
-
-async fn meta(State(state): State<AppState>) -> Json<Value> {
-    let calls = limits::calls_today(&state.db, &state.clock)
-        .await
-        .unwrap_or(0);
-    Json(json!({
-        "app": "PreVisit Desk",
-        "version": env!("CARGO_PKG_VERSION"),
-        "models": { "primary": state.config.model, "fallback": state.config.model_fallback },
-        "retention_days": state.config.retention_days,
-        "max_message_chars": state.config.max_message_chars,
-        "daily_limit_reached": calls >= state.config.daily_model_call_limit,
-        "server_today": format_date(state.clock.today()),
-        "eval": eval_summary(&state.config.data_dir),
-    }))
-}
 
 // ---------------------------------------------------------------------------
 // Assembly
@@ -133,8 +88,8 @@ pub fn content_security_policy(web_dir: Option<&FsPath>) -> String {
 /// Everything under `/api/v2`.
 fn api_router() -> Router<AppState> {
     Router::new()
-        .route("/health", get(health))
-        .route("/meta", get(meta))
+        .route("/health", get(public::health))
+        .route("/meta", get(public::meta))
         .route("/auth/guest", post(auth::guest))
         .route("/auth/personas", get(auth::personas))
         .route("/auth/login", post(auth::login))
@@ -143,7 +98,12 @@ fn api_router() -> Router<AppState> {
         .route("/auth/claim", post(auth::claim))
         .route("/auth/register", post(auth::register))
         .route("/auth/password", post(auth::change_password))
-        .route("/me", patch(me::patch_me))
+        .route("/trust/facts", get(public::trust_facts))
+        .route("/handbook", get(patient::handbook))
+        .route("/handbook/search", get(patient::handbook_search))
+        .route("/pharmacies", get(patient::pharmacies))
+        .route("/me", patch(me::patch_me).delete(patient::delete_me))
+        .route("/me/export", get(patient::export))
         .route("/me/sessions", get(auth::sessions))
         .route("/me/sessions/{id}", delete(auth::delete_session))
         .route("/me/preferences", put(me::put_preferences))
@@ -156,6 +116,98 @@ fn api_router() -> Router<AppState> {
                 .delete(me::delete_draft),
         )
         .route("/me/stream", get(me::stream))
+        .route(
+            "/visits",
+            get(visit_routes::list).post(visit_routes::create),
+        )
+        .route(
+            "/visits/{id}",
+            get(visit_routes::get)
+                .patch(visit_routes::patch)
+                .delete(visit_routes::delete),
+        )
+        .route("/visits/{id}/messages", post(visit_routes::post_message))
+        .route("/visits/{id}/stream", get(visit_routes::stream))
+        .route("/visits/{id}/runs/retry", post(visit_routes::retry))
+        .route("/visits/{id}/summary", patch(visit_routes::patch_summary))
+        .route("/visits/{id}/submit", post(visit_routes::submit))
+        .route("/visits/{id}/handoff", post(visit_routes::handoff))
+        .route(
+            "/visits/{id}/refill-check",
+            post(visit_routes::refill_check),
+        )
+        .route("/visits/{id}/assign", post(visit_routes::assign))
+        .route("/visits/{id}/takeover", post(visit_routes::takeover))
+        .route("/visits/{id}/release", post(visit_routes::release))
+        .route(
+            "/visits/{id}/staff-messages",
+            post(visit_routes::staff_message),
+        )
+        .route("/visits/{id}/note", get(notes::get).put(notes::put))
+        .route("/visits/{id}/note/sign", post(notes::sign))
+        .route("/visits/{id}/note/addendum", post(notes::addendum))
+        .route("/app/home", get(patient::home))
+        .route("/app/access-log", get(patient::access_log))
+        .route(
+            "/app/consents",
+            get(patient::consents).post(patient::add_consent),
+        )
+        .route("/app/profile", get(profile::get).put(profile::put))
+        .route(
+            "/app/measurements",
+            get(measure::list).post(measure::create),
+        )
+        .route("/app/measurements/{id}", delete(measure::delete))
+        .route("/appointments", get(appts::list).post(appts::book))
+        .route("/appointments/slots", get(appts::slots))
+        .route("/appointments/{id}/cancel", post(appts::cancel))
+        .route("/clinic/overview", get(clinic::overview))
+        .route("/clinic/worklist", get(clinic::worklist))
+        .route("/clinic/patients", get(clinic::patients))
+        .route(
+            "/clinic/patients/{id}",
+            get(clinic::patient).patch(clinic::patch_patient),
+        )
+        .route("/clinic/patients/{id}/notes", post(clinic::add_note))
+        .route("/clinic/patients/{id}/contact", post(clinic::contact))
+        .route(
+            "/clinic/notes/{id}",
+            patch(clinic::patch_note).delete(clinic::delete_note),
+        )
+        .route("/clinic/schedule", get(clinic::schedule))
+        .route("/clinic/tickets", get(clinic::ticket_list))
+        .route("/clinic/tickets/{id}/resolve", post(clinic::resolve_ticket))
+        .route("/staff", get(clinic::staff))
+        .route("/admin/overview", get(admin::overview))
+        .route(
+            "/admin/accounts",
+            get(admin::accounts).post(admin::create_account),
+        )
+        .route(
+            "/admin/accounts/{id}",
+            get(admin::get_account).patch(admin::patch_account),
+        )
+        .route(
+            "/admin/accounts/{id}/reset-password",
+            post(admin::reset_password),
+        )
+        .route(
+            "/admin/accounts/{id}/revoke-sessions",
+            post(admin::revoke_sessions),
+        )
+        .route("/admin/permissions", get(admin::permissions))
+        .route(
+            "/admin/settings",
+            get(admin::get_settings).put(admin::put_settings),
+        )
+        .route("/admin/models", get(admin::models))
+        .route("/admin/oversight", get(admin::oversight))
+        .route("/admin/runs", get(admin::runs))
+        .route("/admin/runs/{id}", get(admin::run))
+        .route("/admin/audit", get(admin::audit_list))
+        .route("/admin/rules", get(admin::rules))
+        .route("/admin/eval", get(admin::eval))
+        .route("/admin/demo/reset", post(admin::demo_reset))
         .merge(rx::routes())
         .fallback(any(not_found))
 }
@@ -167,7 +219,7 @@ pub fn app(state: AppState) -> Router {
     let mut router = Router::new()
         .nest("/api/v2", api_router())
         // Kept for the deployed health checks.
-        .route("/api/v1/health", get(health))
+        .route("/api/v1/health", get(public::health))
         .route("/api/{*rest}", any(not_found))
         .layer(session);
     if let Some(dir) = state.config.web_dir.clone() {
@@ -201,24 +253,6 @@ pub fn app(state: AppState) -> Router {
 mod tests {
     use super::*;
     use uuid::Uuid;
-
-    #[test]
-    fn eval_summary_reads_the_file_and_drops_per_case_rows() {
-        let dir = std::env::temp_dir().join(format!("previsit-meta-test-{}", Uuid::new_v4()));
-        std::fs::create_dir_all(dir.join("eval").join("results")).expect("dirs");
-        assert_eq!(eval_summary(&dir), Value::Null);
-        std::fs::write(dir.join("eval").join("results").join("summary.json"), r#"{"ran_at":"x","model":"m","total":2,"passed":1,"categories":[],"cases":[{"id":"A"}]}"#).expect("write");
-        let value = eval_summary(&dir);
-        assert_eq!(value["total"], 2);
-        assert!(value.get("cases").is_none());
-        std::fs::write(
-            dir.join("eval").join("results").join("summary.json"),
-            "not json",
-        )
-        .expect("write");
-        assert_eq!(eval_summary(&dir), Value::Null);
-        let _ = std::fs::remove_dir_all(dir);
-    }
 
     #[test]
     fn base64_matches_the_rfc_vectors() {

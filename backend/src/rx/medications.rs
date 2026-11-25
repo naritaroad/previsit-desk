@@ -411,8 +411,8 @@ mod tests {
             (20, MedState::WindowOpen),
             (30, MedState::WindowOpen),
             (31, MedState::Late),
-            (90, MedState::Late),
-            (91, MedState::Expired),
+            (89, MedState::Late),
+            (90, MedState::Expired),
         ] {
             assert_eq!(on(&p, day).state, state, "day {day}");
         }
@@ -450,10 +450,10 @@ mod tests {
             c.next_window,
             Some(Window {
                 from: "2026-10-21".into(),
-                to: "2026-12-30".into()
+                to: "2026-12-29".into()
             })
         );
-        assert_eq!(c.valid_until, "2026-12-30");
+        assert_eq!(c.valid_until, "2026-12-29");
         assert_eq!(c.days_left, 20);
         let preview = c.refill_preview.expect("preview");
         assert_eq!(preview.outcome, RefillOutcome::TooEarly);

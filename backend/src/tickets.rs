@@ -1,20 +1,21 @@
 //! Clinician tickets: creation with (visit, reason) de-duplication, numbering `T-YYYYMMDD-NNNN`, listing, resolving.
 
-use serde::Serialize;
 use serde_json::json;
 use sqlx::PgPool;
 use time::Date;
 use uuid::Uuid;
 
+use crate::auth::CurrentUser;
 use crate::clock::Clock;
 use crate::notify;
+use crate::people;
 use crate::perm::Permission;
 use crate::state::AppState;
-use crate::types::{CreatedBy, Ticket, TicketReason, Urgency};
+use crate::types::{CreatedBy, Locale, Ticket, TicketReason, Urgency};
 
 macro_rules! ticket_cols {
     () => {
-        "t.id, t.ticket_no, t.visit_id, t.rx_request_id, t.patient_id, t.reason, t.urgency, t.summary, t.status, t.created_by, t.created_at, t.resolved_at, t.resolved_by, t.resolution_note"
+        "t.id, t.ticket_no, t.visit_id, t.rx_request_id, t.patient_id, t.reason, t.urgency, t.summary, t.status, t.created_by, t.created_at, t.resolved_at, t.resolved_by, t.resolution_note, (SELECT r.submitted_at IS NOT NULL FROM rx_requests r WHERE r.id = t.rx_request_id) AS rx_submitted"
     };
 }
 
@@ -92,8 +93,10 @@ pub async fn open(state: &AppState, new: NewTicket<'_>) -> sqlx::Result<Created>
     if !created.deduped {
         let ticket = &created.ticket;
         // A red flag has its own, louder notification from whoever raised it.
-        if ticket.reason != TicketReason::RedFlag.as_str() {
-            let params = json!({ "no": ticket.ticket_no, "reason": ticket.reason, "patient_id": ticket.patient_id.unwrap_or_default() });
+        if ticket.reason != TicketReason::RedFlag.as_str()
+            && let Some(patient_id) = ticket.patient_id
+        {
+            let params = json!({ "no": ticket.ticket_no, "reason": ticket.reason, "patient_id": patient_id });
             notify::notify_staff(
                 state,
                 Permission::TicketHandle,
@@ -115,10 +118,14 @@ pub async fn open(state: &AppState, new: NewTicket<'_>) -> sqlx::Result<Created>
 
 /// Where staff open what the ticket is about.
 pub fn link(ticket: &Ticket) -> String {
-    match (ticket.visit_id, ticket.rx_request_id) {
-        (Some(id), _) => format!("/clinic/visits/{id}"),
-        (None, Some(id)) => format!("/clinic/rx/{id}"),
-        (None, None) => "/clinic".to_string(),
+    match (ticket.visit_id, ticket.rx_request_id, ticket.patient_id) {
+        (Some(id), _, _) => format!("/clinic/visits/{id}"),
+        // Staff cannot open a draft; the patient's page is where they act on an urgent answer in one.
+        (None, Some(_), Some(patient)) if ticket.rx_submitted != Some(true) => {
+            format!("/clinic/patients/{patient}")
+        }
+        (None, Some(id), _) => format!("/clinic/rx/{id}"),
+        (None, None, _) => "/clinic".to_string(),
     }
 }
 
@@ -173,8 +180,7 @@ async fn create_or_get(db: &PgPool, clock: &Clock, new: NewTicket<'_>) -> sqlx::
     let n: i32 = sqlx::query_scalar("INSERT INTO ticket_counters (day, n) VALUES ($1, 1) ON CONFLICT (day) DO UPDATE SET n = ticket_counters.n + 1 RETURNING n").bind(clock.today()).fetch_one(&mut *tx).await?;
     let ticket_no = format_ticket_no(clock.today(), n);
     let ticket: Ticket = sqlx::query_as(
-        "INSERT INTO clinician_tickets AS t (ticket_no, visit_id, reason, urgency, summary, created_by, rx_request_id, patient_id) VALUES ($1, $2, $3, $4, $5, $6, $7, COALESCE($8, (SELECT v.patient_id FROM visits v WHERE v.id = $2)))
-         RETURNING t.id, t.ticket_no, t.visit_id, t.rx_request_id, t.patient_id, t.reason, t.urgency, t.summary, t.status, t.created_by, t.created_at, t.resolved_at, t.resolved_by, t.resolution_note",
+        concat!("INSERT INTO clinician_tickets AS t (ticket_no, visit_id, reason, urgency, summary, created_by, rx_request_id, patient_id) VALUES ($1, $2, $3, $4, $5, $6, $7, COALESCE($8, (SELECT v.patient_id FROM visits v WHERE v.id = $2))) RETURNING ", ticket_cols!()),
     )
     .bind(&ticket_no)
     .bind(visit_id)
@@ -207,24 +213,45 @@ pub async fn for_visit(db: &PgPool, visit_id: Uuid) -> sqlx::Result<Vec<Ticket>>
     .await
 }
 
-#[derive(Debug, Serialize, sqlx::FromRow)]
-pub struct TicketRow {
-    #[serde(flatten)]
-    #[sqlx(flatten)]
-    pub ticket: Ticket,
-    pub chief_complaint: Option<String>,
+/// Puts the patient's `PersonRef` on each ticket.
+pub async fn fill_patients(
+    db: &PgPool,
+    tickets: &mut [Ticket],
+    locale: Locale,
+) -> sqlx::Result<()> {
+    let people = people::load(db, tickets.iter().filter_map(|t| t.patient_id), locale).await?;
+    for ticket in tickets {
+        ticket.patient = people.get(ticket.patient_id);
+    }
+    Ok(())
 }
 
-/// `status`: `open`, `resolved` or `all`. Urgent first, then newest first.
-pub async fn list(db: &PgPool, status: &str) -> sqlx::Result<Vec<TicketRow>> {
+/// `status`: `open`, `resolved` or `all`; resolved ones only since `since` when given. Urgent first, then newest first.
+pub async fn list(
+    db: &PgPool,
+    status: &str,
+    since: Option<time::OffsetDateTime>,
+) -> sqlx::Result<Vec<Ticket>> {
     sqlx::query_as(concat!(
         "SELECT ",
         ticket_cols!(),
-        ", v.intake->>'chief_complaint' AS chief_complaint FROM clinician_tickets t LEFT JOIN visits v ON v.id = t.visit_id
-         WHERE ($1 = 'all' OR t.status = $1)
+        " FROM clinician_tickets t
+         WHERE ($1 = 'all' OR t.status = $1) AND ($2::timestamptz IS NULL OR t.status = 'open' OR t.resolved_at > $2)
          ORDER BY CASE t.urgency WHEN 'urgent' THEN 0 WHEN 'soon' THEN 1 ELSE 2 END, t.created_at DESC, t.id LIMIT 500"
     ))
     .bind(status)
+    .bind(since)
+    .fetch_all(db)
+    .await
+}
+
+pub async fn for_patient(db: &PgPool, patient_id: Uuid) -> sqlx::Result<Vec<Ticket>> {
+    sqlx::query_as(concat!(
+        "SELECT ",
+        ticket_cols!(),
+        " FROM clinician_tickets t WHERE t.patient_id = $1 ORDER BY t.created_at DESC, t.id LIMIT 200"
+    ))
+    .bind(patient_id)
     .fetch_all(db)
     .await
 }
@@ -244,16 +271,16 @@ impl From<sqlx::Error> for ResolveError {
 pub async fn resolve(
     db: &PgPool,
     id: Uuid,
-    by: &str,
+    by: &CurrentUser,
     note: Option<&str>,
 ) -> Result<Ticket, ResolveError> {
     let updated: Option<Ticket> = sqlx::query_as(
-        "UPDATE clinician_tickets AS t SET status = 'resolved', resolved_at = now(), resolved_by = $2, resolution_note = $3 WHERE t.id = $1 AND t.status = 'open'
-         RETURNING t.id, t.ticket_no, t.visit_id, t.rx_request_id, t.patient_id, t.reason, t.urgency, t.summary, t.status, t.created_by, t.created_at, t.resolved_at, t.resolved_by, t.resolution_note",
+        concat!("UPDATE clinician_tickets AS t SET status = 'resolved', resolved_at = now(), resolved_by = $2, resolution_note = $3, resolved_by_id = $4 WHERE t.id = $1 AND t.status = 'open' RETURNING ", ticket_cols!()),
     )
     .bind(id)
-    .bind(by)
+    .bind(&by.display_name)
     .bind(note)
+    .bind(by.id)
     .fetch_optional(db)
     .await?;
     if let Some(ticket) = updated {

@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 
+use futures::future::BoxFuture;
 use serde::Serialize;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -55,29 +56,32 @@ macro_rules! person_cols {
     };
 }
 
-/// Everyone in `ids`, keyed by id. Unknown ids are simply absent.
-pub async fn load(
+/// Everyone in `ids`, keyed by id. Unknown ids are simply absent. The ids are collected before the query starts, so
+/// the caller's iterator is not held across an await.
+pub fn load(
     db: &PgPool,
     ids: impl IntoIterator<Item = Uuid>,
     locale: Locale,
-) -> sqlx::Result<People> {
+) -> BoxFuture<'_, sqlx::Result<People>> {
     let mut wanted: Vec<Uuid> = ids.into_iter().collect();
     wanted.sort();
     wanted.dedup();
-    if wanted.is_empty() {
-        return Ok(People::default());
-    }
-    let rows: Vec<PersonRow> = sqlx::query_as(concat!(
-        "SELECT ",
-        person_cols!(),
-        " FROM accounts WHERE id = ANY($1)"
-    ))
-    .bind(&wanted)
-    .fetch_all(db)
-    .await?;
-    Ok(People(
-        rows.into_iter().map(|r| (r.id, r.to_ref(locale))).collect(),
-    ))
+    Box::pin(async move {
+        if wanted.is_empty() {
+            return Ok(People::default());
+        }
+        let rows: Vec<PersonRow> = sqlx::query_as(concat!(
+            "SELECT ",
+            person_cols!(),
+            " FROM accounts WHERE id = ANY($1)"
+        ))
+        .bind(&wanted)
+        .fetch_all(db)
+        .await?;
+        Ok(People(
+            rows.into_iter().map(|r| (r.id, r.to_ref(locale))).collect(),
+        ))
+    })
 }
 
 pub async fn one(db: &PgPool, id: Uuid, locale: Locale) -> sqlx::Result<Option<PersonRef>> {

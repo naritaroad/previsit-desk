@@ -31,6 +31,9 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 unicode-normalization = "0.1.26"
 uuid = { version = "1.29.0", features = ["v4", "serde"] }
 
+[dev-dependencies]
+tower = { version = "0.5.2", features = ["util"] }
+
 [profile.release]
 lto = "thin"
 codegen-units = 1

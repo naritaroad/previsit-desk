@@ -437,6 +437,8 @@ struct RedFlagRule {
     lang: Lang,
     label_zh: String,
     label_en: String,
+    pattern: String,
+    note: String,
     regex: Regex,
     has_group: bool,
 }
@@ -457,6 +459,34 @@ impl RedFlagMatch {
         } else {
             &self.label_zh
         }
+    }
+}
+
+/// One red-flag rule as the read-only rules page shows it.
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct RedFlagListItem {
+    pub id: String,
+    pub category: RedFlagCategory,
+    pub severity: String,
+    pub lang: &'static str,
+    pub label: String,
+    pub pattern: String,
+    pub note: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ScopeListItem {
+    pub id: String,
+    pub verdict: ScopeVerdict,
+    pub lang: &'static str,
+    pub pattern: String,
+    pub note: String,
+}
+
+fn lang_name(lang: Lang) -> &'static str {
+    match lang {
+        Lang::Zh => "zh",
+        Lang::En => "en",
     }
 }
 
@@ -481,6 +511,7 @@ impl RedFlagRules {
             column(&headers, "label_en")?,
             column(&headers, "pattern")?,
         );
+        let c_note = headers.iter().position(|h| h.trim() == "note");
         let mut rules = Vec::new();
         let mut seen = HashSet::new();
         for (row_no, row) in reader.records().enumerate() {
@@ -508,6 +539,12 @@ impl RedFlagRules {
                 lang,
                 label_zh,
                 label_en,
+                pattern: row.get(c_pat).unwrap_or("").trim().to_string(),
+                note: c_note
+                    .and_then(|i| row.get(i))
+                    .unwrap_or("")
+                    .trim()
+                    .to_string(),
                 regex,
                 has_group,
             });
@@ -531,6 +568,25 @@ impl RedFlagRules {
 
     pub fn len(&self) -> usize {
         self.rules.len()
+    }
+
+    pub fn list(&self, locale: Locale) -> Vec<RedFlagListItem> {
+        self.rules
+            .iter()
+            .map(|r| RedFlagListItem {
+                id: r.id.clone(),
+                category: r.category,
+                severity: r.severity.clone(),
+                lang: lang_name(r.lang),
+                label: if locale.is_en() {
+                    r.label_en.clone()
+                } else {
+                    r.label_zh.clone()
+                },
+                pattern: r.pattern.clone(),
+                note: r.note.clone(),
+            })
+            .collect()
     }
 
     /// The best un-negated hit in the message, if any. Suicide wins over physical categories because its
@@ -614,6 +670,8 @@ struct ScopeRule {
     id: String,
     verdict: ScopeVerdict,
     lang: Lang,
+    pattern: String,
+    note: String,
     regex: Regex,
     has_group: bool,
 }
@@ -645,6 +703,7 @@ impl ScopeRules {
             column(&headers, "lang")?,
             column(&headers, "pattern")?,
         );
+        let c_note = headers.iter().position(|h| h.trim() == "note");
         let mut rules = Vec::new();
         let mut seen = HashSet::new();
         for row in reader.records() {
@@ -662,6 +721,12 @@ impl ScopeRules {
                 id,
                 verdict,
                 lang,
+                pattern: row.get(c_pat).unwrap_or("").trim().to_string(),
+                note: c_note
+                    .and_then(|i| row.get(i))
+                    .unwrap_or("")
+                    .trim()
+                    .to_string(),
                 regex,
                 has_group,
             });
@@ -682,6 +747,19 @@ impl ScopeRules {
 
     pub fn len(&self) -> usize {
         self.rules.len()
+    }
+
+    pub fn list(&self) -> Vec<ScopeListItem> {
+        self.rules
+            .iter()
+            .map(|r| ScopeListItem {
+                id: r.id.clone(),
+                verdict: r.verdict,
+                lang: lang_name(r.lang),
+                pattern: r.pattern.clone(),
+                note: r.note.clone(),
+            })
+            .collect()
     }
 
     /// The strongest verdict over all clauses: injection, then controlled drug, then prescription request.

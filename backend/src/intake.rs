@@ -272,6 +272,15 @@ pub struct IntakePatch {
     pub patient_questions: Option<Vec<String>>,
 }
 
+/// Why `set_field` refused a value.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SetError {
+    Unknown,
+    Type,
+    TooLong(usize),
+    Personal,
+}
+
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct PatchOutcome {
     /// Field keys whose value actually changed.
@@ -402,6 +411,90 @@ fn merge_list(
 }
 
 impl IntakeState {
+    /// Replaces one field with what the patient typed in the summary editor; `null` clears it. `[]` in a list means
+    /// "none". Returns whether the value changed, or the reason it was refused.
+    pub fn set_field(&mut self, key: &str, value: &Value) -> Result<bool, SetError> {
+        fn text(value: &Value) -> Result<Option<String>, SetError> {
+            match value {
+                Value::Null => Ok(None),
+                Value::String(s) => {
+                    let text = clean_text(s);
+                    if text.is_empty() {
+                        Ok(None)
+                    } else if text.chars().count() > MAX_TEXT_CHARS {
+                        Err(SetError::TooLong(MAX_TEXT_CHARS))
+                    } else if contains_personal_data(&text) {
+                        Err(SetError::Personal)
+                    } else {
+                        Ok(Some(text))
+                    }
+                }
+                _ => Err(SetError::Type),
+            }
+        }
+        fn list(value: &Value, max: usize) -> Result<Option<Vec<String>>, SetError> {
+            let items = match value {
+                Value::Null => return Ok(None),
+                Value::Array(items) => items,
+                _ => return Err(SetError::Type),
+            };
+            if items.len() > max {
+                return Err(SetError::TooLong(max));
+            }
+            let mut out: Vec<String> = Vec::new();
+            for item in items {
+                let Value::String(raw) = item else {
+                    return Err(SetError::Type);
+                };
+                let item = clean_text(raw);
+                if item.is_empty() || is_none_word(&item) || out.contains(&item) {
+                    continue;
+                }
+                if item.chars().count() > MAX_ITEM_CHARS {
+                    return Err(SetError::TooLong(MAX_ITEM_CHARS));
+                }
+                if contains_personal_data(&item) {
+                    return Err(SetError::Personal);
+                }
+                out.push(item);
+            }
+            Ok(Some(out))
+        }
+        let before = self.clone();
+        match key {
+            "chief_complaint" => self.chief_complaint = text(value)?,
+            "hpi.onset" => self.hpi.onset = text(value)?,
+            "hpi.course" => self.hpi.course = text(value)?,
+            "hpi.location" => self.hpi.location = text(value)?,
+            "hpi.character" => self.hpi.character = text(value)?,
+            "hpi.modifiers" => self.hpi.modifiers = text(value)?,
+            "hpi.associated" => self.hpi.associated = text(value)?,
+            "hpi.severity" => {
+                self.hpi.severity = match value {
+                    Value::Null => None,
+                    other => Some(parse_severity(other).map_err(|_| SetError::Type)?),
+                }
+            }
+            "past_history" | "medications" | "allergies" => {
+                let items = list(value, MAX_ITEMS)?;
+                let field = match key {
+                    "past_history" => &mut self.past_history,
+                    "medications" => &mut self.medications,
+                    _ => &mut self.allergies,
+                };
+                *field = ListField {
+                    answered: items.is_some(),
+                    items: items.unwrap_or_default(),
+                };
+            }
+            "patient_questions" => {
+                self.patient_questions = list(value, MAX_QUESTIONS)?.unwrap_or_default()
+            }
+            _ => return Err(SetError::Unknown),
+        }
+        Ok(*self != before)
+    }
+
     /// Merges `patch`. Valid parts are applied even when other parts are refused.
     pub fn apply(&mut self, patch: &IntakePatch) -> PatchOutcome {
         let mut out = PatchOutcome::default();
@@ -540,6 +633,40 @@ mod tests {
             "no_past_history": true, "medications": ["降血壓藥"], "no_allergies": true
         })));
         s
+    }
+
+    #[test]
+    fn the_summary_editor_sets_and_clears_fields() {
+        let mut s = IntakeState::default();
+        assert_eq!(
+            s.set_field("chief_complaint", &json!("  頭  痛 ")),
+            Ok(true)
+        );
+        assert_eq!(s.chief_complaint.as_deref(), Some("頭 痛"));
+        assert_eq!(s.set_field("chief_complaint", &json!("頭 痛")), Ok(false));
+        assert_eq!(s.set_field("hpi.severity", &json!(6)), Ok(true));
+        assert_eq!(s.set_field("hpi.severity", &json!(11)), Err(SetError::Type));
+        assert_eq!(s.set_field("hpi.severity", &Value::Null), Ok(true));
+        assert!(s.hpi.severity.is_none());
+        assert_eq!(s.set_field("allergies", &json!([])), Ok(true));
+        assert!(s.allergies.answered && s.allergies.items.is_empty());
+        assert_eq!(
+            s.set_field("medications", &json!(["降血壓藥", "降血壓藥", "無"])),
+            Ok(true)
+        );
+        assert_eq!(s.medications.items, vec!["降血壓藥"]);
+        assert_eq!(s.set_field("medications", &Value::Null), Ok(true));
+        assert!(!s.medications.answered);
+        assert_eq!(
+            s.set_field("hpi.onset", &json!("電話 0912345678")),
+            Err(SetError::Personal)
+        );
+        assert_eq!(
+            s.set_field("hpi.onset", &json!("字".repeat(201))),
+            Err(SetError::TooLong(200))
+        );
+        assert_eq!(s.set_field("nope", &json!("x")), Err(SetError::Unknown));
+        assert_eq!(s.set_field("hpi.onset", &json!(3)), Err(SetError::Type));
     }
 
     #[test]

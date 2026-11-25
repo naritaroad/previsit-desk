@@ -46,6 +46,7 @@ macro_rules! str_enum {
 
 str_enum!(Locale { ZhTw => "zh-TW", En => "en" });
 str_enum!(VisitStatus { Active => "active", RedFlag => "red_flag", Submitted => "submitted", Reviewed => "reviewed" });
+str_enum!(VisitMode { Ai => "ai", Human => "human" });
 str_enum!(Stage { ChiefComplaint => "chief_complaint", Hpi => "hpi", Background => "background", Confirm => "confirm", Done => "done" });
 str_enum!(Urgency { Routine => "routine", Soon => "soon", Urgent => "urgent" });
 str_enum!(RedFlagCategory {
@@ -149,9 +150,12 @@ pub mod message_kind {
     pub const RED_FLAG: &str = "red_flag";
     pub const REFUSAL: &str = "refusal";
     pub const NOTICE: &str = "notice";
+    /// "X took over this conversation" and "back to the assistant".
+    pub const HANDOFF: &str = "handoff";
 }
 
-#[derive(Debug, Clone, Serialize, sqlx::FromRow)]
+/// A visit as stored. The API shape is [`crate::visits::VisitView`], which needs the reader's language.
+#[derive(Debug, Clone, sqlx::FromRow)]
 pub struct Visit {
     pub id: Uuid,
     #[sqlx(try_from = "String")]
@@ -160,29 +164,47 @@ pub struct Visit {
     pub status: VisitStatus,
     #[sqlx(try_from = "String")]
     pub stage: Stage,
+    /// Highest urgency among the visit's open tickets.
     #[sqlx(try_from = "String")]
     pub urgency: Urgency,
-    #[serde(with = "time::serde::rfc3339")]
+    #[sqlx(try_from = "String")]
+    pub mode: VisitMode,
+    pub patient_id: Option<Uuid>,
+    pub appointment_id: Option<Uuid>,
+    pub title: Option<String>,
+    pub pinned: bool,
+    pub archived: bool,
+    pub assigned_to: Option<Uuid>,
+    pub reviewed_by_id: Option<Uuid>,
+    pub chief_complaint: Option<String>,
+    pub last_seq: i64,
+    pub summary_revision: i32,
+    pub edited_by_patient: bool,
+    pub evidence: Value,
     pub created_at: OffsetDateTime,
-    #[serde(with = "time::serde::rfc3339")]
     pub updated_at: OffsetDateTime,
-    #[serde(with = "time::serde::rfc3339::option")]
+    pub last_activity_at: OffsetDateTime,
     pub submitted_at: Option<OffsetDateTime>,
-    #[serde(with = "time::serde::rfc3339::option")]
     pub reviewed_at: Option<OffsetDateTime>,
-    pub reviewed_by: Option<String>,
-    pub review_note: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, sqlx::FromRow)]
 pub struct Message {
     pub id: Uuid,
+    pub client_id: Option<String>,
+    pub seq: i64,
     pub role: String,
     pub kind: String,
+    #[sqlx(skip)]
+    pub author: Option<PersonRef>,
+    #[serde(skip)]
+    pub author_id: Option<Uuid>,
     pub content: String,
     #[serde(with = "time::serde::rfc3339")]
     pub created_at: OffsetDateTime,
     pub run_id: Option<Uuid>,
+    /// `interrupted`: the turn this patient message started was cut off and can be retried.
+    pub status: String,
 }
 
 #[derive(Debug, Clone, Serialize, sqlx::FromRow)]
@@ -259,11 +281,15 @@ pub struct Ticket {
     pub ticket_no: String,
     /// `None` for a ticket opened from an rx request.
     pub visit_id: Option<Uuid>,
+    #[serde(rename = "rx_id")]
     pub rx_request_id: Option<Uuid>,
     #[serde(skip)]
     pub patient_id: Option<Uuid>,
     #[sqlx(skip)]
     pub patient: Option<PersonRef>,
+    /// Whether the rx request behind it left the draft state.
+    #[serde(skip)]
+    pub rx_submitted: Option<bool>,
     pub reason: String,
     #[sqlx(try_from = "String")]
     pub urgency: Urgency,

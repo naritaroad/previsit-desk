@@ -30,8 +30,6 @@ pub enum Bucket {
     Messages,
     /// Other patient POSTs: refill-check, submit, handoff.
     Actions,
-    /// `GET /visits/{id}` (anti-enumeration).
-    Reads,
     /// `POST /auth/login`
     Login,
     /// `POST /auth/guest`, `/auth/register` and `/auth/claim`
@@ -365,7 +363,7 @@ mod tests {
             let key = limiter.key(&format!("client-{i}"));
             assert!(
                 limiter
-                    .check_at(Bucket::Reads, key, 5, TEN_MINUTES, t0)
+                    .check_at(Bucket::Writes, key, 5, TEN_MINUTES, t0)
                     .is_ok()
             );
         }
@@ -375,7 +373,7 @@ mod tests {
         assert!(
             limiter
                 .check_at(
-                    Bucket::Reads,
+                    Bucket::Writes,
                     key,
                     5,
                     TEN_MINUTES,
@@ -388,7 +386,7 @@ mod tests {
         assert!(
             limiter
                 .check_at(
-                    Bucket::Reads,
+                    Bucket::Writes,
                     key,
                     5,
                     TEN_MINUTES,

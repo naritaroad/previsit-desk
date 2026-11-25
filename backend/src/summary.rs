@@ -1,6 +1,8 @@
 //! The pre-visit summary for the clinician: built by the program from the intake fields (never from model prose),
 //! with an optional narrative paragraph written by the model after guard and personal-data checks.
 
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::PgPool;
@@ -50,6 +52,50 @@ pub struct PrevisitSummary {
     pub refill: Option<Value>,
     pub generated_by: GeneratedBy,
     pub disclaimer: String,
+    /// Bumped on every change of the intake or the summary; `PATCH /visits/{id}/summary` sends it back.
+    #[serde(default)]
+    pub revision: i32,
+    #[serde(default)]
+    pub edited_by_patient: bool,
+    /// What the doctor may still want to ask: fields nobody filled in, and questions the model listed.
+    #[serde(default)]
+    pub follow_up: Vec<String>,
+    /// Field key -> ids of the messages the value came from.
+    #[serde(default)]
+    pub evidence: BTreeMap<String, Vec<Uuid>>,
+}
+
+pub const MAX_FOLLOW_UP: usize = 8;
+
+/// The model's questions first, then one line per field that was not collected.
+pub fn follow_up_list(intake: &IntakeState, asked: &[String], locale: Locale) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for item in asked {
+        if !out.contains(item) && out.len() < MAX_FOLLOW_UP {
+            out.push(item.clone());
+        }
+    }
+    let missing = intake.missing();
+    if !missing.is_empty() {
+        out.push(fmt(
+            T::FollowUpMissing,
+            locale,
+            &[(
+                "fields",
+                &missing
+                    .iter()
+                    .map(|k| field_label(k, locale))
+                    .collect::<Vec<_>>()
+                    .join(if locale.is_en() { ", " } else { "、" }),
+            )],
+        ));
+    }
+    out
+}
+
+/// Evidence as stored on the visit; anything that does not parse is dropped.
+pub fn parse_evidence(value: &Value) -> BTreeMap<String, Vec<Uuid>> {
+    serde_json::from_value(value.clone()).unwrap_or_default()
 }
 
 fn shown(text: &str, locale: Locale) -> String {
@@ -170,6 +216,8 @@ pub struct SummaryInput<'a> {
     /// A checked model narrative; `None` uses the program's own.
     pub narrative: Option<String>,
     pub model: Option<String>,
+    /// Questions the model listed for the doctor, already checked.
+    pub follow_up: Vec<String>,
     pub now: OffsetDateTime,
 }
 
@@ -182,6 +230,7 @@ pub fn build(input: SummaryInput<'_>) -> PrevisitSummary {
         refill,
         narrative,
         model,
+        follow_up,
         now,
     } = input;
     let from_model = narrative.is_some();
@@ -220,6 +269,10 @@ pub fn build(input: SummaryInput<'_>) -> PrevisitSummary {
                 .unwrap_or_default(),
         },
         disclaimer: t(T::Disclaimer, locale).to_string(),
+        revision: 0,
+        edited_by_patient: false,
+        follow_up: follow_up_list(intake, &follow_up, locale),
+        evidence: BTreeMap::new(),
     }
 }
 
@@ -326,6 +379,7 @@ mod tests {
             refill: None,
             narrative: None,
             model: None,
+            follow_up: vec![],
             now: datetime!(2026-11-25 00:00 UTC),
         });
         assert_eq!(summary.chief_complaint, None);
@@ -350,6 +404,7 @@ mod tests {
             refill: None,
             narrative: Some("字".repeat(400)),
             model: Some("gemini-x".into()),
+            follow_up: vec![],
             now: datetime!(2026-11-25 00:00 UTC),
         });
         assert_eq!(summary.generated_by.kind, "model");
@@ -369,6 +424,7 @@ mod tests {
             refill: Some(json!({"outcome": "eligible"})),
             narrative: None,
             model: None,
+            follow_up: vec![],
             now: datetime!(2026-11-25 00:00 UTC),
         });
         let back: PrevisitSummary =
@@ -388,6 +444,7 @@ mod tests {
             refill: None,
             narrative: None,
             model: None,
+            follow_up: vec![],
             now: datetime!(2026-11-25 00:00 UTC),
         });
         assert!(

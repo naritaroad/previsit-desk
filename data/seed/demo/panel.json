@@ -1,0 +1,462 @@
+[
+  {
+    "key": "tsai",
+    "display_name": "蔡淑芬",
+    "display_name_en": "Shu-Fen Tsai",
+    "record": {
+      "age": 58,
+      "sex": "female",
+      "height_cm": 160,
+      "conditions": [
+        { "name": "高血壓", "since": "2016", "source": "clinic" }
+      ],
+      "medications": [],
+      "allergies": [],
+      "family_history": [{ "name": "父親心肌梗塞", "source": "patient" }],
+      "lifestyle": { "smoking": "不抽菸", "alcohol": "不喝酒", "exercise": "很少運動" },
+      "preferred_pharmacy": "ph-minsheng",
+      "care": { "status": "watch", "tags": ["高血壓"], "last_contact": -40 },
+      "measurements": [
+        { "kind": "bp", "time": "21:10", "points": [[-30, 152, 94], [-20, 149, 92], [-10, 155, 95], [-1, 158, 96]] }
+      ],
+      "prescriptions": [
+        { "drug_id": "telmisartan", "dose": "40 mg，每日一次，早餐後一顆", "dose_en": "40 mg, one tablet once a day after breakfast", "issued": -40, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-40, "ph-minsheng"]] },
+        { "drug_id": "amlodipine", "dose": "5 mg，每日一次，早餐後一顆", "dose_en": "5 mg, one tablet once a day after breakfast", "issued": -80, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-80, "ph-minsheng"], [-52, "ph-minsheng"], [-25, "ph-minsheng"]] }
+      ],
+      "visits": [
+        {
+          "key": "chest",
+          "day": 0,
+          "minutes_ago": 35,
+          "status": "red_flag",
+          "messages": [
+            ["assistant", "請先說說，您今天哪裡不舒服？"],
+            ["patient", "從昨天晚上開始很累，走樓梯會喘"],
+            ["assistant", "昨天晚上開始累，走樓梯會喘。休息的時候會喘嗎？"],
+            ["patient", "休息還好，可是剛剛胸口悶痛，痛到左邊肩膀"]
+          ],
+          "intake": {
+            "chief_complaint": "累、走樓梯會喘",
+            "hpi.onset": "昨天晚上"
+          },
+          "evidence": { "chief_complaint": [1], "hpi.onset": [1] }
+        }
+      ]
+    },
+    "notes": [
+      { "by": "coordinator", "day": -40, "time": "15:20", "body": "血壓在家量常常超過 150，提醒過按時吃藥。女兒可以一起來看診。", "pinned": true }
+    ],
+    "contacts": [],
+    "appointments": []
+  },
+  {
+    "key": "huang",
+    "display_name": "黃俊傑",
+    "display_name_en": "Chun-Chieh Huang",
+    "record": {
+      "age": 34,
+      "sex": "male",
+      "height_cm": 175,
+      "conditions": [],
+      "medications": [],
+      "allergies": [{ "name": "磺胺類藥物", "detail": "小時候起疹子", "source": "patient" }],
+      "family_history": [],
+      "lifestyle": { "smoking": "每天半包", "alcohol": "週末", "exercise": "沒有固定運動" },
+      "preferred_pharmacy": "ph-anhe",
+      "care": { "status": "new", "tags": [], "last_contact": null },
+      "measurements": [
+        { "kind": "weight", "time": "08:00", "points": [[-3, 81.2]] }
+      ],
+      "prescriptions": [
+        { "drug_id": "cetirizine", "dose": "10 mg，每日一次，睡前一顆", "dose_en": "10 mg, one tablet once a day at bedtime", "issued": -21, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-21, "ph-anhe"]] }
+      ],
+      "visits": [
+        {
+          "key": "cough",
+          "day": 0,
+          "minutes_ago": 95,
+          "status": "submitted",
+          "appointment": "today",
+          "messages": [
+            ["assistant", "請先說說，您今天哪裡不舒服？"],
+            ["patient", "咳嗽快兩個禮拜了，有痰"],
+            ["assistant", "咳嗽快兩個禮拜，有痰。痰是什麼顏色，有發燒嗎？"],
+            ["patient", "黃黃的，前幾天有燒到 38 度，現在沒有了"],
+            ["assistant", "痰黃黃的，前幾天燒過，現在退了。難受的程度，0 分是完全沒感覺，10 分是最難受，您會給幾分？"],
+            ["patient", "5 分吧，晚上比較厲害，會咳到睡不好"],
+            ["assistant", "5 分，晚上比較厲害。平常有在吃什麼藥嗎？對藥物或食物過敏的話也告訴我一聲。"],
+            ["patient", "沒吃藥，對磺胺藥過敏。沒有其他病，想問抽菸會不會比較難好"],
+            ["assistant", "我念給您聽：咳嗽快兩週，黃痰，前幾天燒到 38 度已退，晚上較嚴重，難受 5 分。沒有慢性病、沒吃藥，對磺胺藥過敏。想問抽菸會不會比較難好。請問這樣正確嗎？"],
+            ["patient", "正確"],
+            ["assistant", "摘要已送出，醫師看診前會看到。"]
+          ],
+          "intake": {
+            "chief_complaint": "咳嗽有痰",
+            "hpi.onset": "快兩週前",
+            "hpi.course": "前幾天燒到 38 度，已退；晚上較嚴重",
+            "hpi.character": "黃痰",
+            "hpi.severity": 5,
+            "hpi.associated": "咳到睡不好",
+            "past_history": [],
+            "medications": [],
+            "allergies": ["磺胺類藥物"],
+            "patient_questions": ["抽菸會不會比較難好"]
+          },
+          "evidence": { "chief_complaint": [1], "hpi.onset": [1], "hpi.course": [3, 5], "hpi.character": [3], "hpi.severity": [5], "hpi.associated": [5], "past_history": [7], "medications": [7], "allergies": [7] },
+          "follow_up": ["有沒有喘或胸痛", "同住的人有沒有類似症狀"]
+        }
+      ]
+    },
+    "notes": [],
+    "contacts": [],
+    "appointments": [
+      { "key": "today", "day": 0, "time": "10:15", "department": "家庭醫學科", "department_en": "Family medicine", "mode": "in_person", "room": "第 3 診間", "reason": "咳嗽" }
+    ]
+  },
+  {
+    "key": "lee",
+    "display_name": "李美玲",
+    "display_name_en": "Mei-Ling Lee",
+    "record": {
+      "age": 47,
+      "sex": "female",
+      "height_cm": 158,
+      "conditions": [{ "name": "偏頭痛", "since": "2010", "source": "clinic" }],
+      "medications": [{ "name": "維他命 B 群", "source": "patient" }],
+      "allergies": [],
+      "family_history": [{ "name": "母親偏頭痛", "source": "patient" }],
+      "lifestyle": { "smoking": "不抽菸", "alcohol": "偶爾紅酒", "exercise": "每週瑜伽兩次" },
+      "preferred_pharmacy": "ph-guangfu",
+      "care": { "status": "active", "tags": ["偏頭痛"], "last_contact": -9 },
+      "measurements": [
+        { "kind": "bp", "time": "20:00", "points": [[-14, 118, 74], [-7, 121, 76], [-1, 119, 75]] }
+      ],
+      "prescriptions": [
+        { "drug_id": "esomeprazole", "dose": "20 mg，每日一次，早餐前一顆", "dose_en": "20 mg, one tablet once a day before breakfast", "issued": -78, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-78, "ph-guangfu"], [-50, "ph-guangfu"], [-23, "ph-guangfu"]] }
+      ],
+      "visits": [
+        {
+          "key": "headache",
+          "day": -1,
+          "time": "20:40",
+          "status": "submitted",
+          "appointment": "today",
+          "assigned": "physician",
+          "messages": [
+            ["assistant", "請先說說，您今天哪裡不舒服？"],
+            ["patient", "頭痛變頻繁，這個月已經五次了"],
+            ["assistant", "這個月五次。痛在哪一邊，痛起來是什麼感覺？"],
+            ["patient", "右邊太陽穴，一陣一陣跳著痛，會怕光想吐"],
+            ["assistant", "右邊太陽穴跳痛，怕光想吐。難受的程度，0 分是完全沒感覺，10 分是最難受，您會給幾分？"],
+            ["patient", "最痛 8 分，躺在暗的地方睡一下會好。平常只吃 B 群，沒有過敏"]
+          ],
+          "intake": {
+            "chief_complaint": "頭痛變頻繁",
+            "hpi.onset": "這個月開始，共五次",
+            "hpi.course": "每次睡一下會好",
+            "hpi.location": "右側太陽穴",
+            "hpi.character": "一陣一陣跳痛",
+            "hpi.severity": 8,
+            "hpi.modifiers": "躺在暗處睡一下會緩解",
+            "hpi.associated": "怕光、想吐",
+            "past_history": ["偏頭痛"],
+            "medications": ["維他命 B 群"],
+            "allergies": []
+          },
+          "evidence": { "chief_complaint": [1], "hpi.onset": [1], "hpi.location": [3], "hpi.character": [3], "hpi.associated": [3], "hpi.severity": [5], "hpi.modifiers": [5], "medications": [5], "allergies": [5] },
+          "follow_up": ["頭痛和月經週期、睡眠的關係", "最近止痛藥一個月吃幾天"]
+        }
+      ]
+    },
+    "notes": [
+      { "by": "physician", "day": -9, "time": "11:30", "body": "下次看診確認止痛藥使用天數，必要時請她帶頭痛日記來。", "pinned": false }
+    ],
+    "contacts": [
+      { "by": "coordinator", "day": -9, "time": "16:10", "channel": "phone_note", "body": "電話提醒約診時間，病人說會先填預問診。" }
+    ],
+    "appointments": [
+      { "key": "today", "day": 0, "time": "09:30", "department": "家庭醫學科", "department_en": "Family medicine", "mode": "in_person", "room": "第 3 診間", "reason": "頭痛" }
+    ]
+  },
+  {
+    "key": "wang",
+    "display_name": "王建國",
+    "display_name_en": "Chien-Kuo Wang",
+    "record": {
+      "age": 66,
+      "sex": "male",
+      "height_cm": 168,
+      "conditions": [
+        { "name": "第二型糖尿病", "since": "2011", "source": "clinic" },
+        { "name": "高血壓", "since": "2009", "source": "clinic" }
+      ],
+      "medications": [],
+      "allergies": [],
+      "family_history": [],
+      "lifestyle": { "smoking": "不抽菸", "alcohol": "不喝酒", "exercise": "每天散步" },
+      "preferred_pharmacy": "ph-anhe",
+      "care": { "status": "active", "tags": ["糖尿病", "慢箋"], "last_contact": -3 },
+      "measurements": [
+        { "kind": "glucose", "time": "07:00", "points": [[-40, 162], [-33, 158], [-26, 151], [-19, 149], [-12, 143], [-5, 146]] },
+        { "kind": "bp", "time": "07:05", "points": [[-40, 136, 80], [-19, 134, 79], [-5, 131, 78]] },
+        { "kind": "lab", "name": "HbA1c", "unit": "%", "time": "09:00", "source": "clinic", "points": [[-95, 8.1], [-3, 7.4]] },
+        { "kind": "lab", "name": "eGFR", "unit": "mL/min", "time": "09:00", "source": "clinic", "points": [[-3, 71]] }
+      ],
+      "prescriptions": [
+        { "drug_id": "metformin", "dose": "500 mg，每日兩次，早晚餐後各一顆", "dose_en": "500 mg, one tablet twice a day after breakfast and dinner", "issued": -82, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-82, "ph-anhe"], [-54, "ph-anhe"], [-27, "ph-anhe"]] },
+        { "drug_id": "empagliflozin", "dose": "10 mg，每日一次，早餐後一顆", "dose_en": "10 mg, one tablet once a day after breakfast", "issued": -82, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-82, "ph-anhe"], [-54, "ph-anhe"], [-27, "ph-anhe"]] },
+        { "drug_id": "amlodipine", "dose": "5 mg，每日一次，早餐後一顆", "dose_en": "5 mg, one tablet once a day after breakfast", "issued": -20, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-20, "ph-anhe"]] }
+      ],
+      "visits": [
+        {
+          "key": "diabetes",
+          "day": -3,
+          "time": "08:15",
+          "status": "reviewed",
+          "messages": [
+            ["assistant", "請先說說，您今天哪裡不舒服？"],
+            ["patient", "回診看糖尿病，最近腳底有點麻"],
+            ["assistant", "腳底有點麻。多久了，兩腳都會嗎？"],
+            ["patient", "大概一個月，兩腳都會，晚上比較明顯，難受 3 分，沒有傷口"],
+            ["assistant", "一個月，兩腳都麻，晚上明顯，沒有傷口。檔案上有糖尿病和高血壓，現在還是一樣嗎？"],
+            ["patient", "一樣，沒有過敏"]
+          ],
+          "intake": {
+            "chief_complaint": "糖尿病回診，腳底麻",
+            "hpi.onset": "約一個月前",
+            "hpi.course": "晚上比較明顯",
+            "hpi.location": "兩腳腳底",
+            "hpi.severity": 3,
+            "hpi.associated": "沒有傷口",
+            "past_history": ["第二型糖尿病", "高血壓"],
+            "medications": ["Metformin", "Empagliflozin", "Amlodipine"],
+            "allergies": []
+          },
+          "evidence": { "chief_complaint": [1], "hpi.onset": [3], "hpi.course": [3], "hpi.location": [3], "hpi.severity": [3], "hpi.associated": [3], "past_history": [5], "allergies": [5] },
+          "note": {
+            "assessment": "糖尿病控制改善（HbA1c 8.1 → 7.4），雙足麻，需評估周邊神經病變。",
+            "plan": "安排足部檢查，原處方續用，三個月後追蹤 HbA1c。",
+            "patient_message": "血糖比上次進步。腳麻我們會安排檢查，這段時間每天看一下腳底有沒有傷口，不要赤腳走路。",
+            "addenda": ["足部單股纖維檢查已排下週三。"]
+          }
+        }
+      ]
+    },
+    "notes": [
+      { "by": "coordinator", "day": -3, "time": "14:00", "body": "足部檢查單已開，約下週三上午。", "pinned": false }
+    ],
+    "contacts": [],
+    "appointments": [
+      { "key": "past", "day": -3, "time": "09:00", "department": "慢性病門診", "department_en": "Chronic care clinic", "mode": "in_person", "room": "第 3 診間", "reason": "糖尿病回診" }
+    ]
+  },
+  {
+    "key": "chou",
+    "display_name": "周雅婷",
+    "display_name_en": "Ya-Ting Chou",
+    "record": {
+      "age": 29,
+      "sex": "female",
+      "height_cm": 163,
+      "conditions": [],
+      "medications": [],
+      "allergies": [{ "name": "蝦子", "detail": "嘴唇腫", "source": "patient" }],
+      "family_history": [],
+      "lifestyle": { "smoking": "不抽菸", "alcohol": "不喝酒", "exercise": "每週慢跑" },
+      "preferred_pharmacy": "ph-guangfu",
+      "care": { "status": "new", "tags": [], "last_contact": null },
+      "measurements": [],
+      "prescriptions": [],
+      "visits": [
+        {
+          "key": "stomach",
+          "day": 0,
+          "minutes_ago": 12,
+          "status": "active",
+          "appointment": "today",
+          "messages": [
+            ["assistant", "請先說說，您今天哪裡不舒服？"],
+            ["patient", "胃痛三天，吃飽會比較痛"],
+            ["assistant", "胃痛三天，吃飽比較痛。是悶痛、絞痛，還是像火在燒？"]
+          ],
+          "intake": {
+            "chief_complaint": "胃痛",
+            "hpi.onset": "三天前",
+            "hpi.modifiers": "吃飽會比較痛"
+          },
+          "evidence": { "chief_complaint": [1], "hpi.onset": [1], "hpi.modifiers": [1] }
+        }
+      ]
+    },
+    "notes": [],
+    "contacts": [],
+    "appointments": [
+      { "key": "today", "day": 0, "time": "11:15", "department": "家庭醫學科", "department_en": "Family medicine", "mode": "in_person", "room": "第 3 診間", "reason": "胃痛" }
+    ]
+  },
+  {
+    "key": "cheng",
+    "display_name": "鄭文雄",
+    "display_name_en": "Wen-Hsiung Cheng",
+    "record": {
+      "age": 73,
+      "sex": "male",
+      "height_cm": 166,
+      "conditions": [
+        { "name": "退化性膝關節炎", "since": "2017", "source": "clinic" },
+        { "name": "高血壓", "since": "2005", "source": "clinic" }
+      ],
+      "medications": [{ "name": "葡萄糖胺", "detail": "自己買", "source": "patient" }],
+      "allergies": [],
+      "family_history": [],
+      "lifestyle": { "smoking": "不抽菸", "alcohol": "不喝酒", "exercise": "膝蓋痛，很少走路" },
+      "preferred_pharmacy": "ph-heping",
+      "care": { "status": "watch", "tags": ["長者", "膝關節"], "last_contact": 0 },
+      "measurements": [
+        { "kind": "bp", "time": "08:30", "points": [[-21, 139, 82], [-7, 141, 84]] },
+        { "kind": "weight", "time": "08:20", "points": [[-21, 79.0], [-7, 79.4]] }
+      ],
+      "prescriptions": [
+        { "drug_id": "valsartan", "dose": "80 mg，每日一次，早餐後一顆", "dose_en": "80 mg, one tablet once a day after breakfast", "issued": -60, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-60, "ph-heping"], [-32, "ph-heping"]] },
+        { "drug_id": "bisoprolol", "dose": "2.5 mg，每日一次，早餐後一顆", "dose_en": "2.5 mg, one tablet once a day after breakfast", "issued": -49, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-49, "ph-heping"], [-21, "ph-heping"]] },
+        { "drug_id": "rosuvastatin", "dose": "5 mg，每日一次，睡前一顆", "dose_en": "5 mg, one tablet once a day at bedtime", "issued": -79, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-79, "ph-heping"], [-51, "ph-heping"], [-24, "ph-heping"]] }
+      ],
+      "visits": [
+        {
+          "key": "knee",
+          "day": 0,
+          "minutes_ago": 150,
+          "status": "active",
+          "mode": "human",
+          "assigned": "coordinator",
+          "messages": [
+            ["assistant", "請先說說，您今天哪裡不舒服？"],
+            ["patient", "膝蓋痛，想問能不能請人打電話給我，我眼睛不好打字慢"],
+            ["assistant", "膝蓋痛。我把您的需求轉給醫療團隊，他們會跟您聯絡。"],
+            ["staff:coordinator", "鄭伯伯您好，我是許雅雯。膝蓋是這幾天比較痛，還是一直都這樣？您用語音輸入也可以，慢慢來。"],
+            ["patient", "這兩天下雨比較痛"],
+            ["staff:coordinator", "好，我幫您約禮拜四下午看診。這幾天先少爬樓梯。您方便的時間跟我說一聲。"]
+          ],
+          "intake": {
+            "chief_complaint": "膝蓋痛",
+            "hpi.onset": "這兩天",
+            "hpi.modifiers": "下雨天比較痛"
+          },
+          "evidence": { "chief_complaint": [1], "hpi.onset": [4], "hpi.modifiers": [4] },
+          "ticket": { "reason": "patient_request", "urgency": "routine", "summary": "病人請醫療團隊聯絡，打字不方便。", "created_by": "model", "resolved_by": "coordinator", "resolution": "已在站內訊息聯絡。" }
+        }
+      ]
+    },
+    "notes": [
+      { "by": "coordinator", "day": -7, "time": "10:30", "body": "視力不好，訊息用短句；兒子週末會陪同。", "pinned": true }
+    ],
+    "contacts": [
+      { "by": "coordinator", "day": -7, "time": "10:25", "channel": "phone_note", "body": "電話說明怎麼用語音輸入填預問診。" }
+    ],
+    "appointments": []
+  },
+  {
+    "key": "kuo",
+    "display_name": "郭家豪",
+    "display_name_en": "Chia-Hao Kuo",
+    "record": {
+      "age": 52,
+      "sex": "male",
+      "height_cm": 174,
+      "conditions": [
+        { "name": "痛風", "since": "2015", "source": "clinic" },
+        { "name": "高血脂", "since": "2019", "source": "clinic" }
+      ],
+      "medications": [],
+      "allergies": [],
+      "family_history": [{ "name": "父親痛風", "source": "patient" }],
+      "lifestyle": { "smoking": "不抽菸", "alcohol": "應酬時喝", "exercise": "週末打羽球" },
+      "preferred_pharmacy": "ph-guangfu",
+      "care": { "status": "active", "tags": ["痛風"], "last_contact": -8 },
+      "measurements": [
+        { "kind": "weight", "time": "07:45", "points": [[-50, 86.3], [-20, 85.6], [-8, 85.1]] },
+        { "kind": "lab", "name": "尿酸", "unit": "mg/dL", "time": "09:20", "source": "clinic", "points": [[-99, 8.4], [-8, 6.2]] }
+      ],
+      "prescriptions": [
+        { "drug_id": "febuxostat", "dose": "40 mg，每日一次，早餐後一顆", "dose_en": "40 mg, one tablet once a day after breakfast", "issued": -80, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-80, "ph-guangfu"], [-52, "ph-guangfu"], [-25, "ph-guangfu"]] },
+        { "drug_id": "pitavastatin", "dose": "2 mg，每日一次，睡前一顆", "dose_en": "2 mg, one tablet once a day at bedtime", "issued": -21, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-21, "ph-guangfu"]] }
+      ],
+      "visits": [
+        {
+          "key": "gout",
+          "day": -8,
+          "time": "19:30",
+          "status": "reviewed",
+          "messages": [
+            ["assistant", "請先說說，您今天哪裡不舒服？"],
+            ["patient", "上個月大拇趾又發作一次，現在好了，要回診看尿酸"],
+            ["assistant", "上個月發作一次，現在好了。發作時痛幾天，痛到幾分？"],
+            ["patient", "三天，最痛 7 分，腳趾紅腫。吃海鮮隔天就發作"]
+          ],
+          "intake": {
+            "chief_complaint": "痛風回診",
+            "hpi.onset": "上個月發作一次",
+            "hpi.course": "痛三天後好了",
+            "hpi.location": "大拇趾",
+            "hpi.severity": 7,
+            "hpi.modifiers": "吃海鮮隔天發作",
+            "hpi.associated": "紅腫",
+            "past_history": ["痛風", "高血脂"],
+            "medications": ["非布索坦", "匹伐他汀"],
+            "allergies": []
+          },
+          "evidence": { "chief_complaint": [1], "hpi.onset": [1], "hpi.course": [3], "hpi.location": [1], "hpi.severity": [3], "hpi.modifiers": [3], "hpi.associated": [3] },
+          "note": {
+            "assessment": "痛風，尿酸 6.2，比前次下降。",
+            "plan": "原處方續用，飲食衛教，三個月後抽血。",
+            "patient_message": "尿酸降到 6.2，比上次好很多。海鮮和啤酒還是要少，多喝水。再發作請記下日期和前一天吃了什麼。"
+          }
+        }
+      ]
+    },
+    "notes": [],
+    "contacts": [],
+    "appointments": [
+      { "key": "past", "day": -8, "time": "10:00", "department": "家庭醫學科", "department_en": "Family medicine", "mode": "video", "room": null, "reason": "痛風回診" }
+    ]
+  },
+  {
+    "key": "yang",
+    "display_name": "楊麗華",
+    "display_name_en": "Li-Hua Yang",
+    "record": {
+      "age": 63,
+      "sex": "female",
+      "height_cm": 154,
+      "conditions": [
+        { "name": "甲狀腺功能低下", "since": "2013", "source": "clinic" },
+        { "name": "骨質疏鬆", "since": "2021", "source": "clinic" }
+      ],
+      "medications": [{ "name": "鈣片", "source": "patient" }],
+      "allergies": [{ "name": "碘顯影劑", "detail": "打針後全身癢", "source": "clinic" }],
+      "family_history": [],
+      "lifestyle": { "smoking": "不抽菸", "alcohol": "不喝酒", "exercise": "早上健走" },
+      "preferred_pharmacy": "ph-anhe",
+      "care": { "status": "active", "tags": ["甲狀腺", "慢箋"], "last_contact": -30 },
+      "measurements": [
+        { "kind": "weight", "time": "07:30", "points": [[-60, 55.0], [-30, 55.4], [-2, 55.9]] },
+        { "kind": "lab", "name": "TSH", "unit": "mIU/L", "time": "08:50", "source": "clinic", "points": [[-130, 3.4], [-34, 4.1]] }
+      ],
+      "prescriptions": [
+        { "drug_id": "levothyroxine", "dose": "50 mcg，每日一次，空腹一顆", "dose_en": "50 mcg, one tablet once a day on an empty stomach", "issued": -34, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-34, "ph-anhe"], [-7, "ph-anhe"]] },
+        { "drug_id": "atorvastatin", "dose": "10 mg，每日一次，睡前一顆", "dose_en": "10 mg, one tablet once a day at bedtime", "issued": -81, "total_days": 84, "days_per_fill": 28, "fills_allowed": 3, "fills": [[-81, "ph-anhe"], [-53, "ph-anhe"], [-26, "ph-anhe"]] }
+      ],
+      "visits": []
+    },
+    "notes": [
+      { "by": "physician", "day": -34, "time": "11:50", "body": "TSH 4.1，下次抽血再看，暫不更動。", "pinned": false }
+    ],
+    "contacts": [
+      { "by": "coordinator", "day": -30, "time": "09:40", "channel": "phone_note", "body": "提醒領藥時間，病人說下週會去安和示範藥局。" }
+    ],
+    "appointments": [
+      { "key": "next", "day": 1, "time": "09:45", "department": "家庭醫學科", "department_en": "Family medicine", "mode": "in_person", "room": "第 3 診間", "reason": "甲狀腺追蹤" },
+      { "key": "today", "day": 0, "time": "14:30", "department": "慢性病門診", "department_en": "Chronic care clinic", "mode": "video", "room": null, "reason": "領藥後說明" }
+    ]
+  }
+]

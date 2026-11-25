@@ -2,7 +2,7 @@
 //! `data/seed/refill_rules.csv`. No model is involved. Output is one of four outcomes.
 //!
 //! Date convention: `supply_end = last_fill_date + days_per_fill` (the first day without medicine). The refill window
-//! is `[supply_end - early_window_days, prescription_date + total_days]`. After `supply_end` the refill is still allowed,
+//! is `[supply_end - early_window_days, prescription_date + total_days - 1]`. After `supply_end` the refill is still allowed,
 //! with a reminder about the gap. Every `consult` opens a clinician ticket.
 
 use std::collections::BTreeMap;
@@ -32,6 +32,8 @@ pub struct RuleEntry {
     pub key: String,
     pub value: String,
     pub source_url: String,
+    pub unit: String,
+    pub verified_on: String,
     pub text_zh: Option<String>,
     pub text_en: Option<String>,
 }
@@ -66,6 +68,7 @@ impl RefillRules {
             col("source_url").context("missing column source_url")?,
         );
         let (c_zh, c_en) = (col("text_zh"), col("text_en"));
+        let (c_unit, c_verified) = (col("unit"), col("verified_on"));
         let mut entries = Vec::new();
         for row in reader.records() {
             let row = row?;
@@ -83,6 +86,8 @@ impl RefillRules {
                 key,
                 value: row.get(c_value).unwrap_or("").trim().to_string(),
                 source_url: row.get(c_url).unwrap_or("").trim().to_string(),
+                unit: optional(c_unit).unwrap_or_default(),
+                verified_on: optional(c_verified).unwrap_or_default(),
                 text_zh: optional(c_zh),
                 text_en: optional(c_en),
             });
@@ -170,6 +175,34 @@ impl RefillRules {
     pub fn len(&self) -> usize {
         self.entries.len()
     }
+
+    /// The rules as the read-only pages show them.
+    pub fn list(&self, locale: Locale) -> Vec<RuleListItem> {
+        self.entries
+            .iter()
+            .map(|e| RuleListItem {
+                key: e.key.clone(),
+                value: e.value.clone(),
+                unit: e.unit.clone(),
+                text: self
+                    .rule_out(&e.key, locale)
+                    .map(|r| r.text)
+                    .unwrap_or_default(),
+                source_url: e.source_url.clone(),
+                verified_on: e.verified_on.clone(),
+            })
+            .collect()
+    }
+}
+
+#[derive(Debug, Clone, Serialize, PartialEq)]
+pub struct RuleListItem {
+    pub key: String,
+    pub value: String,
+    pub unit: String,
+    pub text: String,
+    pub source_url: String,
+    pub verified_on: String,
 }
 
 // ---------------------------------------------------------------------------
@@ -464,6 +497,11 @@ fn days(date: Date, n: i64) -> Date {
     date.checked_add(Duration::days(n)).unwrap_or(Date::MAX)
 }
 
+/// The last day a chronic prescription can be dispensed: the last day of use of its final fill.
+pub fn last_valid_day(prescription_date: Date, total_days: i64) -> Date {
+    days(prescription_date, total_days - 1)
+}
+
 /// Ticket reason by priority: controlled drug > symptom change > side effects > special status > other.
 fn ticket_reason(codes: &[&str]) -> (TicketReason, Urgency) {
     let has = |c: &str| codes.contains(&c);
@@ -487,7 +525,9 @@ pub fn check(input: &Checked, rules: &RefillRules, locale: Locale) -> Evaluation
         text: fmt(key, locale, args),
     };
     let today_text = format_date(input.today);
-    let latest = days(input.prescription_date, input.total_days);
+    // The prescription is valid until the last day the final fill is taken. Dispensed on schedule, day 1 is the
+    // prescription date, so that is total_days - 1 days later (the conservative reading).
+    let latest = last_valid_day(input.prescription_date, input.total_days);
     let make = |outcome: RefillOutcome,
                 title: T,
                 message: String,
@@ -785,7 +825,7 @@ mod tests {
     #[test]
     fn window_boundaries() {
         let r = rules();
-        // supply_end = D+30, window opens D+20, prescription valid through D+90.
+        // supply_end = D+30, window opens D+20, prescription valid through D+89 (90 days counting D).
         let at = |n| check(&base(n), &r, Locale::ZhTw).result;
         assert_eq!(at(30).outcome, RefillOutcome::Eligible);
         assert!(at(30).reasons.iter().all(|x| x.code != "supply_gap"));
@@ -796,15 +836,16 @@ mod tests {
             "a gap reminder after the supply ran out"
         );
         assert_eq!(
-            at(90).outcome,
+            at(89).outcome,
             RefillOutcome::Eligible,
             "the last valid day"
         );
-        assert_eq!(at(91).outcome, RefillOutcome::Revisit);
+        assert_eq!(at(90).outcome, RefillOutcome::Revisit);
+        assert_eq!(last_valid_day(d(0), 90), d(89));
         let eligible = at(25);
         assert_eq!(
             eligible.latest_date.as_deref(),
-            Some(format_date(d(90)).as_str())
+            Some(format_date(d(89)).as_str())
         );
         assert_eq!(eligible.next_fill_number, Some(2));
     }

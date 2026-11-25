@@ -1,0 +1,54 @@
+[
+  {
+    "id": "ph-anhe",
+    "name": "安和示範藥局",
+    "name_en": "Anhe Demo Pharmacy",
+    "district": "示範區安和里",
+    "district_en": "Anhe, Demo District",
+    "address": "示範區安和路 12 號 1 樓",
+    "address_en": "1F, 12 Anhe Rd., Demo District",
+    "hours": "週一至週五 08:30–21:30，週六 09:00–18:00",
+    "hours_en": "Mon–Fri 08:30–21:30, Sat 09:00–18:00",
+    "services": ["慢箋調劑", "用藥諮詢", "量血壓"],
+    "services_en": ["Refill dispensing", "Medicine counselling", "Blood pressure check"]
+  },
+  {
+    "id": "ph-minsheng",
+    "name": "民生示範藥局",
+    "name_en": "Minsheng Demo Pharmacy",
+    "district": "示範區民生里",
+    "district_en": "Minsheng, Demo District",
+    "address": "示範區民生東路 88 號",
+    "address_en": "88 Minsheng E. Rd., Demo District",
+    "hours": "每日 09:00–22:00",
+    "hours_en": "Daily 09:00–22:00",
+    "services": ["慢箋調劑", "用藥諮詢", "藥盒分裝"],
+    "services_en": ["Refill dispensing", "Medicine counselling", "Pill organiser filling"]
+  },
+  {
+    "id": "ph-heping",
+    "name": "和平示範藥局",
+    "name_en": "Heping Demo Pharmacy",
+    "district": "示範區和平里",
+    "district_en": "Heping, Demo District",
+    "address": "示範區和平街 5 巷 3 號",
+    "address_en": "3, Lane 5, Heping St., Demo District",
+    "hours": "週一至週六 08:00–20:00",
+    "hours_en": "Mon–Sat 08:00–20:00",
+    "services": ["慢箋調劑", "吸入器使用指導"],
+    "services_en": ["Refill dispensing", "Inhaler technique coaching"]
+  },
+  {
+    "id": "ph-guangfu",
+    "name": "光復示範藥局",
+    "name_en": "Guangfu Demo Pharmacy",
+    "district": "示範區光復里",
+    "district_en": "Guangfu, Demo District",
+    "address": "示範區光復南路 201 號",
+    "address_en": "201 Guangfu S. Rd., Demo District",
+    "hours": "週一至週日 10:00–21:00",
+    "hours_en": "Daily 10:00–21:00",
+    "services": ["慢箋調劑", "血糖機租借", "用藥諮詢"],
+    "services_en": ["Refill dispensing", "Glucose meter loan", "Medicine counselling"]
+  }
+]

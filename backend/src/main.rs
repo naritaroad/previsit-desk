@@ -5,33 +5,46 @@
 //!   previsit-api eval [...]    run data/eval/cases.jsonl against the configured model
 //!   previsit-api healthcheck   GET /api/v1/health on the local port; exit 0 on 200, else 1 (for container health checks)
 
+mod admin;
+mod appts;
 mod audit;
 mod auth;
+mod clinic;
 mod clock;
 mod config;
 mod demo;
 mod engine;
 mod error;
 mod eval;
+mod events;
 mod guard;
 mod health_edu;
 mod http;
 mod hub;
 mod idem;
 mod intake;
+#[cfg(test)]
+mod itest;
+mod jobs;
 mod limits;
 mod llm;
 mod me;
+mod measure;
+mod notes;
 mod notify;
 mod page;
+mod patient;
 mod people;
 mod perm;
 mod pii;
 mod precheck;
+mod profile;
 mod prompt;
+mod public;
 mod refill;
 mod routes;
 mod rx;
+mod rxq;
 mod settings;
 mod sse;
 mod state;
@@ -41,6 +54,7 @@ mod texts;
 mod tickets;
 mod tools;
 mod types;
+mod visit_routes;
 mod visits;
 
 use std::path::{Path, PathBuf};
@@ -89,7 +103,9 @@ fn enter_project_root() {
             if env_file.is_file() {
                 // A line that does not parse (a value with spaces and no quotes) drops everything after it.
                 if let Err(dotenvy::Error::LineParse(_, at)) = dotenvy::from_path(&env_file) {
-                    eprintln!(".env: a line could not be read (column {at}); later lines are ignored");
+                    eprintln!(
+                        ".env: a line could not be read (column {at}); later lines are ignored"
+                    );
                 }
             }
             let _ = std::env::set_current_dir(&root);
@@ -147,9 +163,10 @@ fn check_data(data_dir: &Path) -> Result<()> {
     }
     let demo = DemoData::load(data_dir)?;
     println!(
-        "demo              {} accounts, {} personas",
+        "demo              {} accounts, {} personas, {} panel patients",
         demo.accounts.len(),
-        demo.personas.len()
+        demo.personas.len(),
+        demo.panel_len()
     );
     for line in rx::check_data(data_dir)? {
         println!("{line}");
@@ -264,11 +281,6 @@ async fn build_state(
         Mode::Eval { .. } => SettingsStore::fixed(Settings::defaults(&config)),
     };
     let clock = Clock::system();
-    match visits::cleanup(&db, clock.retention_cutoff(settings.get().retention_days)).await {
-        Ok(n) if n > 0 => tracing::info!(deleted = n, "removed visits past the retention period"),
-        Ok(_) => {}
-        Err(e) => tracing::warn!(error = %e, "retention sweep failed"),
-    }
     Ok(AppState {
         db,
         config,
@@ -345,32 +357,21 @@ async fn serve() -> Result<()> {
     let config = Config::from_env()?;
     let (stop, stopping) = watch::channel(false);
     let state = build_state(config, Mode::Serve, stopping).await?;
-    let config = state.config.clone();
-    tracing::info!(addr = %config.bind, model = %config.model, fallback = ?config.model_fallback, thinking = ?config.thinking, model_ready = config.model_ready(), handbook_sections = state.handbook.section_count(), "listening");
-
-    // Daily retention sweep.
-    let sweep = state.clone();
-    tokio::spawn(async move {
-        let mut tick = tokio::time::interval(Duration::from_secs(6 * 3600));
-        tick.tick().await;
-        loop {
-            tick.tick().await;
-            match visits::cleanup(
-                &sweep.db,
-                sweep
-                    .clock
-                    .retention_cutoff(sweep.settings.get().retention_days),
-            )
+    let interrupted = visits::mark_interrupted(&state).await?;
+    if !interrupted.is_empty() {
+        tracing::warn!(
+            turns = interrupted.len(),
+            "turns were cut off by the last stop; patients can retry them"
+        );
+        engine::finish_interrupted_red_flags(&state, &interrupted)
             .await
-            {
-                Ok(n) if n > 0 => {
-                    tracing::info!(deleted = n, "removed visits past the retention period")
-                }
-                Ok(_) => {}
-                Err(e) => tracing::warn!(error = %e, "retention sweep failed"),
-            }
-        }
-    });
+            .map_err(|e| anyhow::anyhow!("screen interrupted turns: {e}"))?;
+    }
+    let config = state.config.clone();
+    tracing::info!(addr = %config.bind, model = %config.model, fallback = ?config.model_fallback, thinking = ?config.thinking, model_ready = config.model_ready(&config.model), handbook_sections = state.handbook.section_count(), "listening");
+
+    // Retention, guests, reminders and the demo data; the first round runs right away.
+    jobs::spawn(state.clone());
 
     let listener = tokio::net::TcpListener::bind(config.bind)
         .await

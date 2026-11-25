@@ -56,6 +56,7 @@ impl SourceType {
 
 #[derive(Debug, Clone)]
 pub struct Chunk {
+    pub chapter: String,
     pub section: String,
     pub title: String,
     pub text: String,
@@ -63,6 +64,19 @@ pub struct Chunk {
     pub source_name: String,
     pub source_url: Option<String>,
     pub verified_on: Date,
+}
+
+/// One section of the handbook, for the public handbook page.
+#[derive(Debug, Clone, Serialize)]
+pub struct Section {
+    pub section: String,
+    pub title: String,
+    pub chapter: String,
+    pub text: String,
+    pub source_type: SourceType,
+    pub source_name: String,
+    pub source_url: Option<String>,
+    pub verified_on: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -377,9 +391,9 @@ impl Handbook {
                 if parts.is_empty() {
                     bail!("{section} {title}: the section has no text");
                 }
-                let _ = &chapter;
                 for text in parts {
                     chunks.push(Chunk {
+                        chapter: chapter.clone(),
                         section: section.clone(),
                         title: title.clone(),
                         text,
@@ -423,6 +437,30 @@ impl Handbook {
             .map(|c| c.section.as_str())
             .collect::<HashSet<_>>()
             .len()
+    }
+
+    /// Whole sections in handbook order (search chunks of one section put back together).
+    pub fn sections(&self) -> Vec<Section> {
+        let mut out: Vec<Section> = Vec::new();
+        for chunk in &self.chunks {
+            match out.last_mut().filter(|s| s.section == chunk.section) {
+                Some(section) => {
+                    section.text.push_str("\n\n");
+                    section.text.push_str(&chunk.text);
+                }
+                None => out.push(Section {
+                    section: chunk.section.clone(),
+                    title: chunk.title.clone(),
+                    chapter: chunk.chapter.clone(),
+                    text: chunk.text.clone(),
+                    source_type: chunk.source_type,
+                    source_name: chunk.source_name.clone(),
+                    source_url: chunk.source_url.clone(),
+                    verified_on: crate::clock::format_date(chunk.verified_on),
+                }),
+            }
+        }
+        out
     }
 
     pub fn chunk_count(&self) -> usize {

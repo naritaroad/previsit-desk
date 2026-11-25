@@ -15,6 +15,7 @@ macro_rules! named_enum {
         impl $name {
             pub const ALL: &'static [$name] = &[$($name::$var),+];
 
+            #[allow(dead_code)]
             pub fn as_str(self) -> &'static str {
                 match self {
                     $($name::$var => $text),+
